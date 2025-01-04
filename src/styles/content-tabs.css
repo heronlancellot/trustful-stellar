@@ -1,0 +1,27 @@
+.tab-active {
+  transition: border-bottom-color 0.3s ease-in-out;
+  border-bottom: 1px solid theme("colors.brandGreen") !important;
+  span {
+    color: theme("colors.brandWhite") !important;
+  }
+}
+
+.tab {
+  transition: border-bottom-color 0.3s ease-in-out;
+  border-bottom: 1px solid theme("colors.whiteOpacity008");
+  span {
+    color: theme("colors.whiteOpacity05");
+    transition: color 0.3s ease-in-out;
+  }
+}
+
+.tab:hover {
+  border-bottom: 1px solid theme("colors.whiteOpacity05");
+  span {
+    color: theme("colors.brandWhite");
+  }
+}
+
+.nav-bar {
+  border-bottom: 1px solid theme("colors.whiteOpacity008");
+}

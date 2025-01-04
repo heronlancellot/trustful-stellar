@@ -1,0 +1,12 @@
+.custom-table {
+  width: 100%;
+  table-layout: fixed;
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0px;
+  border: 1px solid theme("colors.whiteOpacity008");
+  th,
+  td {
+    border-bottom: 1px solid theme("colors.whiteOpacity008");
+  }
+}
