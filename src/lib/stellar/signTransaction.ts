@@ -2,6 +2,8 @@ import { kit } from "@/components/auth/ConnectStellarWallet";
 import { WalletNetwork } from "@creit.tech/stellar-wallets-kit";
 import * as StellarSdk from "@stellar/stellar-sdk";
 import toast from "react-hot-toast";
+import { isTestnet } from "@/lib/wallet/chains";
+
 
 const signTransaction = async (transactionXdr: string) => {
   const { address } = await kit.getAddress();
@@ -33,10 +35,14 @@ export const sendSignedTransaction = async (
   transactionXdr: string,
   userAddress: string
 ) => {
+  const testnet = process.env.NEXT_PUBLIC_TESTNET_NETWORK ?? ""
+  const publicNetwork = process.env.NEXT_PUBLIC_NETWORK ?? ""
+
   try {
     const network = StellarSdk.Networks.PUBLIC;
     const horizonServer = new StellarSdk.Horizon.Server(
-      "https://horizon.stellar.org"
+      isTestnet ? testnet : publicNetwork
+
     );
 
     // 2. Re build the original transaction
