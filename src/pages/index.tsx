@@ -27,7 +27,7 @@ const HomePage = () => {
           </div>
           <div className="pr-[5%] pt-[2%] pb-[2%] flex flex-col h-full w-full justify-around">
             <CardLink
-              title="Issue Badge"
+              title="Communities"
               mainIcon={
                 <BadgeIcon
                   color={tailwindConfig.theme.extend.colors.brandGreen}
@@ -38,7 +38,7 @@ const HomePage = () => {
                   color={tailwindConfig.theme.extend.colors.brandBlack}
                 />
               }
-              onClick={() => router.push("/issue-badge")}
+              onClick={() => router.push("/communities")}
             />
             <CardLink
               title="Verify Reputation"

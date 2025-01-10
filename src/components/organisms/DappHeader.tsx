@@ -25,12 +25,12 @@ export const DappHeader = () => {
           <div className="flex h-full">
             <div
               className={cc([
-                { "tab-active": path.includes("issue-badge") },
+                { "tab-active": path.includes("communities") },
                 "tab p-2 px-4 items-center flex",
               ])}
-              onClick={() => router.push("/issue-badge")}
+              onClick={() => router.push("/communities")}
             >
-              <span>Issue Badge</span>
+              <span>Communities</span>
             </div>
             <div
               className={cc([
@@ -51,7 +51,7 @@ export const DappHeader = () => {
               <span>FAQ</span>
             </div>
           </div>
-          
+
         )}
       </div>
       <div className="flex flex-row">
