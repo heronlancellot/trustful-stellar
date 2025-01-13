@@ -2,7 +2,7 @@ import { CardLink } from "@/components/atoms/CardLink";
 import { BlockfulCredits } from "@/components/atoms/homepage/BlockfulCredits";
 import { HomepageBackground } from "@/components/atoms/homepage/HomepageBackground";
 import { ArrowRightIcon } from "@/components/atoms/icons/ArrowRightIcon";
-import { BadgeIcon } from "@/components/atoms/icons/BadgeIcon";
+import { CommunitiesIcon } from "@/components/atoms/icons/CommunitiesIcon";
 import { VerifyReputationIcon } from "@/components/atoms/icons/VerifyReputationIcon";
 import { useRouter } from "next/router";
 import ScrollBar from "react-perfect-scrollbar";
@@ -29,7 +29,7 @@ const HomePage = () => {
             <CardLink
               title="Communities"
               mainIcon={
-                <BadgeIcon
+                <CommunitiesIcon
                   color={tailwindConfig.theme.extend.colors.brandGreen}
                 />
               }
