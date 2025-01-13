@@ -174,7 +174,7 @@ export default function IssueBadgePage() {
   return (
     <PageTemplate
       className=""
-      title={"Generate Attestation"}
+      title={"Communities"}
       tooltip={{
         tooltipId: "generate-attestation-tip",
         tooltipText:

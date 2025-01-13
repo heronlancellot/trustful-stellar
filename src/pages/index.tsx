@@ -2,7 +2,7 @@ import { CardLink } from "@/components/atoms/CardLink";
 import { BlockfulCredits } from "@/components/atoms/homepage/BlockfulCredits";
 import { HomepageBackground } from "@/components/atoms/homepage/HomepageBackground";
 import { ArrowRightIcon } from "@/components/atoms/icons/ArrowRightIcon";
-import { BadgeIcon } from "@/components/atoms/icons/BadgeIcon";
+import { CommunitiesIcon } from "@/components/atoms/icons/CommunitiesIcon";
 import { VerifyReputationIcon } from "@/components/atoms/icons/VerifyReputationIcon";
 import { useRouter } from "next/router";
 import ScrollBar from "react-perfect-scrollbar";
@@ -27,9 +27,9 @@ const HomePage = () => {
           </div>
           <div className="pr-[5%] pt-[2%] pb-[2%] flex flex-col h-full w-full justify-around">
             <CardLink
-              title="Issue Badge"
+              title="Communities"
               mainIcon={
-                <BadgeIcon
+                <CommunitiesIcon
                   color={tailwindConfig.theme.extend.colors.brandGreen}
                 />
               }
@@ -38,7 +38,7 @@ const HomePage = () => {
                   color={tailwindConfig.theme.extend.colors.brandBlack}
                 />
               }
-              onClick={() => router.push("/issue-badge")}
+              onClick={() => router.push("/communities")}
             />
             <CardLink
               title="Verify Reputation"
