@@ -183,7 +183,7 @@ export default function IssueBadgePage() {
     >
       <ContentTabs
         tabs={{
-          Import: {
+          All: {
             content: (
               <CardWrapper>
                 {Object.keys(communityQuests).map((questName) => {
@@ -209,6 +209,87 @@ export default function IssueBadgePage() {
               </CardWrapper>
             ),
             tabNumber: 1,
+          },
+          Joined: {
+            content: (
+              <CardWrapper>
+                {Object.keys(communityQuests).map((questName) => {
+                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
+                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
+                    if (questIsFullyImported(questName) === undefined) {
+                      return;
+                    }
+                  }
+                  return (
+                    <AttestationBadge
+                      key={questName}
+                      title={convertQuestNameToPresentation(questName)}
+                      icon={getQuestIcon(questName)}
+                      imported={questIsFullyImported(questName)}
+                      onClick={() => {
+                        setImportModalOpen(true);
+                        setSelectedQuestName(questName);
+                      }}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 2,
+          },
+          Created: {
+            content: (
+              <CardWrapper>
+                {Object.keys(communityQuests).map((questName) => {
+                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
+                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
+                    if (questIsFullyImported(questName) === undefined) {
+                      return;
+                    }
+                  }
+                  return (
+                    <AttestationBadge
+                      key={questName}
+                      title={convertQuestNameToPresentation(questName)}
+                      icon={getQuestIcon(questName)}
+                      imported={questIsFullyImported(questName)}
+                      onClick={() => {
+                        setImportModalOpen(true);
+                        setSelectedQuestName(questName);
+                      }}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 3,
+          },
+          Hidden: {
+            content: (
+              <CardWrapper>
+                {Object.keys(communityQuests).map((questName) => {
+                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
+                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
+                    if (questIsFullyImported(questName) === undefined) {
+                      return;
+                    }
+                  }
+                  return (
+                    <AttestationBadge
+                      key={questName}
+                      title={convertQuestNameToPresentation(questName)}
+                      icon={getQuestIcon(questName)}
+                      imported={questIsFullyImported(questName)}
+                      onClick={() => {
+                        setImportModalOpen(true);
+                        setSelectedQuestName(questName);
+                      }}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 3,
           },
         }}
       ></ContentTabs>
