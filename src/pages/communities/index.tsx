@@ -26,6 +26,11 @@ import assetClient from "@/lib/http-clients/AssetClient";
 import toast from "react-hot-toast";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
 import { LEGACY_STELLAR_QUEST_NAME } from "@/lib/constants";
+import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
+import { communitiesData } from "@/lib/utils/mock/communitiesAll"
+import { Communities } from "@/types/communities";
+
+
 
 export default function IssueBadgePage() {
   const { userAddress, setUserAddress } = useAuthContext();
@@ -40,6 +45,10 @@ export default function IssueBadgePage() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+
+
+  const [communities] = useState<Communities[]>(communitiesData)
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -186,23 +195,12 @@ export default function IssueBadgePage() {
           All: {
             content: (
               <CardWrapper>
-                {Object.keys(communityQuests).map((questName) => {
-                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
-                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
-                    if (questIsFullyImported(questName) === undefined) {
-                      return;
-                    }
-                  }
+                {communities.map((community) => {
+
                   return (
-                    <AttestationBadge
-                      key={questName}
-                      title={convertQuestNameToPresentation(questName)}
-                      icon={getQuestIcon(questName)}
-                      imported={questIsFullyImported(questName)}
-                      onClick={() => {
-                        setImportModalOpen(true);
-                        setSelectedQuestName(questName);
-                      }}
+                    <CommunitiesCard
+                      key={community.id}
+                      title={community.title}
                     />
                   );
                 })}
@@ -214,7 +212,6 @@ export default function IssueBadgePage() {
             content: (
               <CardWrapper>
                 {Object.keys(communityQuests).map((questName) => {
-                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
                   if (questName === LEGACY_STELLAR_QUEST_NAME) {
                     if (questIsFullyImported(questName) === undefined) {
                       return;
@@ -241,7 +238,6 @@ export default function IssueBadgePage() {
             content: (
               <CardWrapper>
                 {Object.keys(communityQuests).map((questName) => {
-                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
                   if (questName === LEGACY_STELLAR_QUEST_NAME) {
                     if (questIsFullyImported(questName) === undefined) {
                       return;
