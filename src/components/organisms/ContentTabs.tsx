@@ -1,9 +1,14 @@
 import { Tabs } from "@/components/organisms/types";
 import cc from "classcat";
 import React, { useState } from "react";
+import { PlusIcon, PrimaryButton } from "../atoms";
+import { SearchIcon } from "../atoms/icons/SearchIcon";
+import { IconPosition } from "@/types/iconPosition";
 
 export interface ContentTabsProps extends React.ComponentPropsWithoutRef<"div"> {
   tabs: Tabs;
+  inputText?: string;
+  onButtonClick?: (value: string) => void;
 }
 
 export const ContentTabs: React.FC<ContentTabsProps> = ({
@@ -35,7 +40,12 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
         </div>
 
         <div>
-          <h1>Search</h1>
+          <PrimaryButton
+            className="rounded-lg w-max"
+            label="Create"
+            icon={<PlusIcon color="black" width={16} height={16} />}
+            iconPosition={IconPosition.LEFT}
+          />
         </div>
       </nav>
       <div className="w-full pt-8">

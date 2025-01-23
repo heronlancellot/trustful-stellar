@@ -32,7 +32,7 @@ import { Communities } from "@/types/communities";
 
 
 
-export default function IssueBadgePage() {
+export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
   const { setCommunityQuests, communityQuests } = useCommunityContext();
   const {
