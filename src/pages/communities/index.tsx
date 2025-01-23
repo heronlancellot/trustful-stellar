@@ -200,7 +200,7 @@ export default function IssueBadgePage() {
                   return (
                     <CommunitiesCard
                       key={community.id}
-                      title={community.title}
+                      community={community}
                     />
                   );
                 })}
@@ -211,22 +211,11 @@ export default function IssueBadgePage() {
           Joined: {
             content: (
               <CardWrapper>
-                {Object.keys(communityQuests).map((questName) => {
-                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
-                    if (questIsFullyImported(questName) === undefined) {
-                      return;
-                    }
-                  }
+                {communities.map((community) => {
                   return (
-                    <AttestationBadge
-                      key={questName}
-                      title={convertQuestNameToPresentation(questName)}
-                      icon={getQuestIcon(questName)}
-                      imported={questIsFullyImported(questName)}
-                      onClick={() => {
-                        setImportModalOpen(true);
-                        setSelectedQuestName(questName);
-                      }}
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
                     />
                   );
                 })}
@@ -237,22 +226,11 @@ export default function IssueBadgePage() {
           Created: {
             content: (
               <CardWrapper>
-                {Object.keys(communityQuests).map((questName) => {
-                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
-                    if (questIsFullyImported(questName) === undefined) {
-                      return;
-                    }
-                  }
+                {communities.map((community) => {
                   return (
-                    <AttestationBadge
-                      key={questName}
-                      title={convertQuestNameToPresentation(questName)}
-                      icon={getQuestIcon(questName)}
-                      imported={questIsFullyImported(questName)}
-                      onClick={() => {
-                        setImportModalOpen(true);
-                        setSelectedQuestName(questName);
-                      }}
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
                     />
                   );
                 })}

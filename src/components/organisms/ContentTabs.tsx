@@ -14,7 +14,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
   return (
     <div className={cc([className, "w-screen h-max bg-brandBlack"])} {...props}>
-      <nav className="flex nav-bar px-12 justify-between">
+      <nav className="flex nav-bar px-12 justify-between cursor-pointer">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)

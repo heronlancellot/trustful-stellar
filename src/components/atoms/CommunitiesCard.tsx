@@ -1,61 +1,69 @@
-import { SVGProps } from "react";
 import cc from "classcat";
-import { CheckIcon } from "./icons/CheckIcon";
-import { ArrowIcon } from "./icons/ArrowIcon";
 import React from "react";
-import tailwindConfig from "tailwind.config";
+import { Communities } from "@/types/communities";
+import { InformationIcon, PlusIcon, StarIcon, TagIcon, UserIcon } from "./icons";
 
 interface CommunitiesCardProps extends React.ComponentPropsWithoutRef<"div"> {
-    title: string;
+    community: Communities;
 }
 
 export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
-    title,
+    community,
     className,
     ...props
 }) => {
     return (
         <div
-            className="rounded-lg flex border border-whiteOpacity008 w-[21vw] h-[25vh] bg-whiteOpacity005 hover:cursor-pointer"
+            className={cc([
+                "rounded-lg flex flex-col border border-whiteOpacity008 max-w-sm w-full bg-whiteOpacity005 hover:cursor-pointer",
+                className
+            ])}
             {...props}
+            style={{ boxSizing: 'border-box' }}
         >
-            <div className="flex flex-1 max-w-[50%] flex-col p-3 justify-between">
-                <div className="flex-1 p-2 w-max">
-                    <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008">
-                        <h1>icon</h1>
+            <div className="flex justify-between p-3">
+                <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008 flex items-center justify-center overflow-hidden">
+                    <div className="w-4 h-4 ">
+                        <StarIcon />
                     </div>
                 </div>
-                <div className={"title p-2 mt-3 h-max justify-center w-max"}>
-                    {/* <span>{title}</span> */}
-                    <span>{'Title'}</span>
+                <div className="flex items-center gap-1">
+                    <button className="w-8 h-8 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center rounded-md"><InformationIcon /></button>
+                    <button className="w-8 h-8 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center rounded-md"><PlusIcon /></button>
                 </div>
             </div>
-            <div className="flex flex-1 max-w-[50%] flex-col align-center">
-                <div className="flex-1 m-4 ml-6 h-[25px]">
-                    <div
-                        className={cc([
+            <div className="flex flex-col p-3 gap-1 justify-center" >
+                <div className="title" >
+                    <span className="text-lg font-bold border-s-violet-600">{community?.title}</span>
+                </div>
+                <div className="description">
+                    <span className="text-xs block overflow-hidden text-ellipsis text-gray-500">
+                        {community?.description}
+                    </span>
 
-                            "flex text-xs font-medium justify-end",
-                        ])}
-                    >
-                        <div className="w-3 mr-2">
-                            <CheckIcon />
+                </div>
+
+
+                <div className="flex flex-start mt-7 gap-3">
+                    <div className="flex items-center text-xs justify-center gap-1">
+                        <div className="w-3 h-3">
+                            <UserIcon />
                         </div>
-                        <span className="text-brandGreen">IMPORTED</span>
+                        <div className="flex justify-center">
+                            <span>{community?.users}</span>
+                        </div>
                     </div>
-                    <div
-                        className={cc([
-                            "flex text-xs font-medium justify-end",
-                        ])}
-                    >
-                        <div className="w-3 mr-2">
-                            <ArrowIcon
-                                color={tailwindConfig.theme.extend.colors.whiteOpacity05}
-                            />
+
+                    <div className="flex items-center text-xs justify-center gap-1 ">
+                        <div className=" w-3 h-3">
+                            <TagIcon />
                         </div>
-                        <span className="text-whiteOpacity05">IMPORT</span>
+                        <div>
+                            <span>{community?.badges}</span>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     );
