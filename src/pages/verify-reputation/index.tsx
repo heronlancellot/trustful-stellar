@@ -82,6 +82,7 @@ function VerifyReputationPage() {
       onSearch(searchAddress);
       setInputText(searchAddress);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchAddress]);
   return (
     <PageTemplate className="h-full" title="Verify Reputation" tooltip={{

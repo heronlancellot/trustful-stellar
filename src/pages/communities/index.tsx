@@ -26,8 +26,14 @@ import assetClient from "@/lib/http-clients/AssetClient";
 import toast from "react-hot-toast";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
 import { LEGACY_STELLAR_QUEST_NAME } from "@/lib/constants";
+import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
+import { communitiesData } from "@/lib/utils/mock/communitiesAll"
+import { Communities } from "@/types/communities";
+import { useRouter } from "next/router";
 
-export default function IssueBadgePage() {
+
+
+export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
   const { setCommunityQuests, communityQuests } = useCommunityContext();
   const {
@@ -40,6 +46,11 @@ export default function IssueBadgePage() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
+
+
+
+  const [communities] = useState<Communities[]>(communitiesData)
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -74,6 +85,7 @@ export default function IssueBadgePage() {
       setUserBadgesImported([]);
       setUserBadgesToImport([], [], []);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
 
   useEffect(() => {
@@ -180,10 +192,60 @@ export default function IssueBadgePage() {
         tooltipText:
           "Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.",
       }}
+      isCommunity
     >
       <ContentTabs
         tabs={{
-          Import: {
+          All: {
+            content: (
+              <CardWrapper>
+                {communities.map((community) => {
+
+                  return (
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 1,
+          },
+          Joined: {
+            content: (
+              <CardWrapper>
+                {communities.map((community) => {
+                  return (
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 2,
+          },
+          Created: {
+            content: (
+              <CardWrapper>
+                {communities.map((community) => {
+                  return (
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
+                    />
+                  );
+                })}
+              </CardWrapper>
+            ),
+            tabNumber: 3,
+          },
+          Hidden: {
             content: (
               <CardWrapper>
                 {Object.keys(communityQuests).map((questName) => {
@@ -208,7 +270,7 @@ export default function IssueBadgePage() {
                 })}
               </CardWrapper>
             ),
-            tabNumber: 1,
+            tabNumber: 3,
           },
         }}
       ></ContentTabs>
