@@ -85,6 +85,7 @@ export default function CommunitiesPage() {
       setUserBadgesImported([]);
       setUserBadgesToImport([], [], []);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
 
   useEffect(() => {
