@@ -192,6 +192,7 @@ export default function CommunitiesPage() {
         tooltipText:
           "Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.",
       }}
+      isCommunity
     >
       <ContentTabs
         tabs={{

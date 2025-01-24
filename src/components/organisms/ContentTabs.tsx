@@ -1,9 +1,8 @@
 import { Tabs } from "@/components/organisms/types";
 import cc from "classcat";
 import React, { useState } from "react";
-import { PlusIcon, PrimaryButton } from "../atoms";
-import { SearchIcon } from "../atoms/icons/SearchIcon";
-import { IconPosition } from "@/types/iconPosition";
+import { SearchIconPrimary } from "../atoms";
+
 
 export interface ContentTabsProps extends React.ComponentPropsWithoutRef<"div"> {
   tabs: Tabs;
@@ -19,7 +18,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
   return (
     <div className={cc([className, "w-screen h-max bg-brandBlack"])} {...props}>
-      <nav className="flex nav-bar px-12 justify-between cursor-pointer">
+      <nav className="flex nav-bar px-12 justify-between cursor-pointer items-center">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)
@@ -38,14 +37,8 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
               );
             })}
         </div>
-
         <div>
-          <PrimaryButton
-            className="rounded-lg w-max"
-            label="Create"
-            icon={<PlusIcon color="black" width={16} height={16} />}
-            iconPosition={IconPosition.LEFT}
-          />
+          <SearchIconPrimary />
         </div>
       </nav>
       <div className="w-full pt-8">
