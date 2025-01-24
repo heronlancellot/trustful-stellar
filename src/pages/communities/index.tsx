@@ -29,6 +29,7 @@ import { LEGACY_STELLAR_QUEST_NAME } from "@/lib/constants";
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { communitiesData } from "@/lib/utils/mock/communitiesAll"
 import { Communities } from "@/types/communities";
+import { useRouter } from "next/router";
 
 
 
@@ -45,6 +46,7 @@ export default function CommunitiesPage() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
 
 
 
@@ -201,6 +203,7 @@ export default function CommunitiesPage() {
                     <CommunitiesCard
                       key={community.id}
                       community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
                     />
                   );
                 })}
@@ -216,6 +219,7 @@ export default function CommunitiesPage() {
                     <CommunitiesCard
                       key={community.id}
                       community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
                     />
                   );
                 })}
@@ -231,6 +235,7 @@ export default function CommunitiesPage() {
                     <CommunitiesCard
                       key={community.id}
                       community={community}
+                      onClick={() => router.push("communities/detailslayoutonly")}
                     />
                   );
                 })}
