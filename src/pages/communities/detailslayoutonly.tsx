@@ -1,8 +1,18 @@
-import { PlusIcon, PrimaryButton, TagIcon, UserIcon } from "@/components";
+import { ContentTabs, PlusIcon, PrimaryButton, TagIcon, UserIcon } from "@/components";
+import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
+import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
+import { CustomTable } from "@/components/organisms/CustomTable";
 import { IconPosition } from "@/types/iconPosition";
+import tailwindConfig from "tailwind.config";
+
 
 
 export default function DetailsLayout() {
+
+    const searchedUserBadges = [{
+        score: 6,
+        description: ''
+    }]
     return (
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
             <div className="flex justify-between p-8">
@@ -34,6 +44,58 @@ export default function DetailsLayout() {
                 <div><TagIcon className="w-4" /></div>
                 <div className="text-gray-500">20</div>
                 <div className="text-gray-500">Badges</div>
+            </div>
+
+            <div className="py-8">
+                <ContentTabs tabs={{
+                    Badges: {
+                        content: (
+                            <div className="px-12">
+                                <CustomTable
+                                    childrenForEmptyTable={
+                                        <TableEmptyScreen
+                                            icon={
+                                                <SearchIcon
+                                                    color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                />
+                                            }
+                                            title="Search to start"
+                                            description="Check a user's reputation by searching for their address"
+                                        />
+                                    }
+                                    className="mt-6"
+                                    headers={["Name", "Score"]}
+                                    data={searchedUserBadges}
+                                ></CustomTable>
+                            </div>
+                        ), tabNumber: 1
+                    },
+                    Leadboard: {
+                        content: (
+                            <div className="px-12">
+                                <CustomTable
+                                    childrenForEmptyTable={
+                                        <TableEmptyScreen
+                                            icon={
+                                                <SearchIcon
+                                                    color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                />
+                                            }
+                                            title="Search to start"
+                                            description="Check a user's reputation by searching for their address"
+                                        />
+                                    }
+                                    className="mt-6"
+                                    headers={["Rank", "Address", "Points", "Badges"]}
+                                    data={searchedUserBadges}
+                                ></CustomTable>
+                            </div>
+
+                        ), tabNumber: 2
+                    }
+                }}>
+
+                </ContentTabs>
             </div>
         </div>
 
