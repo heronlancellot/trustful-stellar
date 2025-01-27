@@ -195,6 +195,7 @@ export default function CommunitiesPage() {
       isCommunity
     >
       <ContentTabs
+        inputSearch
         tabs={{
           All: {
             content: (
