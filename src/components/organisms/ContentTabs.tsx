@@ -8,11 +8,13 @@ export interface ContentTabsProps extends React.ComponentPropsWithoutRef<"div"> 
   tabs: Tabs;
   inputText?: string;
   onButtonClick?: (value: string) => void;
+  inputSearch?: Boolean;
 }
 
 export const ContentTabs: React.FC<ContentTabsProps> = ({
   className,
   tabs,
+  inputSearch,
   ...props
 }) => {
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
@@ -38,7 +40,10 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
             })}
         </div>
         <div>
-          <SearchIconPrimary />
+          {inputSearch && (
+            <SearchIconPrimary />
+          )}
+
         </div>
       </nav>
       <div className="w-full pt-8">
