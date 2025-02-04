@@ -1,18 +1,56 @@
 import { ContentTabs, PlusIcon, PrimaryButton, TagIcon, UserIcon } from "@/components";
 import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
 import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
+import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
 import { CustomTable } from "@/components/organisms/CustomTable";
 import { IconPosition } from "@/types/iconPosition";
+import { useRouter } from "next/router";
 import tailwindConfig from "tailwind.config";
 
 
 
 export default function DetailsLayout() {
 
-    const searchedUserBadges = [{
-        score: 6,
-        description: ''
-    }]
+    const router = useRouter()
+    const status = router.query.status
+
+    const statusList = {
+        all: 'all',
+        joined: 'joined',
+        created: 'created',
+        hidden: 'hidden'
+    }
+
+    const { all, joined, created, hidden } = statusList
+
+    const searchedUserBadgesData = [{
+        id: '',
+        name: '',
+        score: '',
+        description: '',
+        status: ''
+    },
+    ]
+
+    const searchedUserBadges = searchedUserBadgesData.map((badge) => ({
+        badgeName: (
+            <div className="flex flex-row items-center h-7">
+                <div className="flex flex-col">
+                    <span>{badge?.name}</span>
+                    <span>{badge?.score}</span>
+                    <span>{badge?.status}</span>
+                    <span>{badge?.description}</span>
+                    <span className="text-sm text-whiteOpacity05">
+                        Points: {badge.score}
+                    </span>
+                </div>
+            </div>
+        ),
+        Badges: <IssuerTableCell issuerAddress={badge?.id} />,
+        Score: <IssuerTableCell issuerAddress={badge?.score} />,
+        Name: <IssuerTableCell issuerAddress={badge?.name} />,
+        Status: <IssuerTableCell issuerAddress={badge?.status} />,
+    }));
     return (
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
             <div className="flex justify-between p-8">
@@ -47,58 +85,163 @@ export default function DetailsLayout() {
             </div>
 
             <div className="py-8">
-                <ContentTabs tabs={{
-                    Badges: {
-                        content: (
-                            <div className="px-12">
-                                <CustomTable
-                                    childrenForEmptyTable={
-                                        <TableEmptyScreen
-                                            icon={
-                                                <SearchIcon
-                                                    color={tailwindConfig.theme.extend.colors.whiteOpacity05}
-                                                />
-                                            }
-                                            title="Search to start"
-                                            description="Check a user's reputation by searching for their address"
-                                        />
-                                    }
-                                    className="mt-6"
-                                    headers={["Name", "Score"]}
-                                    data={searchedUserBadges}
-                                ></CustomTable>
-                            </div>
-                        ), tabNumber: 1
-                    },
-                    Leadboard: {
-                        content: (
-                            <div className="px-12">
-                                <CustomTable
-                                    childrenForEmptyTable={
-                                        <TableEmptyScreen
-                                            icon={
-                                                <SearchIcon
-                                                    color={tailwindConfig.theme.extend.colors.whiteOpacity05}
-                                                />
-                                            }
-                                            title="Search to start"
-                                            description="Check a user's reputation by searching for their address"
-                                        />
-                                    }
-                                    className="mt-6"
-                                    headers={["Rank", "Address", "Points", "Badges"]}
-                                    data={searchedUserBadges}
-                                ></CustomTable>
-                            </div>
+                {status === all && (
+                    <ContentTabs tabs={{
+                        Badges: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Name", "Score"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
+                            ), tabNumber: 1
+                        },
+                        Leadboard: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Rank", "Address", "Points", "Badges"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
 
-                        ), tabNumber: 2
-                    }
-                }}>
+                            ), tabNumber: 2
+                        }
+                    }}>
 
-                </ContentTabs>
+                    </ContentTabs>
+                )}
+                {status === created && (
+                    <ContentTabs tabs={{
+                        Badges: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Name", "Score", "Status"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
+                            ), tabNumber: 1
+                        },
+                        Leadboard: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Rank", "Address", "Points", "Badges"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
+
+                            ), tabNumber: 2
+                        }
+                    }}>
+
+                    </ContentTabs>
+                )}
+                {status === joined && (
+                    <ContentTabs tabs={{
+                        Badges: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Name", "Score", "Status"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
+                            ), tabNumber: 1
+                        },
+                        Leadboard: {
+                            content: (
+                                <div className="px-12">
+                                    <CustomTable
+                                        childrenForEmptyTable={
+                                            <TableEmptyScreen
+                                                icon={
+                                                    <SearchIcon
+                                                        color={tailwindConfig.theme.extend.colors.whiteOpacity05}
+                                                    />
+                                                }
+                                                title="Search to start"
+                                                description="Check a user's reputation by searching for their address"
+                                            />
+                                        }
+                                        className="mt-6"
+                                        headers={["Rank", "Address", "Points", "Badges"]}
+                                        data={searchedUserBadges}
+                                    ></CustomTable>
+                                </div>
+
+                            ), tabNumber: 2
+                        }
+                    }}>
+
+                    </ContentTabs>
+                )}
             </div>
         </div>
 
     )
 }
+
 

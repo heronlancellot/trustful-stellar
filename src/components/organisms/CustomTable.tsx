@@ -7,6 +7,7 @@ export interface CustomTableProps<T extends Record<string, any>>
   childrenForEmptyTable: ReactNode;
   data?: T[];
   headers: string[];
+  status?: any
 }
 
 export const CustomTable = <T extends Record<string, any>>({

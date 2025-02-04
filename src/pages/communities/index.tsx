@@ -201,13 +201,14 @@ export default function CommunitiesPage() {
             content: (
               <CardWrapper>
                 {communities.map((community) => {
-
                   return (
                     <CommunitiesCard
                       key={community.id}
                       community={community}
-                      onClick={() => router.push("communities/detailslayoutonly")}
-                    />
+                      onClick={() => router.push({
+                        pathname: "communities/detailslayoutonly",
+                        query: { status: 'all' }
+                      })} />
                   );
                 })}
               </CardWrapper>
@@ -222,7 +223,10 @@ export default function CommunitiesPage() {
                     <CommunitiesCard
                       key={community.id}
                       community={community}
-                      onClick={() => router.push("communities/detailslayoutonly")}
+                      onClick={() => router.push({
+                        pathname: "communities/detailslayoutonly",
+                        query: { status: 'joined' }
+                      })}
                     />
                   );
                 })}
@@ -238,7 +242,10 @@ export default function CommunitiesPage() {
                     <CommunitiesCard
                       key={community.id}
                       community={community}
-                      onClick={() => router.push("communities/detailslayoutonly")}
+                      onClick={() => router.push({
+                        pathname: "communities/detailslayoutonly",
+                        query: { status: 'created' }
+                      })}
                     />
                   );
                 })}
@@ -249,23 +256,15 @@ export default function CommunitiesPage() {
           Hidden: {
             content: (
               <CardWrapper>
-                {Object.keys(communityQuests).map((questName) => {
-                  // Hiding the Legacy Stellar Quests if the User doesn't have any badge to import(a.k.a. questIsFullyImport(questName)===undefined)
-                  if (questName === LEGACY_STELLAR_QUEST_NAME) {
-                    if (questIsFullyImported(questName) === undefined) {
-                      return;
-                    }
-                  }
+                {communities.map((community) => {
                   return (
-                    <AttestationBadge
-                      key={questName}
-                      title={convertQuestNameToPresentation(questName)}
-                      icon={getQuestIcon(questName)}
-                      imported={questIsFullyImported(questName)}
-                      onClick={() => {
-                        setImportModalOpen(true);
-                        setSelectedQuestName(questName);
-                      }}
+                    <CommunitiesCard
+                      key={community.id}
+                      community={community}
+                      onClick={() => router.push({
+                        pathname: "communities/detailslayoutonly",
+                        query: { status: 'hidden' }
+                      })}
                     />
                   );
                 })}
