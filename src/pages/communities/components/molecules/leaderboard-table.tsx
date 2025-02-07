@@ -42,7 +42,7 @@ function getPointsTextColor(rank: number) {
   return colorsMap[rank as keyof typeof colorsMap] || colorsMap.default;
 }
 
-export function LeaderboardTable() {
+export default function LeaderboardTable() {
   const searchedLeadboardData: LeaderboardPlayer[] = [
     {
       rank: 1,

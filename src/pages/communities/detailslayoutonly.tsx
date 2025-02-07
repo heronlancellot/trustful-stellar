@@ -19,7 +19,7 @@ import tailwindConfig from "tailwind.config";
 import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
 import { useModal } from "@/hooks/useModal";
 import { CustomModal } from "./components/molecules/custom-modal";
-import { LeaderboardTable } from "./components/molecules/leaderboard-table";
+import LeaderboardTable from "./components/molecules/leaderboard-table"; "./components/molecules/leaderboard-table";
 
 export default function DetailsLayout() {
   const { openModal, closeModal, isOpen } = useModal();
@@ -165,7 +165,7 @@ export default function DetailsLayout() {
           <div className="w-full bg-whiteOpacity008">
             <div className="p-6 border-whiteOpacity005 border-b">
               <span className="text-base font-normal">
-                If you hide this community it won't be visible anymore.
+                {`If you hide this community it won't be visible anymore.`}
               </span>
             </div>
           </div>
