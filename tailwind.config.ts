@@ -12,6 +12,7 @@ const config = {
         othersRed: "rgba(239, 87, 66, 1)",
         grey02: "rgba(45, 46, 47, 1)",
         darkGreenOpacity01: "rgba(211,248,144,0.10)",
+        orange: "rgba(255, 165, 0, 1)",
       },
     },
   },
