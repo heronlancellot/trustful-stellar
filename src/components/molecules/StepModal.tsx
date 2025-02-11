@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PlusIcon } from "../atoms/icons";
+import { PlusIcon, StarIcon, TagIcon } from "../atoms/icons";
 import { AwardIcon } from "../atoms/icons/AwardIcon";
 import { GithubIcon } from "../atoms/icons/GithubIcon";
 import { TrophyIcon } from "../atoms/icons/TrophyIcon";
@@ -12,6 +12,7 @@ import { BankIcon } from "../atoms/icons/BankIcon";
 import { AlertIcon } from "../atoms/icons/AlertIcon";
 import { TrashIcon } from "../atoms/icons/TrashIcon";
 import { CloseIcon } from "../atoms/icons/CloseIcon";
+import Image from "next/image";
 
 interface ModalProps {
   isOpen: boolean;
@@ -41,9 +42,7 @@ const CustomBadge = () => {
       <div>
         <p className="text-sm font-light">
           When creating custom badges, you will need to provide the issuer and
-          other specific details such as the name of the asset. Please ensure
-          you have the necessary knowledge and skills to complete this process
-          correctly.
+          other specific details such as the name of the asset.
         </p>
       </div>
     </div>
@@ -250,14 +249,41 @@ export const StepModal: React.FC<ModalProps> = ({
       case 3:
         return (
           <div className="space-y-4 h-96">
-            <div className="w-20 h-20 bg-gray-700 rounded-full">
-              {/* selected icon */}
+            <div className="w-16 h-16 bg-whiteOpacity008 rounded-full flex items-center justify-center">
+              <div className="w-6">
+                <StarIcon />
+              </div>
             </div>
-            <h2 className="text-xl font-bold">Stellar Quests</h2>
-            <p className="text-gray-400">
+            <h2 className="text-xl font-bold font-space-grotesk">
+              Stellar Quests
+            </h2>
+            <p className="text-whiteOpacity05 text-sm font-light">
               Integer malesuada leo nisi, quis ullamcorper mauris elementum ut.
               Suspendisse eget libero iaculis, maximus velit vitae.
             </p>
+            <div className="flex flex-row items-center gap-2">
+              <div className="w-5 h-5 overflow-hidden rounded-full">
+                <img
+                  src="https://s3-alpha-sig.figma.com/img/d77f/3e8e/1a09e906bd85fac175ad1140dc507ae4?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=S92ienvowHBeaM2Z55wzkEf0VlKnHs23w7SfEUZddkdBtR9sKQKGJC6mqVGT0OLilsJCxtAnAc2gJCmZm8t3JPtvGSc6UAaXLJ-IAGnywWLka6-gkK5a14GENsQe6Fe2oMwZ3Yw0LkECHjMYwKnMJVBvDJDHSK-z1ZpE-ZiWbYX3pv7Bv7uuXonylEaeiWVFM100HmbGilwwTCftYTlFZaM2xPL6OLEnDz0q~1XSHFbW2q3BI4x9VjoJanC1R6la6~4-w0K2xOKLXLV1KROpO2b5a8M5BRlXo~0vbVvSHUqK40XiBU2YYdtvvlAUh05rNsCoxtdqwdEi1E1TNnJq8g__"
+                  width={20}
+                  height={20}
+                  alt="User Avatar"
+                  className="rounded-full"
+                />
+              </div>
+              <div>
+                <p className="font-light text-sm text-whiteOpacity05">
+                  Created by 012312...1ED8
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-row items-center gap-3 text-whiteOpacity05">
+              <TagIcon />
+              <p className="text-sm font-light text-whiteOpacity05">
+                20 badges
+              </p>
+            </div>
+            <CustomBadge />
           </div>
         );
 
