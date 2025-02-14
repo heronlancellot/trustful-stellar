@@ -1,8 +1,12 @@
 export interface Communities {
-    id: number;
-    title: string;
+    communityAddress: string;
+    factoryAddress?: string;
+    name: string;
     description: string;
-    users: number;
-    badges: number;
-    icon: string;
+    creatorAddress?: string;
+    isHidden?: boolean;
+    blocktimestamp?: string;
+    totalBadges?: number;
+    totalMembers?: number;
+    managers?: string[];
 }

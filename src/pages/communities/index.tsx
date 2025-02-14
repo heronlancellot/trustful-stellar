@@ -1,5 +1,4 @@
 import {
-  AttestationBadge,
   ContentTabs,
   GenericModal,
   StarIcon,
@@ -25,13 +24,9 @@ import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
 import assetClient from "@/lib/http-clients/AssetClient";
 import toast from "react-hot-toast";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
-import { LEGACY_STELLAR_QUEST_NAME } from "@/lib/constants";
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
-import { communitiesData } from "@/lib/utils/mock/communitiesAll"
-import { Communities } from "@/types/communities";
 import { useRouter } from "next/router";
-
-
+import useCommunitiesController from "./controller";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
@@ -43,14 +38,12 @@ export default function CommunitiesPage() {
     setUserBadgesToImport,
   } = useUsersContext();
 
+  const { communities } = useCommunitiesController()
+
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
-
-
-
-  const [communities] = useState<Communities[]>(communitiesData)
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -203,7 +196,7 @@ export default function CommunitiesPage() {
                 {communities.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
                         pathname: "communities/detailslayoutonly",
@@ -221,7 +214,7 @@ export default function CommunitiesPage() {
                 {communities.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
                         pathname: "communities/detailslayoutonly",
@@ -240,7 +233,7 @@ export default function CommunitiesPage() {
                 {communities.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
                         pathname: "communities/detailslayoutonly",
@@ -259,7 +252,7 @@ export default function CommunitiesPage() {
                 {communities.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
                         pathname: "communities/detailslayoutonly",

@@ -34,7 +34,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             </div>
             <div className="flex flex-col p-3 gap-1 justify-center" >
                 <div className="title" >
-                    <span className="text-lg font-bold border-s-violet-600">{community?.title}</span>
+                    <span className="text-lg font-bold border-s-violet-600">{community?.name}</span>
                 </div>
                 <div className="description">
                     <span className="text-xs block overflow-hidden text-ellipsis text-gray-500">
@@ -50,7 +50,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                             <UserIcon />
                         </div>
                         <div className="flex justify-center">
-                            <span>{community?.users}</span>
+                            <span>{community?.totalMembers}</span>
                         </div>
                     </div>
 
@@ -59,7 +59,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                             <TagIcon />
                         </div>
                         <div>
-                            <span>{community?.badges}</span>
+                            <span>{community?.totalBadges}</span>
                         </div>
                     </div>
                 </div>
