@@ -10,8 +10,6 @@ import { PageTemplate } from "@/components/templates/PageTemplate";
 import { useUsersContext } from "@/components/user/Context";
 import communityClient from "@/lib/http-clients/CommunityClient";
 import usersClient from "@/lib/http-clients/UsersClient";
-import { getQuestIcon as getQuestIcon } from "@/lib/getQuestIcon";
-import { convertQuestNameToPresentation } from "@/lib/utils/convertBadgeSetNameToPresentation";
 import { useCallback, useEffect, useState } from "react";
 import _ from "lodash";
 import { CommunityQuests } from "@/components/community/types";
@@ -26,7 +24,7 @@ import toast from "react-hot-toast";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { useRouter } from "next/router";
-import useCommunitiesController from "./controller";
+import useCommunitiesController from "../../components/community/hooks/controller";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();

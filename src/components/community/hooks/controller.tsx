@@ -1,3 +1,5 @@
+'use client'
+
 import { Communities } from "@/types/communities";
 import { useEffect, useState } from "react";
 
@@ -21,6 +23,7 @@ export default function useCommunitiesController() {
     }, [])
 
     return {
-        communities, setCommunities
+        communities,
+        setCommunities
     }
 }
