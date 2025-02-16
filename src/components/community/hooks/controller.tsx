@@ -9,7 +9,7 @@ export default function useCommunitiesController() {
     useEffect(() => {
         const getCommunities = async () => {
             try {
-                const response = await fetch('api/communities');
+                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
                 const data = await response.json();
 
                 setCommunities(data)

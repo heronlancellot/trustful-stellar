@@ -197,7 +197,7 @@ export default function CommunitiesPage() {
                       key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'all' }
                       })} />
                   );
@@ -215,7 +215,7 @@ export default function CommunitiesPage() {
                       key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'joined' }
                       })}
                     />
@@ -234,7 +234,7 @@ export default function CommunitiesPage() {
                       key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'created' }
                       })}
                     />
@@ -253,7 +253,7 @@ export default function CommunitiesPage() {
                       key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'hidden' }
                       })}
                     />
