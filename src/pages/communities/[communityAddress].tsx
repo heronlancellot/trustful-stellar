@@ -20,9 +20,9 @@ import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
 import { useModal } from "@/hooks/useModal";
 import { CustomModal } from "./components/molecules/custom-modal";
 import LeaderboardTable from "./components/molecules/leaderboard-table"; import { useEffect, useState } from "react";
-import { BadgesList, Communities, MembersList } from "@/types/communities";
 import { CommunityTableCell } from "./components/molecules/CommunityTableCell";
 import { useParams, usePathname } from "next/navigation";
+import { useCommunityContext } from "@/components/community/Context";
 "./components/molecules/leaderboard-table";
 
 interface DetailsProps {
@@ -38,56 +38,18 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const { status } = router.query;
     const communityAddress = router.query.communityAddress;
 
-    const [communities, setCommunities] = useState<Communities>()
-    const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>()
-    const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>()
+    const { getCommunitiesBadgesList,
+        getCommunitiesMembersList,
+        communitiesBadgesList,
+        communitiesMembersList,
+        getCommunitiesDetails,
+        communitiesDetail,
+        setCommunitiesDetail } = useCommunityContext()
 
     useEffect(() => {
-        const getCommunities = async () => {
-            try {
-                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}`);
-                const data = await response.json();
-                console.log(data);
-
-                setCommunities(data)
-
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        const getCommunitiesBadgesList = async () => {
-            try {
-                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges`);
-                const data = await response.json();
-                console.log(data);
-
-                setCommunitiesBadgesList(data)
-
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        const getCommunitiesMembersList = async () => {
-            try {
-                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/members`);
-                const data = await response.json();
-                console.log(data);
-
-                setCommunitiesMembersList(data)
-
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-
-
-
-        getCommunities()
-        getCommunitiesBadgesList()
-        getCommunitiesMembersList()
+        getCommunitiesDetails(`${communityAddress}`)
+        getCommunitiesBadgesList(`${communityAddress}`)
+        getCommunitiesMembersList(`${communityAddress}`)
     }, [])
 
     const statusList = {
@@ -129,9 +91,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
             <div className="flex justify-between p-8">
                 <div>
-                    <h1 className="text-2xl">{`${communities?.name}`}</h1>
+                    <h1 className="text-2xl">{`${communitiesDetail?.name}`}</h1>
                     <h3 className="text-gray-500">
-                        {`${communities?.description}`}
+                        {`${communitiesDetail?.description}`}
                     </h3>
                 </div>
                 <div>
@@ -195,20 +157,20 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 <div>
                     <UserIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">Created by {communities?.creatorAddress?.substring(0, 10)}...</div>
+                <div className="text-gray-500">Created by {communitiesDetail?.creatorAddress?.substring(0, 10)}...</div>
                 <div className="text-gray-500">/</div>
 
                 <div>
                     <UserIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">{communities?.totalMembers}</div>
+                <div className="text-gray-500">{communitiesDetail?.totalMembers}</div>
                 <div className="text-gray-500">partcipants</div>
                 <div className="text-gray-500">/</div>
 
                 <div>
                     <TagIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">{communities?.totalBadges}</div>
+                <div className="text-gray-500">{communitiesDetail?.totalBadges}</div>
                 <div className="text-gray-500">Badges</div>
             </div>
 
@@ -365,6 +327,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div className="py-8">
                 {status === all && (
                     <ContentTabs
+
                         tabs={{
                             Badges: {
                                 content: (

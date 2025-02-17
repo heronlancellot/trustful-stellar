@@ -29,7 +29,7 @@ import { useParams, usePathname } from "next/navigation";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, getCommunities, setCommunities } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -37,13 +37,15 @@ export default function CommunitiesPage() {
     setUserBadgesToImport,
   } = useUsersContext();
 
-  const { communities, getCommunitiesSpec, refetchCommunitiesAll } = useCommunitiesController()
+  const { inputText, setInputText } = useCommunitiesController()
 
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
   const { status } = router.query;
+
+  const pathName = usePathname()
 
   const statusList = {
     all: "all",
@@ -66,6 +68,30 @@ export default function CommunitiesPage() {
     }
 
   }, [status]);
+
+  useEffect(() => {
+    const getCommunities = async () => {
+      try {
+        const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
+        const data = await response.json();
+
+        setCommunities(data)
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getCommunities()
+  }, [])
+
+  // useEffect(() => {
+  //   if (pathName === '/communities') {
+  //     console.log(pathName);
+
+  //     getCommunities();
+  //   }
+  // }, [pathName]);
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -212,6 +238,8 @@ export default function CommunitiesPage() {
       isCommunity
     >
       <ContentTabs
+        inputText={inputText}
+        setInputText={setInputText}
         inputSearch
         onButtonClick={(tabName) => {
           router.push({

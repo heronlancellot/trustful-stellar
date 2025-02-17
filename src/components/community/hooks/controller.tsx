@@ -1,10 +1,15 @@
 'use client'
 
-import { Communities } from "@/types/communities";
+import { BadgesList, Communities, MembersList } from "@/types/communities";
 import { useEffect, useState } from "react";
 
 export default function useCommunitiesController() {
     const [communities, setCommunities] = useState<Communities[]>([])
+    const [communitiesDetail, setCommunitiesDetail] = useState<Communities>()
+    const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>()
+    const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>()
+    const [inputText, setInputText] = useState("");
+
 
     useEffect(() => {
         const getCommunities = async () => {
@@ -36,6 +41,19 @@ export default function useCommunitiesController() {
         }
     };
 
+    const getCommunitiesDetails = async (communityAdress: string) => {
+        try {
+            const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAdress}`);
+            const data = await response.json();
+            console.log(data);
+
+            setCommunitiesDetail(data)
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const refetchCommunitiesAll = async () => {
         try {
             const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
@@ -49,11 +67,48 @@ export default function useCommunitiesController() {
         }
     };
 
+    const getCommunitiesBadgesList = async (communityAddress: string) => {
+        try {
+            const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges`);
+            const data = await response.json();
+            console.log(data);
+
+            setCommunitiesBadgesList(data)
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getCommunitiesMembersList = async (communityAddress: string) => {
+        try {
+            const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/members`);
+            const data = await response.json();
+            console.log(data);
+
+            setCommunitiesMembersList(data)
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
     return {
         communities,
         setCommunities,
         getCommunitiesSpec,
-        refetchCommunitiesAll
+        refetchCommunitiesAll,
+        getCommunitiesDetails,
+        getCommunitiesBadgesList,
+        getCommunitiesMembersList,
+        communitiesBadgesList,
+        setCommunitiesBadgesList,
+        communitiesMembersList,
+        setCommunitiesMembersList,
+        communitiesDetail,
+        setCommunitiesDetail,
+        inputText,
+        setInputText
     }
 }
