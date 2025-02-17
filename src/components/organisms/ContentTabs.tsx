@@ -15,6 +15,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   className,
   tabs,
   inputSearch,
+  onButtonClick,
   ...props
 }) => {
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
@@ -32,7 +33,10 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
                     { "tab-active": tabName == selectedTab },
                     "tab p-2 px-4"
                   ])}
-                  onClick={() => setSelectedTab(tabName)}
+                  onClick={() => {
+                    setSelectedTab(tabName);
+                    onButtonClick?.(tabName.toLowerCase())
+                  }}
                 >
                   {tabProps.trigger ? tabProps.trigger : <span>{tabName}</span>}
                 </div>

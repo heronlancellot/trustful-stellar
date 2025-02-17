@@ -25,6 +25,7 @@ import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModa
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { useRouter } from "next/router";
 import useCommunitiesController from "../../components/community/hooks/controller";
+import { useParams, usePathname } from "next/navigation";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
@@ -36,12 +37,35 @@ export default function CommunitiesPage() {
     setUserBadgesToImport,
   } = useUsersContext();
 
-  const { communities } = useCommunitiesController()
+  const { communities, getCommunitiesSpec, refetchCommunitiesAll } = useCommunitiesController()
 
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
+  const { status } = router.query;
+
+  const statusList = {
+    all: "all",
+    joined: "joined",
+    created: "created",
+    hidden: "hidden",
+  };
+
+  useEffect(() => {
+    if (status !== statusList.all) {
+      async function getComumm() {
+        await getCommunitiesSpec(`${status}`)
+        console.log(status);
+      }
+      getComumm()
+    }
+
+    if (status === statusList.all) {
+      refetchCommunitiesAll()
+    }
+
+  }, [status]);
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -174,6 +198,8 @@ export default function CommunitiesPage() {
     return questBadgesWithIsImported;
   };
 
+
+
   return (
     <PageTemplate
       className=""
@@ -187,11 +213,17 @@ export default function CommunitiesPage() {
     >
       <ContentTabs
         inputSearch
+        onButtonClick={(tabName) => {
+          router.push({
+            pathname: router.pathname,
+            query: { status: tabName }
+          })
+        }}
         tabs={{
           All: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
                       key={community.communityAddress}
@@ -209,7 +241,7 @@ export default function CommunitiesPage() {
           Joined: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
                       key={community.communityAddress}
@@ -228,7 +260,7 @@ export default function CommunitiesPage() {
           Created: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
                       key={community.communityAddress}
@@ -247,7 +279,7 @@ export default function CommunitiesPage() {
           Hidden: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
                       key={community.communityAddress}

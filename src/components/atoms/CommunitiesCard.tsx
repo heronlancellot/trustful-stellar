@@ -54,11 +54,11 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center text-xs justify-center gap-1 ">
+                    <div className="flex items-center text-xs justify-center gap-2">
                         <div className=" w-3 h-3">
                             <TagIcon />
                         </div>
-                        <div>
+                        <div className="flex justify-center">
                             <span>{community?.totalBadges}</span>
                         </div>
                     </div>

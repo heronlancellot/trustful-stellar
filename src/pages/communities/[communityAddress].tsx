@@ -20,7 +20,9 @@ import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
 import { useModal } from "@/hooks/useModal";
 import { CustomModal } from "./components/molecules/custom-modal";
 import LeaderboardTable from "./components/molecules/leaderboard-table"; import { useEffect, useState } from "react";
-import { Communities } from "@/types/communities";
+import { BadgesList, Communities, MembersList } from "@/types/communities";
+import { CommunityTableCell } from "./components/molecules/CommunityTableCell";
+import { useParams, usePathname } from "next/navigation";
 "./components/molecules/leaderboard-table";
 
 interface DetailsProps {
@@ -29,29 +31,16 @@ interface DetailsProps {
     }
 }
 
-// interface DataProps {
-//     communityAddress?: string;
-//     factoryAddress?: string;
-//     name?: string;
-//     description?: string;
-//     creatorAddress?: string;
-//     isHidden?: boolean;
-//     blocktimestamp?: string;
-//     totalBadges?: number;
-//     totalMembers?: number;
-//     managers?: string[];
-// }
-
 export default function DetailsCommunity({ params }: DetailsProps) {
     const { openModal, closeModal, isOpen } = useModal();
 
     const router = useRouter();
-    const status = router.query.status;
+    const { status } = router.query;
     const communityAddress = router.query.communityAddress;
 
-    console.log(communityAddress);
-
     const [communities, setCommunities] = useState<Communities>()
+    const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>()
+    const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>()
 
     useEffect(() => {
         const getCommunities = async () => {
@@ -67,7 +56,38 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             }
         };
 
+        const getCommunitiesBadgesList = async () => {
+            try {
+                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges`);
+                const data = await response.json();
+                console.log(data);
+
+                setCommunitiesBadgesList(data)
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const getCommunitiesMembersList = async () => {
+            try {
+                const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/members`);
+                const data = await response.json();
+                console.log(data);
+
+                setCommunitiesMembersList(data)
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+
+
+
         getCommunities()
+        getCommunitiesBadgesList()
+        getCommunitiesMembersList()
     }, [])
 
     const statusList = {
@@ -89,24 +109,20 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         },
     ];
 
-    const searchedUserBadges = searchedUserBadgesData.map((badge) => ({
+    const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
         badgeName: (
             <div className="flex flex-row items-center h-7">
                 <div className="flex flex-col">
                     <span>{badge?.name}</span>
                     <span>{badge?.score}</span>
-                    <span>{badge?.status}</span>
-                    <span>{badge?.description}</span>
                     <span className="text-sm text-whiteOpacity05">
                         Points: {badge.score}
                     </span>
                 </div>
             </div>
         ),
-        Badges: <IssuerTableCell issuerAddress={badge?.id} />,
-        Score: <IssuerTableCell issuerAddress={badge?.score} />,
-        Name: <IssuerTableCell issuerAddress={badge?.name} />,
-        Status: <IssuerTableCell issuerAddress={badge?.status} />,
+        Score: <CommunityTableCell issuerAddress={badge?.score.toString()} />,
+        Name: <CommunityTableCell issuerAddress={badge?.name} />,
     }));
 
     return (
@@ -377,7 +393,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 tabNumber: 1,
                             },
                             Leaderboard: {
-                                content: <LeaderboardTable />,
+                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
                                 tabNumber: 2,
                             },
                         }}
