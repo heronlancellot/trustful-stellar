@@ -8,10 +8,10 @@ export type CommunityContext = {
   setCommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
   communitiesDetail: Communities | undefined;
   setCommunitiesDetail: Communities | undefined | any;
-  communitiesBadgesList: BadgesList[] | undefined;
-  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<BadgesList[] | undefined>>;
-  communitiesMembersList: MembersList[] | undefined;
-  setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[] | undefined>>;
+  communitiesBadgesList: BadgesList[];
+  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<BadgesList[]>>;
+  communitiesMembersList: MembersList[];
+  setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[]>>;
   getCommunities: () => Promise<void>;
   getCommunitiesSpec: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;

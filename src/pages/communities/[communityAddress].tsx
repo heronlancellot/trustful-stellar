@@ -35,8 +35,13 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const { openModal, closeModal, isOpen } = useModal();
 
     const router = useRouter();
-    const { status } = router.query;
-    const communityAddress = router.query.communityAddress;
+    const { status, communityAddress } = router.query;
+    // const pathName = useParams()
+    // const communityAddress = pathName?.communityAddress;
+    // console.log(router);
+    console.log(router.query);
+
+
 
     const { getCommunitiesBadgesList,
         getCommunitiesMembersList,
@@ -47,10 +52,20 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         setCommunitiesDetail } = useCommunityContext()
 
     useEffect(() => {
-        getCommunitiesDetails(`${communityAddress}`)
-        getCommunitiesBadgesList(`${communityAddress}`)
-        getCommunitiesMembersList(`${communityAddress}`)
-    }, [])
+        if (communityAddress) {
+            getCommunitiesDetails(`${communityAddress}`)
+            getCommunitiesBadgesList(`${communityAddress}`)
+            getCommunitiesMembersList(`${communityAddress}`)
+        }
+    }, [communityAddress])
+
+    // useEffect(() => {
+    //     if (communityAddress) {
+    //         getCommunitiesDetails(`${communityAddress}`)
+    //         getCommunitiesBadgesList(`${communityAddress}`)
+    //         getCommunitiesMembersList(`${communityAddress}`)
+    //     }
+    // }, [communityAddress])
 
     const statusList = {
         all: "all",
@@ -86,6 +101,12 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         Score: <CommunityTableCell issuerAddress={badge?.score.toString()} />,
         Name: <CommunityTableCell issuerAddress={badge?.name} />,
     }));
+
+    if (!communityAddress || !status) {
+        console.log('/////////////entrou');
+
+        return <h1>Carregando...</h1>
+    }
 
     return (
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">

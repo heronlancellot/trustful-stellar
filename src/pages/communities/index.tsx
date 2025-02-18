@@ -45,8 +45,6 @@ export default function CommunitiesPage() {
   const router = useRouter()
   const { status } = router.query;
 
-  const pathName = usePathname()
-
   const statusList = {
     all: "all",
     joined: "joined",

@@ -14,8 +14,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const [communityQuests, setCommunityQuests] = useState<CommunityQuests>({});
   const [communities, setCommunities] = useState<Communities[]>([])
   const [communitiesDetail, setCommunitiesDetail] = useState<Communities | any>();
-  const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>()
-  const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>()
+  const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>([])
+  const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>([])
 
   useEffect(() => {
     const getCommunities = async () => {
@@ -64,8 +64,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
       console.log(data);
 
-      setCommunitiesDetail(data);
-      setCommunities(data)
+      setCommunitiesDetail(data)
+      setCommunities([data])
 
     } catch (error) {
       console.error(error);
