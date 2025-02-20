@@ -58,7 +58,6 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
         </div>
         <div className="">
           {inputSearch && (
-            // <SearchIconPrimary />
             <SearchBar
               placeholder={"Paste the address..."}
               onButtonClick={onSearch}

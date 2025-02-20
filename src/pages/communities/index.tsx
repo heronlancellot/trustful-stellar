@@ -56,7 +56,6 @@ export default function CommunitiesPage() {
     if (status !== statusList.all) {
       async function getComumm() {
         await getCommunitiesSpec(`${status}`)
-        console.log(status);
       }
       getComumm()
     }

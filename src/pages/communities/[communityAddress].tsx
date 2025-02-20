@@ -36,12 +36,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
     const router = useRouter();
     const { status, communityAddress } = router.query;
-    // const pathName = useParams()
-    // const communityAddress = pathName?.communityAddress;
-    // console.log(router);
-    console.log(router.query);
-
-
 
     const { getCommunitiesBadgesList,
         getCommunitiesMembersList,
@@ -95,7 +89,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }));
 
     if (!communityAddress || !status) {
-        console.log('/////////////entrou');
 
         return <h1>Carregando...</h1>
     }

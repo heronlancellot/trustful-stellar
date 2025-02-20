@@ -49,7 +49,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${status}/GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS`);
       const data = await response.json();
-      console.log(data);
 
       setCommunities(data)
 
@@ -62,7 +61,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAdress}`);
       const data = await response.json();
-      console.log(data);
 
       setCommunitiesDetail(data)
       setCommunities([data])
@@ -76,7 +74,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
       const data = await response.json();
-      console.log(data);
 
       setCommunities(data)
 
@@ -89,7 +86,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges`);
       const data = await response.json();
-      console.log(data);
 
       setCommunitiesBadgesList(data)
 
@@ -102,7 +98,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/members`);
       const data = await response.json();
-      console.log(data);
 
       setCommunitiesMembersList(data)
 

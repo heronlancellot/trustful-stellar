@@ -94,9 +94,6 @@ export default function LeaderboardTable({ communitiesMembersList }: any) {
       rank: index + 1
     }));
 
-  console.log('rank');
-  console.log(rankedSorted);
-
   const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
     const formattedUserAddress = `${player.userAddress.slice(0, 10)}...`
     return ({
