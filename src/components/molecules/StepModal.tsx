@@ -263,7 +263,7 @@ export const StepModal: React.FC<ModalProps> = ({
             </p>
             <div className="flex flex-row items-center gap-2">
               <div className="w-5 h-5 overflow-hidden rounded-full">
-                <img
+                <Image
                   src="https://s3-alpha-sig.figma.com/img/d77f/3e8e/1a09e906bd85fac175ad1140dc507ae4?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=S92ienvowHBeaM2Z55wzkEf0VlKnHs23w7SfEUZddkdBtR9sKQKGJC6mqVGT0OLilsJCxtAnAc2gJCmZm8t3JPtvGSc6UAaXLJ-IAGnywWLka6-gkK5a14GENsQe6Fe2oMwZ3Yw0LkECHjMYwKnMJVBvDJDHSK-z1ZpE-ZiWbYX3pv7Bv7uuXonylEaeiWVFM100HmbGilwwTCftYTlFZaM2xPL6OLEnDz0q~1XSHFbW2q3BI4x9VjoJanC1R6la6~4-w0K2xOKLXLV1KROpO2b5a8M5BRlXo~0vbVvSHUqK40XiBU2YYdtvvlAUh05rNsCoxtdqwdEi1E1TNnJq8g__"
                   width={20}
                   height={20}

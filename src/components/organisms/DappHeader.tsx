@@ -28,7 +28,7 @@ export const DappHeader = () => {
                 { "tab-active": path.includes("communities") },
                 "tab p-2 px-4 items-center flex",
               ])}
-              onClick={() => router.push("/communities")}
+              onClick={() => router.push("/communities?status=all")}
             >
               <span>Communities</span>
             </div>
