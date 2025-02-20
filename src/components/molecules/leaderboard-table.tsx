@@ -4,6 +4,8 @@ import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
 import tailwindConfig from "tailwind.config";
 import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
 import { RankIcon } from "@/components/atoms/icons/RankIcon";
+import { MembersList } from "@/types/communities";
+import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
 
 type LeaderboardPlayer = {
   rank: number;
@@ -42,7 +44,7 @@ function getPointsTextColor(rank: number) {
   return colorsMap[rank as keyof typeof colorsMap] || colorsMap.default;
 }
 
-export default function LeaderboardTable() {
+export default function LeaderboardTable({ communitiesMembersList }: any) {
   const searchedLeadboardData: LeaderboardPlayer[] = [
     {
       rank: 1,
@@ -86,42 +88,45 @@ export default function LeaderboardTable() {
     },
   ];
 
-  const leaderboardRenderData = searchedLeadboardData.map((player) => ({
-    rank: (
-      <div className="flex justify-center items-center relative w-min">
-        <RankIcon
-          width={28}
-          height={28}
-          color={getRankIconColor(player.rank)}
-        />
-        <span
-          className="text-xs absolute"
-          style={{ color: getRankTextColor(player.rank) }}
-        >
-          {player.rank}
+  const rankedSorted = communitiesMembersList
+    .map((member: MembersList, index: number) => ({
+      ...member,
+      rank: index + 1
+    }));
+
+  const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
+    const formattedUserAddress = `${player.userAddress.slice(0, 10)}...`
+    return ({
+      rank: (
+        <div className="flex justify-center items-center relative w-min">
+          <RankIcon
+            width={28}
+            height={28}
+            color={getRankIconColor(player.rank)}
+          />
+          <span
+            className="text-xs absolute"
+            style={{ color: getRankTextColor(player.rank) }}
+          >
+            {player.rank}
+          </span>
+        </div>
+      ),
+
+      address: <CommunityTableCell issuerAddress={formattedUserAddress} />,
+      points: (
+        <span style={{ color: getPointsTextColor(player.rank) }}>
+          {player.points}
         </span>
-      </div>
-    ),
-    // TODO: remove this once we are sure we will use the IssuerTableCell component
-    // address: (
-    //   <div className="flex flex-row items-center gap-2">
-    //     <img src={player.avatarUrl} className="w-6 h-6 rounded-full" />
-    //     <span>{getEllipsedAddress(player.address)}</span>
-    //   </div>
-    // ),
-    address: <IssuerTableCell issuerAddress={player.address} />,
-    points: (
-      <span style={{ color: getPointsTextColor(player.rank) }}>
-        {player.points}
-      </span>
-    ),
-    badges: (
-      <div className="flex flex-row items-center gap-1">
-        <span>{player.badges}</span>
-        <span>/ 20</span>
-      </div>
-    ),
-  }));
+      ),
+      badges: (
+        <div className="flex flex-row items-center gap-1">
+          <span>{player.badges}</span>
+          <span>/ 20</span>
+        </div>
+      ),
+    })
+  });
 
   return (
     <div className="px-12">

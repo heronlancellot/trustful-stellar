@@ -17,7 +17,6 @@ import tailwindConfig from "tailwind.config";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
-// import { reputationDetailsData } from "@/lib/utils/mock/reputationDetails";
 
 
 function VerifyReputationPage() {
@@ -86,8 +85,6 @@ function VerifyReputationPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchAddress]);
-
-  // const [reputation] = useState(reputationDetailsData)
 
   return (
     <PageTemplate className="h-full" title="Verify Reputation" tooltip={{

@@ -1,5 +1,4 @@
 import {
-  AttestationBadge,
   ContentTabs,
   GenericModal,
   StarIcon,
@@ -11,8 +10,6 @@ import { PageTemplate } from "@/components/templates/PageTemplate";
 import { useUsersContext } from "@/components/user/Context";
 import communityClient from "@/lib/http-clients/CommunityClient";
 import usersClient from "@/lib/http-clients/UsersClient";
-import { getQuestIcon as getQuestIcon } from "@/lib/getQuestIcon";
-import { convertQuestNameToPresentation } from "@/lib/utils/convertBadgeSetNameToPresentation";
 import { useCallback, useEffect, useState } from "react";
 import _ from "lodash";
 import { CommunityQuests } from "@/components/community/types";
@@ -25,17 +22,14 @@ import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
 import assetClient from "@/lib/http-clients/AssetClient";
 import toast from "react-hot-toast";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
-import { LEGACY_STELLAR_QUEST_NAME } from "@/lib/constants";
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
-import { communitiesData } from "@/lib/utils/mock/communitiesAll"
-import { Communities } from "@/types/communities";
 import { useRouter } from "next/router";
-
-
+import useCommunitiesController from "../../components/community/hooks/controller";
+import { useParams, usePathname } from "next/navigation";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, getCommunities, setCommunities } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -43,14 +37,50 @@ export default function CommunitiesPage() {
     setUserBadgesToImport,
   } = useUsersContext();
 
+  const { inputText, setInputText } = useCommunitiesController()
+
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [selectedQuestName, setSelectedQuestName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
+  const { status } = router.query;
 
+  const statusList = {
+    all: "all",
+    joined: "joined",
+    created: "created",
+    hidden: "hidden",
+  };
 
+  useEffect(() => {
+    if (status !== statusList.all) {
+      async function getComumm() {
+        await getCommunitiesSpec(`${status}`)
+      }
+      getComumm()
+    }
 
-  const [communities] = useState<Communities[]>(communitiesData)
+    if (status === statusList.all) {
+      refetchCommunitiesAll()
+    }
+
+  }, [status]); //eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const getCommunities = async () => {
+      try {
+        const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
+        const data = await response.json();
+
+        setCommunities(data)
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getCommunities()
+  }, []) //eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBadges = useCallback(async () => {
     try {
@@ -183,6 +213,8 @@ export default function CommunitiesPage() {
     return questBadgesWithIsImported;
   };
 
+
+
   return (
     <PageTemplate
       className=""
@@ -195,18 +227,26 @@ export default function CommunitiesPage() {
       isCommunity
     >
       <ContentTabs
+        inputText={inputText}
+        setInputText={setInputText}
         inputSearch
+        onButtonClick={(tabName) => {
+          router.push({
+            pathname: router.pathname,
+            query: { status: tabName }
+          })
+        }}
         tabs={{
           All: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'all' }
                       })} />
                   );
@@ -218,13 +258,13 @@ export default function CommunitiesPage() {
           Joined: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'joined' }
                       })}
                     />
@@ -237,13 +277,13 @@ export default function CommunitiesPage() {
           Created: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'created' }
                       })}
                     />
@@ -256,13 +296,13 @@ export default function CommunitiesPage() {
           Hidden: {
             content: (
               <CardWrapper>
-                {communities.map((community) => {
+                {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.id}
+                      key={community.communityAddress}
                       community={community}
                       onClick={() => router.push({
-                        pathname: "communities/detailslayoutonly",
+                        pathname: `communities/${community.communityAddress}`,
                         query: { status: 'hidden' }
                       })}
                     />
