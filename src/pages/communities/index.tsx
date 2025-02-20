@@ -65,7 +65,7 @@ export default function CommunitiesPage() {
       refetchCommunitiesAll()
     }
 
-  }, [status]);
+  }, [status]); //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const getCommunities = async () => {
@@ -81,15 +81,7 @@ export default function CommunitiesPage() {
     };
 
     getCommunities()
-  }, [])
-
-  // useEffect(() => {
-  //   if (pathName === '/communities') {
-  //     console.log(pathName);
-
-  //     getCommunities();
-  //   }
-  // }, [pathName]);
+  }, []) //eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBadges = useCallback(async () => {
     try {

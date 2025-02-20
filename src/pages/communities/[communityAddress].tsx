@@ -19,8 +19,8 @@ import tailwindConfig from "tailwind.config";
 import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
 import { useModal } from "@/hooks/useModal";
 import { CustomModal } from "./components/molecules/custom-modal";
-import LeaderboardTable from "./components/molecules/leaderboard-table"; import { useEffect, useState } from "react";
-import { CommunityTableCell } from "./components/molecules/CommunityTableCell";
+import LeaderboardTable from "../../components/molecules/leaderboard-table"; import { useEffect, useState } from "react";
+import { CommunityTableCell } from "../../components/molecules/CommunityTableCell";
 import { useParams, usePathname } from "next/navigation";
 import { useCommunityContext } from "@/components/community/Context";
 "./components/molecules/leaderboard-table";
@@ -57,15 +57,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             getCommunitiesBadgesList(`${communityAddress}`)
             getCommunitiesMembersList(`${communityAddress}`)
         }
-    }, [communityAddress])
-
-    // useEffect(() => {
-    //     if (communityAddress) {
-    //         getCommunitiesDetails(`${communityAddress}`)
-    //         getCommunitiesBadgesList(`${communityAddress}`)
-    //         getCommunitiesMembersList(`${communityAddress}`)
-    //     }
-    // }, [communityAddress])
+    }, [communityAddress]) //eslint-disable-line react-hooks/exhaustive-deps
 
     const statusList = {
         all: "all",
@@ -412,30 +404,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 ),
                                 tabNumber: 1,
                             },
-                            Leadboard: {
-                                content: (
-                                    <div className="px-12">
-                                        <CustomTable
-                                            childrenForEmptyTable={
-                                                <TableEmptyScreen
-                                                    icon={
-                                                        <SearchIcon
-                                                            color={
-                                                                tailwindConfig.theme.extend.colors
-                                                                    .whiteOpacity05
-                                                            }
-                                                        />
-                                                    }
-                                                    title="Search to start"
-                                                    description="Check a user's reputation by searching for their address"
-                                                />
-                                            }
-                                            className="mt-6"
-                                            headers={["Rank", "Address", "Points", "Badges"]}
-                                            data={searchedUserBadges}
-                                        ></CustomTable>
-                                    </div>
-                                ),
+                            Leaderboard: {
+                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
                                 tabNumber: 2,
                             },
                         }}
@@ -470,30 +440,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 ),
                                 tabNumber: 1,
                             },
-                            Leadboard: {
-                                content: (
-                                    <div className="px-12">
-                                        <CustomTable
-                                            childrenForEmptyTable={
-                                                <TableEmptyScreen
-                                                    icon={
-                                                        <SearchIcon
-                                                            color={
-                                                                tailwindConfig.theme.extend.colors
-                                                                    .whiteOpacity05
-                                                            }
-                                                        />
-                                                    }
-                                                    title="Search to start"
-                                                    description="Check a user's rank on our leaderboard"
-                                                />
-                                            }
-                                            className="mt-6 leaderboard-table"
-                                            headers={["Rank", "Address", "Points", "Badges"]}
-                                            data={searchedUserBadges}
-                                        ></CustomTable>
-                                    </div>
-                                ),
+                            Leaderboard: {
+                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
                                 tabNumber: 2,
                             },
                         }}

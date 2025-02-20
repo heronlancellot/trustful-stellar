@@ -10,4 +10,8 @@ export interface MembersList {
     communityAddress: string;
     lastIndexedAt: string;
     user: User;
+    badges: number;
+
+    points: number;
+    rank: number;
 }

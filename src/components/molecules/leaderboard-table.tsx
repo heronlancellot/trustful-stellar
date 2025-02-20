@@ -5,7 +5,7 @@ import tailwindConfig from "tailwind.config";
 import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
 import { RankIcon } from "@/components/atoms/icons/RankIcon";
 import { MembersList } from "@/types/communities";
-import { CommunityTableCell } from "./CommunityTableCell";
+import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
 
 type LeaderboardPlayer = {
   rank: number;
@@ -88,7 +88,16 @@ export default function LeaderboardTable({ communitiesMembersList }: any) {
     },
   ];
 
-  const leaderboardRenderData = communitiesMembersList?.map((player: any) => {
+  const rankedSorted = communitiesMembersList
+    .map((member: MembersList, index: number) => ({
+      ...member,
+      rank: index + 1
+    }));
+
+  console.log('rank');
+  console.log(rankedSorted);
+
+  const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
     const formattedUserAddress = `${player.userAddress.slice(0, 10)}...`
     return ({
       rank: (
