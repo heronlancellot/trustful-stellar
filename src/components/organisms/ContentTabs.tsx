@@ -56,7 +56,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
               );
             })}
         </div>
-        <div className="">
+        <div className="py-4">
           {inputSearch && (
             <SearchBar
               placeholder={"Paste the address..."}
