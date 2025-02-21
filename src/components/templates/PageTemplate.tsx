@@ -62,7 +62,7 @@ export const PageTemplate = ({
           <h1 className="font-space-grotesk">{title}</h1>{" "}
 
           {isCommunity && (
-            <div className="p-6">
+            <div className="py-6 px-12">
               <PrimaryButton
                 className="rounded-lg w-max"
                 label="Create"
