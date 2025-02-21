@@ -30,7 +30,7 @@ export const DappHeader = () => {
               ])}
               onClick={() => router.push("/communities?status=all")}
             >
-              <span>Communities</span>
+              <span className="cursor-pointer">Communities</span>
             </div>
             <div
               className={cc([
@@ -39,7 +39,7 @@ export const DappHeader = () => {
               ])}
               onClick={() => router.push("/verify-reputation")}
             >
-              <span>Verify Reputation</span>
+              <span className="cursor-pointer">Verify Reputation</span>
             </div>
             <div
               className={cc([
@@ -48,7 +48,7 @@ export const DappHeader = () => {
               ])}
               onClick={() => router.push("/faq")}
             >
-              <span>FAQ</span>
+              <span className="cursor-pointer">FAQ</span>
             </div>
           </div>
 
