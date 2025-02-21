@@ -121,8 +121,10 @@ export default function LeaderboardTable({ communitiesMembersList }: any) {
       ),
       badges: (
         <div className="flex flex-row items-center gap-1">
-          <span>{player.badges}</span>
-          <span>/ 20</span>
+          <span style={{ color: getPointsTextColor(player.rank) }}>
+            {player.badges}
+          </span>
+          <span className="text-whiteOpacity05">/ 20</span>
         </div>
       ),
     })
