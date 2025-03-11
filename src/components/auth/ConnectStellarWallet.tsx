@@ -4,6 +4,7 @@ import {
   AlbedoModule,
   StellarWalletsKit,
   WalletNetwork,
+  xBullModule,
 } from "@creit.tech/stellar-wallets-kit";
 import cc from "classcat";
 import { UserDropdown } from "../molecules";
@@ -19,7 +20,8 @@ interface ConnectWalletProps {
 export const kit: StellarWalletsKit = new StellarWalletsKit({
   network: isTestnet ? WalletNetwork.TESTNET : WalletNetwork.PUBLIC,
   selectedWalletId: ALBEDO_ID,
-  modules: [new AlbedoModule()],
+  modules: [new AlbedoModule(), new xBullModule(),
+  ],
 });
 
 export const ConnectStellarWallet = ({

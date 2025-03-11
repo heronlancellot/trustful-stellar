@@ -2,6 +2,7 @@ import {
     ArrowRightIcon,
     CheckIcon,
     ContentTabs,
+    GenericModal,
     PlusIcon,
     PrimaryButton,
     StarIcon,
@@ -24,6 +25,10 @@ import { CommunityTableCell } from "../../components/molecules/CommunityTableCel
 import { useParams, usePathname } from "next/navigation";
 import { useCommunityContext } from "@/components/community/Context";
 "./components/molecules/leaderboard-table";
+import { kit } from "@/components/auth/ConnectStellarWallet";
+import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
+import { useAuthContext } from "@/components/auth/Context";
+import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
 
 interface DetailsProps {
     params: {
@@ -33,6 +38,12 @@ interface DetailsProps {
 
 export default function DetailsCommunity({ params }: DetailsProps) {
     const { openModal, closeModal, isOpen } = useModal();
+
+    const [isImportModalOpen, setImportModalOpen] = useState(true);
+
+    const { userAddress, setUserAddress } = useAuthContext();
+
+
 
     const router = useRouter();
     const { status, communityAddress } = router.query;
@@ -62,15 +73,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
     const { all, joined, created, hidden } = statusList;
 
-    const searchedUserBadgesData = [
-        {
-            id: "",
-            name: "",
-            score: "",
-            description: "",
-            status: "",
-        },
-    ];
 
     const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
         badgeName: (
@@ -102,6 +104,35 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         {`${communitiesDetail?.description}`}
                     </h3>
                 </div>
+
+                <GenericModal
+                    isOpen={isImportModalOpen}
+                    buttonLabel="Connect"
+                    title="Connect Wallet"
+                    onClose={() => {
+                        setImportModalOpen(false);
+                    }}
+                    onButtonClick={async () => {
+                        kit.signTransaction(ALBEDO_ID);
+                        const { address } = await kit.getAddress();
+                        setUserAddress(address);
+                    }}
+                    isAsync={true}
+                >
+                    <div className="p-2 w-full h-full items-center justify-center flex flex-col">
+                        <div className="my-8 p-8 pt-6 w-[150px] h-[150px] rounded-full bg-whiteOpacity005 items-center justify-center">
+                            <WalletIcon
+                                color={tailwindConfig.theme.extend.colors.brandGreen}
+                            ></WalletIcon>
+                        </div>
+                        <div className="text-center">
+                            <span>
+                                Please connect your wallet to import badges from GitHub Soroban.
+                            </span>
+                        </div>
+                    </div>
+                </GenericModal>
+
                 <div>
                     {status === all && (
                         <div className="flex justify-items-center py-2">
