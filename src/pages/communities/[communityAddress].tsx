@@ -29,6 +29,7 @@ import { kit } from "@/components/auth/ConnectStellarWallet";
 import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
 import { useAuthContext } from "@/components/auth/Context";
 import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
+import AddUserToContract from "@/AddUserToContract";
 
 interface DetailsProps {
     params: {
@@ -42,8 +43,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const [isImportModalOpen, setImportModalOpen] = useState(true);
 
     const { userAddress, setUserAddress } = useAuthContext();
-
-
 
     const router = useRouter();
     const { status, communityAddress } = router.query;
@@ -105,33 +104,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     </h3>
                 </div>
 
-                <GenericModal
-                    isOpen={isImportModalOpen}
-                    buttonLabel="Connect"
-                    title="Connect Wallet"
-                    onClose={() => {
-                        setImportModalOpen(false);
-                    }}
-                    onButtonClick={async () => {
-                        kit.signTransaction(ALBEDO_ID);
-                        const { address } = await kit.getAddress();
-                        setUserAddress(address);
-                    }}
-                    isAsync={true}
-                >
-                    <div className="p-2 w-full h-full items-center justify-center flex flex-col">
-                        <div className="my-8 p-8 pt-6 w-[150px] h-[150px] rounded-full bg-whiteOpacity005 items-center justify-center">
-                            <WalletIcon
-                                color={tailwindConfig.theme.extend.colors.brandGreen}
-                            ></WalletIcon>
-                        </div>
-                        <div className="text-center">
-                            <span>
-                                Please connect your wallet to import badges from GitHub Soroban.
-                            </span>
-                        </div>
-                    </div>
-                </GenericModal>
+                <AddUserToContract />
 
                 <div>
                     {status === all && (

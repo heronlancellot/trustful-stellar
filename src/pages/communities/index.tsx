@@ -25,11 +25,10 @@ import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModa
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { useRouter } from "next/router";
 import useCommunitiesController from "../../components/community/hooks/controller";
-import { useParams, usePathname } from "next/navigation";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, getCommunities, setCommunities } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, setCommunities } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -122,19 +121,19 @@ export default function CommunitiesPage() {
     fetchBadges();
   }, [fetchBadges]);
 
-  const questIsFullyImported = (questName: string) => {
-    const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
-      ({ isImported }) => isImported === undefined
-    );
-    if (!userAddress || userHasNoBadgesOfThisQuest) {
-      return undefined;
-    }
-    // TODO: Compare user trustful and normal badges with badge set badges.
-    const needToImportBadges = getModalBadges(questName).some(
-      ({ isImported }) => isImported === false
-    );
-    return !needToImportBadges;
-  };
+  // const questIsFullyImported = (questName: string) => {
+  //   const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
+  //     ({ isImported }) => isImported === undefined
+  //   );
+  //   if (!userAddress || userHasNoBadgesOfThisQuest) {
+  //     return undefined;
+  //   }
+  //   // TODO: Compare user trustful and normal badges with badge set badges.
+  //   const needToImportBadges = getModalBadges(questName).some(
+  //     ({ isImported }) => isImported === false
+  //   );
+  //   return !needToImportBadges;
+  // };
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {

@@ -10,10 +10,11 @@ import {
     TimeoutInfinite,
 } from "@stellar/stellar-sdk";
 import {
-    ALBEDO_ID, ISupportedWallet, StellarWalletsKit,
+    ALBEDO_ID,
+    ISupportedWallet,
+    StellarWalletsKit,
     WalletNetwork,
     allowAllModules,
-    XBULL_ID,
 } from "@creit.tech/stellar-wallets-kit";
 
 const FRIENDBOT_URL = "https://friendbot-testnet.stellar.org/";
@@ -22,9 +23,9 @@ const CONTRACT_ID = "CA7ZX4HWYPPB6BJJRWXLIAYS5L752V32MJRZM3AL7PXCCYPVL2ZNN6S7";
 
 // Função para adicionar um usuário
 export async function addUser(userToAdd: string): Promise<any> {
-
     try {
-        const aliceSecret = "SCN4N2G6BAKVISPVULAS6ZLK57UJJLOMF5QPS73IJWRRRAD66ZF3UX6X"; // Isso aqui não pode ter no teu codigo pq é a senha do usuário 
+        const aliceSecret =
+            "SCN4N2G6BAKVISPVULAS6ZLK57UJJLOMF5QPS73IJWRRRAD66ZF3UX6X";
         const keypair = Keypair.fromSecret(aliceSecret);
         const publicKey = keypair.publicKey();
         console.log("Using sender public key (Alice):", publicKey);
@@ -40,13 +41,14 @@ export async function addUser(userToAdd: string): Promise<any> {
 
         const kit: StellarWalletsKit = new StellarWalletsKit({
             network: WalletNetwork.TESTNET,
-            selectedWalletId: XBULL_ID,
+            selectedWalletId: ALBEDO_ID,
             modules: allowAllModules(),
         });
 
         await kit.openModal({
             onWalletSelected: async (option: ISupportedWallet) => {
-                if (option.id === ALBEDO_ID) { // Ensure only Albedo is selected
+                if (option.id === ALBEDO_ID) {
+                    // Ensure only Albedo is selected
                     kit.setWallet(option.id);
                     const { address } = await kit.getAddress();
                     console.log("Selected wallet address:", address);
@@ -62,13 +64,16 @@ export async function addUser(userToAdd: string): Promise<any> {
         // Construir a transação com a operação de chamada do contrato
         const transaction = new TransactionBuilder(account, {
             fee: BASE_FEE,
-            networkPassphrase: Networks.TESTNET
+            networkPassphrase: Networks.TESTNET,
         })
             .addOperation(
                 Operation.invokeContractFunction({
                     function: "add_user",
                     contract: CONTRACT_ID,
-                    args: [new Address(publicKey).toScVal(), new Address(userToAdd).toScVal()]
+                    args: [
+                        new Address(publicKey).toScVal(),
+                        new Address(userToAdd).toScVal(),
+                    ],
                 })
             )
             .setTimeout(TimeoutInfinite)
@@ -92,26 +97,23 @@ export async function addUser(userToAdd: string): Promise<any> {
             const maxAttempts = 10;
 
             do {
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Esperar 2 segundos
+                await new Promise((resolve) => setTimeout(resolve, 2000)); // Esperar 2 segundos
                 txResponse = await server.getTransaction(sendResponse.hash);
                 attempts++;
-            } while (
-                txResponse.status === "NOT_FOUND" &&
-                attempts < maxAttempts
-            );
+            } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
 
             if (txResponse.status === "SUCCESS") {
                 return {
                     success: true,
                     transactionId: sendResponse.hash,
-                    result: txResponse
+                    result: txResponse,
                 };
             } else {
                 return {
                     success: false,
                     error: `Transaction failed with status: ${txResponse.status}`,
                     transactionId: sendResponse.hash,
-                    result: txResponse
+                    result: txResponse,
                 };
             }
         } else {
@@ -127,22 +129,24 @@ export async function addUser(userToAdd: string): Promise<any> {
                 success: false,
                 error: `Transaction submission failed with status: ${sendResponse.status}`,
                 errorDetails: errorDetails,
-                result: sendResponse
+                result: sendResponse,
             };
         }
-
     } catch (error) {
         console.error("Error in addUser:", error);
         return {
             success: false,
-            error: '',
-            details: error
+            error: "",
+            details: error,
         };
     }
 }
 
 // Função para criar e financiar um novo usuário
-async function createAndFundUser(): Promise<{ publicKey: string, secret: string }> {
+async function createAndFundUser(): Promise<{
+    publicKey: string;
+    secret: string;
+}> {
     // Gerar um novo keypair aleatório
     const newUserKeypair = Keypair.random();
     const newUserPublicKey = newUserKeypair.publicKey();
@@ -161,7 +165,7 @@ async function createAndFundUser(): Promise<{ publicKey: string, secret: string 
 
         return {
             publicKey: newUserPublicKey,
-            secret: newUserSecret
+            secret: newUserSecret,
         };
     } catch (error) {
         console.error("Error funding account:", error);
