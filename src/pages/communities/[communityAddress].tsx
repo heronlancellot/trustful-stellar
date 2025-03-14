@@ -8,70 +8,70 @@ import {
     StarIcon,
     TagIcon,
     UserIcon,
-} from "@/components";
-import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
-import { RankIcon } from "@/components/atoms/icons/RankIcon";
-import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
-import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
-import { CustomTable } from "@/components/organisms/CustomTable";
-import { IconPosition } from "@/types/iconPosition";
-import { useRouter } from "next/router";
-import tailwindConfig from "tailwind.config";
-import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
-import { useModal } from "@/hooks/useModal";
-import { CustomModal } from "./components/molecules/custom-modal";
-import LeaderboardTable from "../../components/molecules/leaderboard-table"; import { useEffect, useState } from "react";
-import { CommunityTableCell } from "../../components/molecules/CommunityTableCell";
-import { useParams, usePathname } from "next/navigation";
-import { useCommunityContext } from "@/components/community/Context";
-"./components/molecules/leaderboard-table";
-import { kit } from "@/components/auth/ConnectStellarWallet";
-import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
-import { useAuthContext } from "@/components/auth/Context";
-import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
-import AddUserToContract from "@/AddUserToContract";
+} from '@/components';
+import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
+import { RankIcon } from '@/components/atoms/icons/RankIcon';
+import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
+import { IssuerTableCell } from '@/components/atoms/verify-reputation/IssuerTableCell';
+import { CustomTable } from '@/components/organisms/CustomTable';
+import { IconPosition } from '@/types/iconPosition';
+import { useRouter } from 'next/router';
+import tailwindConfig from 'tailwind.config';
+import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
+import { useModal } from '@/hooks/useModal';
+import { CustomModal } from './components/molecules/custom-modal';
+import LeaderboardTable from '../../components/molecules/leaderboard-table';
+import { useEffect, useState } from 'react';
+import { CommunityTableCell } from '../../components/molecules/CommunityTableCell';
+import { useCommunityContext } from '@/components/community/Context';
+('./components/molecules/leaderboard-table');
+import { useAuthContext } from '@/components/auth/Context';
+import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
 
 interface DetailsProps {
     params: {
         data: string[];
-    }
+    };
 }
 
 export default function DetailsCommunity({ params }: DetailsProps) {
     const { openModal, closeModal, isOpen } = useModal();
-
-    const [isImportModalOpen, setImportModalOpen] = useState(true);
-
     const { userAddress, setUserAddress } = useAuthContext();
-
     const router = useRouter();
     const { status, communityAddress } = router.query;
 
-    const { getCommunitiesBadgesList,
+    const stellarContract = useStellarContract({
+        contractId: 'CA7ZX4HWYPPB6BJJRWXLIAYS5L752V32MJRZM3AL7PXCCYPVL2ZNN6S7',
+        rpcUrl: 'https://soroban-testnet.stellar.org',
+        networkType: 'TESTNET',
+    });
+
+    const {
+        getCommunitiesBadgesList,
         getCommunitiesMembersList,
         communitiesBadgesList,
         communitiesMembersList,
         getCommunitiesDetails,
         communitiesDetail,
-        setCommunitiesDetail } = useCommunityContext()
+        setCommunitiesDetail,
+    } = useCommunityContext();
 
     useEffect(() => {
         if (communityAddress) {
-            getCommunitiesDetails(`${communityAddress}`)
-            getCommunitiesBadgesList(`${communityAddress}`)
-            getCommunitiesMembersList(`${communityAddress}`)
+            getCommunitiesDetails(`${communityAddress}`);
+            getCommunitiesBadgesList(`${communityAddress}`);
+            getCommunitiesMembersList(`${communityAddress}`);
         }
-    }, [communityAddress]) //eslint-disable-line react-hooks/exhaustive-deps
+    }, [communityAddress]); //eslint-disable-line react-hooks/exhaustive-deps
 
     const statusList = {
-        all: "all",
-        joined: "joined",
-        created: "created",
-        hidden: "hidden",
+        all: 'all',
+        joined: 'joined',
+        created: 'created',
+        hidden: 'hidden',
     };
 
     const { all, joined, created, hidden } = statusList;
-
 
     const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
         badgeName: (
@@ -90,9 +90,17 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }));
 
     if (!communityAddress || !status) {
-
-        return <h1>Carregando...</h1>
+        return <h1>Carregando...</h1>;
     }
+
+    const handleJoinedCommunities = async () => {
+        const result = await stellarContract.addUser();
+        if (result.success) {
+            console.log('Transaction successful:', result.txHash);
+        } else {
+            console.error('Transaction failed:', result.error);
+        }
+    };
 
     return (
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
@@ -104,8 +112,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     </h3>
                 </div>
 
-                <AddUserToContract />
-
                 <div>
                     {status === all && (
                         <div className="flex justify-items-center py-2">
@@ -114,6 +120,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 label="Join" //condicional rendering regarding status
                                 icon={<PlusIcon color="black" width={16} height={16} />}
                                 iconPosition={IconPosition.LEFT}
+                                onClick={handleJoinedCommunities}
                             />
                         </div>
                     )}
@@ -131,7 +138,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                         />
                                     }
                                     iconPosition={IconPosition.LEFT}
-                                    onClick={() => openModal("hideCommunity")}
+                                    onClick={() => openModal('hideCommunity')}
                                 />
                             </div>
                             <div>
@@ -140,7 +147,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                     label="Managers"
                                     icon={<PlusIcon color="black" width={16} height={16} />}
                                     iconPosition={IconPosition.LEFT}
-                                    onClick={() => openModal("managers")}
+                                    onClick={() => openModal('managers')}
                                 />
                             </div>
                         </div>
@@ -167,7 +174,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 <div>
                     <UserIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">Created by {communitiesDetail?.creatorAddress?.substring(0, 10)}...</div>
+                <div className="text-gray-500">
+                    Created by {communitiesDetail?.creatorAddress?.substring(0, 10)}...
+                </div>
                 <div className="text-gray-500">/</div>
 
                 <div>
@@ -186,8 +195,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
             <CustomModal
                 title="Hide community?"
-                isOpen={isOpen("hideCommunity")}
-                onClose={() => closeModal("hideCommunity")}
+                isOpen={isOpen('hideCommunity')}
+                onClose={() => closeModal('hideCommunity')}
                 isAsync={false}
                 headerBackgroundColor="bg-whiteOpacity008"
             >
@@ -212,8 +221,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
             <CustomModal
                 title="People that can manage"
-                isOpen={isOpen("managers")}
-                onClose={() => closeModal("managers")}
+                isOpen={isOpen('managers')}
+                onClose={() => closeModal('managers')}
                 isAsync={false}
                 headerBackgroundColor="bg-whiteOpacity008"
             >
@@ -248,7 +257,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 </div>
                                             </div>
                                             <div
-                                                onClick={() => openModal("deleteBadge")}
+                                                onClick={() => openModal('deleteBadge')}
                                                 className="w-[15px] h-[15px] cursor-pointer"
                                             >
                                                 <TrashIcon />
@@ -271,7 +280,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 </div>
                                             </div>
                                             <div
-                                                onClick={() => openModal("deleteBadge")}
+                                                onClick={() => openModal('deleteBadge')}
                                                 className="w-[15px] h-[15px] cursor-pointer"
                                             >
                                                 <TrashIcon />
@@ -294,7 +303,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 </div>
                                             </div>
                                             <div
-                                                onClick={() => openModal("deleteBadge")}
+                                                onClick={() => openModal('deleteBadge')}
                                                 className="w-[15px] h-[15px] cursor-pointer"
                                             >
                                                 <TrashIcon />
@@ -310,8 +319,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
             <CustomModal
                 title="Delete badge?"
-                isOpen={isOpen("deleteBadge")}
-                onClose={() => closeModal("deleteBadge")}
+                isOpen={isOpen('deleteBadge')}
+                onClose={() => closeModal('deleteBadge')}
                 isAsync={false}
                 headerBackgroundColor="bg-whiteOpacity008"
             >
@@ -337,7 +346,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div className="py-8">
                 {status === all && (
                     <ContentTabs
-
                         tabs={{
                             Badges: {
                                 content: (
@@ -358,7 +366,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 />
                                             }
                                             className="mt-6"
-                                            headers={["Name", "Score"]}
+                                            headers={['Name', 'Score']}
                                             data={searchedUserBadges}
                                         ></CustomTable>
                                     </div>
@@ -366,7 +374,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 tabNumber: 1,
                             },
                             Leaderboard: {
-                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
+                                content: (
+                                    <LeaderboardTable
+                                        communitiesMembersList={communitiesMembersList}
+                                    />
+                                ),
                                 tabNumber: 2,
                             },
                         }}
@@ -394,7 +406,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 />
                                             }
                                             className="mt-6"
-                                            headers={["Name", "Score", "Status"]}
+                                            headers={['Name', 'Score', 'Status']}
                                             data={searchedUserBadges}
                                         ></CustomTable>
                                     </div>
@@ -402,7 +414,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 tabNumber: 1,
                             },
                             Leaderboard: {
-                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
+                                content: (
+                                    <LeaderboardTable
+                                        communitiesMembersList={communitiesMembersList}
+                                    />
+                                ),
                                 tabNumber: 2,
                             },
                         }}
@@ -430,7 +446,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                 />
                                             }
                                             className="mt-6"
-                                            headers={["Name", "Score", "Status"]}
+                                            headers={['Name', 'Score', 'Status']}
                                             data={searchedUserBadges}
                                         ></CustomTable>
                                     </div>
@@ -438,7 +454,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 tabNumber: 1,
                             },
                             Leaderboard: {
-                                content: <LeaderboardTable communitiesMembersList={communitiesMembersList} />,
+                                content: (
+                                    <LeaderboardTable
+                                        communitiesMembersList={communitiesMembersList}
+                                    />
+                                ),
                                 tabNumber: 2,
                             },
                         }}
