@@ -7,8 +7,8 @@ interface UseStellarContractProps {
     networkType: "TESTNET" | "PUBLIC";
 }
 
-export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractProps) => {
-    const executeContractFunction = async (functionName: string) => {
+export const useStellarContractManager = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractProps) => {
+    const executeContractFunction = async (functionName: string, sender: string, newManagerAddress: string) => {
         try {
             // Get public key via Albedo
             const { pubkey } = await albedo.publicKey({ require_existing: true });
@@ -27,8 +27,8 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
                         function: functionName,
                         contract: contractId,
                         args: [
-                            new Address(pubkey).toScVal(),
-                            // new Address('GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS').toScVal()
+                            new Address(sender).toScVal(),
+                            new Address(newManagerAddress).toScVal()
                         ]
                     })
                 )
@@ -57,7 +57,7 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
 
     return {
         executeContractFunction,
-        addUser: () => executeContractFunction('add_user'),
-        removeUser: () => executeContractFunction('remove_user'),
+        addManager: (sender: string, newManagerAddress: string) => executeContractFunction('add_manager', sender, newManagerAddress),
+        removeManager: (sender: string, newManagerAddress: string) => executeContractFunction('remove_manager', sender, newManagerAddress),
     };
 }; 

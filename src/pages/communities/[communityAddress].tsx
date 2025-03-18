@@ -26,7 +26,7 @@ import { CommunityTableCell } from '../../components/molecules/CommunityTableCel
 import { useCommunityContext } from '@/components/community/Context';
 ('./components/molecules/leaderboard-table');
 import { useAuthContext } from '@/components/auth/Context';
-import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
+import useCommunitiesController from '@/components/community/hooks/controller';
 
 interface DetailsProps {
     params: {
@@ -37,14 +37,9 @@ interface DetailsProps {
 export default function DetailsCommunity({ params }: DetailsProps) {
     const { openModal, closeModal, isOpen } = useModal();
     const { userAddress, setUserAddress } = useAuthContext();
+    const { stellarContractJoinCommunities, stellarContractManagers } = useCommunitiesController()
     const router = useRouter();
     const { status, communityAddress } = router.query;
-
-    const stellarContract = useStellarContract({
-        contractId: 'CA7ZX4HWYPPB6BJJRWXLIAYS5L752V32MJRZM3AL7PXCCYPVL2ZNN6S7',
-        rpcUrl: 'https://soroban-testnet.stellar.org',
-        networkType: 'TESTNET',
-    });
 
     const {
         getCommunitiesBadgesList,
@@ -53,7 +48,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         communitiesMembersList,
         getCommunitiesDetails,
         communitiesDetail,
-        setCommunitiesDetail,
     } = useCommunityContext();
 
     useEffect(() => {
@@ -94,7 +88,23 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
 
     const handleJoinedCommunities = async () => {
-        const result = await stellarContract.addUser();
+        const result = await stellarContractJoinCommunities.addUser();
+
+        if (result.success) {
+            console.log('Transaction successful:', result.txHash);
+        } else {
+            console.error('Transaction failed:', result.error);
+        }
+    };
+
+    const handleInviteManager = async () => {
+        // const sender = 'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS'; // Substituir pelo endereço correto do remetente
+        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
+        const newManager =
+            'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
+
+        const result = await stellarContractManagers.addManager(sender, newManager);
+
         if (result.success) {
             console.log('Transaction successful:', result.txHash);
         } else {
@@ -236,7 +246,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                         className="w-[440px] h-[36px] p-2 rounded-lg bg-whiteOpacity005"
                                         type="text"
                                     />
-                                    <button className="flex items-center justify-center w-[100px] h-[36px] rounded-lg bg-brandGreen text-base text-brandBlack text-center">
+                                    <button className="flex items-center justify-center w-[100px] h-[36px] rounded-lg bg-brandGreen text-base text-brandBlack text-center"
+                                        onClick={handleInviteManager}>
                                         Invite
                                     </button>
                                 </div>
