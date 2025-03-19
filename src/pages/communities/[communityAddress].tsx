@@ -40,6 +40,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const { stellarContractJoinCommunities, stellarContractManagers } = useCommunitiesController()
     const router = useRouter();
     const { status, communityAddress } = router.query;
+    const [newManager, setNewManager] = useState('')
 
     const {
         getCommunitiesBadgesList,
@@ -88,7 +89,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
 
     const handleJoinedCommunities = async () => {
-        const result = await stellarContractJoinCommunities.addUser();
+        const result = await stellarContractJoinCommunities.removeUser();
 
         if (result.success) {
             console.log('Transaction successful:', result.txHash);
@@ -97,11 +98,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         }
     };
 
-    const handleInviteManager = async () => {
+    const handleInviteManager = async (newManager: string) => {
         // const sender = 'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS'; // Substituir pelo endereço correto do remetente
         const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
-        const newManager =
-            'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
+        // const newManager =
+        //     'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
 
         const result = await stellarContractManagers.addManager(sender, newManager);
 
@@ -245,82 +246,39 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                         placeholder="Add managers by inserting the Stellar address"
                                         className="w-[440px] h-[36px] p-2 rounded-lg bg-whiteOpacity005"
                                         type="text"
+                                        onChange={(e) => setNewManager(e.target.value)}
                                     />
                                     <button className="flex items-center justify-center w-[100px] h-[36px] rounded-lg bg-brandGreen text-base text-brandBlack text-center"
-                                        onClick={handleInviteManager}>
+                                        onClick={() => handleInviteManager(newManager)}>
                                         Invite
                                     </button>
                                 </div>
                                 <div className="w-full flex flex-col">
-                                    <div className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3">
-                                        <div className="w-full flex justify-between items-center gap-2">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-[35px] h-[35px] rounded-full p-2 bg-blue-500">
-                                                    <StarIcon />
+                                    {communitiesDetail?.managers?.map((item) => (
+                                        <div key={item} className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3">
+                                            <div className="w-full flex justify-between items-center gap-2">
+                                                <div className="flex gap-4 items-center">
+                                                    <div className="w-[35px] h-[35px] rounded-full p-2 bg-blue-500">
+                                                        <StarIcon />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-normal">
+                                                            {item.slice(10)}
+                                                        </span>
+                                                        <span className="text-xs text-whiteOpacity05">
+                                                            Manager
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-normal">
-                                                        winter_pudgy.eth
-                                                    </span>
-                                                    <span className="text-xs text-whiteOpacity05">
-                                                        Manager
-                                                    </span>
+                                                <div
+                                                    onClick={() => openModal('deleteBadge')}
+                                                    className="w-[15px] h-[15px] cursor-pointer"
+                                                >
+                                                    <TrashIcon />
                                                 </div>
-                                            </div>
-                                            <div
-                                                onClick={() => openModal('deleteBadge')}
-                                                className="w-[15px] h-[15px] cursor-pointer"
-                                            >
-                                                <TrashIcon />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3">
-                                        <div className="w-full flex justify-between items-center gap-2">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-[35px] h-[35px] rounded-full p-2 bg-blue-500">
-                                                    <StarIcon />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-normal">
-                                                        winter_pudgy.eth
-                                                    </span>
-                                                    <span className="text-xs text-whiteOpacity05">
-                                                        Manager
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                onClick={() => openModal('deleteBadge')}
-                                                className="w-[15px] h-[15px] cursor-pointer"
-                                            >
-                                                <TrashIcon />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3">
-                                        <div className="w-full flex justify-between items-center gap-2">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-[35px] h-[35px] rounded-full p-2 bg-blue-500">
-                                                    <StarIcon />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-normal">
-                                                        winter_pudgy.eth
-                                                    </span>
-                                                    <span className="text-xs text-whiteOpacity05">
-                                                        Manager
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                onClick={() => openModal('deleteBadge')}
-                                                className="w-[15px] h-[15px] cursor-pointer"
-                                            >
-                                                <TrashIcon />
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
