@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusIcon, StarIcon, TagIcon } from "../atoms/icons";
 import { AwardIcon } from "../atoms/icons/AwardIcon";
 import { GithubIcon } from "../atoms/icons/GithubIcon";
@@ -13,6 +13,9 @@ import { AlertIcon } from "../atoms/icons/AlertIcon";
 import { TrashIcon } from "../atoms/icons/TrashIcon";
 import { CloseIcon } from "../atoms/icons/CloseIcon";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 interface ModalProps {
   isOpen: boolean;
@@ -57,6 +60,20 @@ const CustomHR = () => {
   );
 };
 
+// Define o schema de validação
+const createCommunitySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().max(120, "Description must be less than 120 characters"),
+  avatar: z.string().min(1, "Avatar is required"),
+  badge: z.string().min(1, "Badge is required"),
+  badges: z.array(z.object({
+    name: z.string(),
+    score: z.number()
+  }))
+});
+
+type CreateCommunityForm = z.infer<typeof createCommunitySchema>;
+
 export const StepModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -65,8 +82,44 @@ export const StepModal: React.FC<ModalProps> = ({
   onBack,
   onConfirm,
 }) => {
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateCommunityForm>({
+    resolver: zodResolver(createCommunitySchema)
+  });
+
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedBadge, setSelectedBadge] = useState<string>("");
+
+  useEffect(() => {
+    setValue('avatar', selectedAvatar);
+    setValue('badge', selectedBadge);
+  }, [selectedAvatar, selectedBadge, setValue]);
+
+  // const onSubmit = async (data: CreateCommunityForm) => {
+  //   try {
+  //     const response = await fetch('/api/communities', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to create community');
+  //     }
+
+  //     onClose();
+  //     console.log(response);
+
+  //   } catch (error) {
+  //     console.error('Error creating community:', error);
+  //   }
+  // };
+
+  const onSubmit = async (data: CreateCommunityForm) => {
+    console.log(data);
+
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -77,20 +130,27 @@ export const StepModal: React.FC<ModalProps> = ({
               <div>
                 <label className="block text-sm mb-2 font-light">Name</label>
                 <input
+                  {...register('name')}
                   type="text"
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                 />
+                {errors.name && (
+                  <span className="text-red-500 text-sm">{errors.name?.message}</span>
+                )}
               </div>
               <div>
-                <label className="block text-sm mb-2 font-light">
-                  Description
-                </label>
+                <label className="block text-sm mb-2 font-light">Description</label>
                 <textarea
-                  className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008  max-h-[200px] min-h-[100px]"
+                  {...register('description')}
+                  className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008 max-h-[200px] min-h-[100px]"
                   rows={4}
                 />
-
-                <div className="text-right text-sm text-gray-400">0/120</div>
+                {errors.description && (
+                  <span className="text-red-500 text-sm">{errors.description?.message}</span>
+                )}
+                <div className="text-right text-sm text-gray-400">
+                  {watch('description')?.length || 0}/120
+                </div>
               </div>
               <div>
                 <label className="block text-sm mb-2">Avatar</label>
@@ -185,10 +245,8 @@ export const StepModal: React.FC<ModalProps> = ({
                 <label className="block text-sm mb-2">Badges</label>
                 <div className="flex gap-1">
                   {BADGE_OPTIONS.map(({ id, label }) => (
-                    // eslint-disable-next-line react/jsx-key
-                    <div className="flex ">
+                    <div className="flex" key={id}>
                       <button
-                        key={id}
                         onClick={() => setSelectedBadge(id)}
                         className={`p-2 w-24 flex items-center justify-center  rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? "bg-darkGreenOpacity01" : ""}`}
                       >
@@ -222,15 +280,22 @@ export const StepModal: React.FC<ModalProps> = ({
               </p>
             </div>
             <CustomHR />
-            {[1, 2, 3, 4, 5, 6].map((num, index) => (
-              <React.Fragment key={num}>
-                {" "}
+            {[1, 2, 3, 4, 5].map((num) => (
+              <React.Fragment key={`badge-${num}`}>
                 <div className="flex w-full justify-between items-center">
                   <div>
-                    <p className="font-light text-sm">Badge Name #{num}</p>
+                    <input
+                      {...register(`badges.${num - 1}.name`)}
+                      type="text"
+                      placeholder={`Badge Name #${num}`}
+                      className="bg-whiteOpacity005 rounded-lg p-2"
+                    />
                   </div>
                   <div className="flex items-center justify-between w-1/3">
                     <input
+                      {...register(`badges.${num - 1}.score`, {
+                        valueAsNumber: true
+                      })}
                       type="number"
                       className="bg-whiteOpacity005 rounded-lg p-2 w-full border-whiteOpacity008"
                     />
@@ -241,7 +306,7 @@ export const StepModal: React.FC<ModalProps> = ({
                     </button>
                   </div>
                 </div>
-                {index < 5 && <CustomHR />}
+                {num < 6 && <CustomHR />}
               </React.Fragment>
             ))}
           </div>
@@ -264,7 +329,7 @@ export const StepModal: React.FC<ModalProps> = ({
             <div className="flex flex-row items-center gap-2">
               <div className="w-5 h-5 overflow-hidden rounded-full">
                 <Image
-                  src="https://s3-alpha-sig.figma.com/img/d77f/3e8e/1a09e906bd85fac175ad1140dc507ae4?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=S92ienvowHBeaM2Z55wzkEf0VlKnHs23w7SfEUZddkdBtR9sKQKGJC6mqVGT0OLilsJCxtAnAc2gJCmZm8t3JPtvGSc6UAaXLJ-IAGnywWLka6-gkK5a14GENsQe6Fe2oMwZ3Yw0LkECHjMYwKnMJVBvDJDHSK-z1ZpE-ZiWbYX3pv7Bv7uuXonylEaeiWVFM100HmbGilwwTCftYTlFZaM2xPL6OLEnDz0q~1XSHFbW2q3BI4x9VjoJanC1R6la6~4-w0K2xOKLXLV1KROpO2b5a8M5BRlXo~0vbVvSHUqK40XiBU2YYdtvvlAUh05rNsCoxtdqwdEi1E1TNnJq8g__"
+                  src="https://fontawesome.com/icons/user?f=classic&s=solid"
                   width={20}
                   height={20}
                   alt="User Avatar"
@@ -336,7 +401,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
-      <div className="bg-grey02 rounded-lg p-6 w-full max-w-md z-50 relative">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-grey02 rounded-lg p-6 w-full max-w-md z-50 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-space-grotesk">Create community</h2>
           <button onClick={onClose}>
@@ -352,14 +417,16 @@ export const StepModal: React.FC<ModalProps> = ({
         <div className="flex justify-end gap-4 mt-6">
           {currentStep > 1 && (
             <button
+              type="button"
               onClick={onBack}
-              className="px-4 py-2  bg-darkGreenOpacity01 rounded-lg w-24"
+              className="px-4 py-2 bg-darkGreenOpacity01 rounded-lg w-24"
             >
               <p className="text-brandGreen">Back</p>
             </button>
           )}
           {currentStep < 3 ? (
             <button
+              type="button"
               onClick={onNext}
               className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
             >
@@ -367,14 +434,14 @@ export const StepModal: React.FC<ModalProps> = ({
             </button>
           ) : (
             <button
-              onClick={onConfirm}
+              type="submit"
               className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
             >
               Confirm
             </button>
           )}
         </div>
-      </div>
+      </form>
     </div>
   );
 };

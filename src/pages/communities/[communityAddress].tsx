@@ -41,6 +41,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const router = useRouter();
     const { status, communityAddress } = router.query;
     const [newManager, setNewManager] = useState('')
+    const [removeManager, setRemoveManager] = useState('')
 
     const {
         getCommunitiesBadgesList,
@@ -68,27 +69,22 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
     const { all, joined, created, hidden } = statusList;
 
-    const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
-        badgeName: (
-            <div className="flex flex-row items-center h-7">
-                <div className="flex flex-col">
-                    <span>{badge?.name}</span>
-                    <span>{badge?.score}</span>
-                    <span className="text-sm text-whiteOpacity05">
-                        Points: {badge.score}
-                    </span>
-                </div>
-            </div>
-        ),
-        Score: <CommunityTableCell issuerAddress={badge?.score.toString()} />,
-        Name: <CommunityTableCell issuerAddress={badge?.name} />,
-    }));
 
     if (!communityAddress || !status) {
         return <h1>Carregando...</h1>;
     }
 
     const handleJoinedCommunities = async () => {
+        const result = await stellarContractJoinCommunities.addUser();
+
+        if (result.success) {
+            console.log('Transaction successful:', result.txHash);
+        } else {
+            console.error('Transaction failed:', result.error);
+        }
+    };
+
+    const handleExitCommunities = async () => {
         const result = await stellarContractJoinCommunities.removeUser();
 
         if (result.success) {
@@ -112,6 +108,37 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             console.error('Transaction failed:', result.error);
         }
     };
+
+    const handleRemoveManager = async (newManager: string) => {
+        // const sender = 'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS'; // Substituir pelo endereço correto do remetente
+        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
+        // const newManager =
+        //     'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
+
+        const result = await stellarContractManagers.removeManager(sender, newManager);
+
+        if (result.success) {
+            console.log('Transaction successful:', result.txHash);
+        } else {
+            console.error('Transaction failed:', result.error);
+        }
+    };
+
+    const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
+        badgeName: (
+            <div className="flex flex-row items-center h-7">
+                <div className="flex flex-col">
+                    <span>{badge?.name}</span>
+                    <span>{badge?.score}</span>
+                    <span className="text-sm text-whiteOpacity05">
+                        Points: {badge.score}
+                    </span>
+                </div>
+            </div>
+        ),
+        Score: <CommunityTableCell issuerAddress={badge?.score.toString()} />,
+        Name: <CommunityTableCell issuerAddress={badge?.name} />,
+    }));
 
     return (
         <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
@@ -271,7 +298,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                     </div>
                                                 </div>
                                                 <div
-                                                    onClick={() => openModal('deleteBadge')}
+                                                    onClick={() => { openModal('deleteBadge'); () => setRemoveManager(item) }}
                                                     className="w-[15px] h-[15px] cursor-pointer"
                                                 >
                                                     <TrashIcon />
@@ -290,6 +317,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 title="Delete badge?"
                 isOpen={isOpen('deleteBadge')}
                 onClose={() => closeModal('deleteBadge')}
+                // onButtonClick={}
                 isAsync={false}
                 headerBackgroundColor="bg-whiteOpacity008"
             >
@@ -305,7 +333,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         <button className="text-sm text-center w-[153px] h-[36px] rounded-md bg-darkGreenOpacity01 text-brandGreen  ">
                             No, keep it
                         </button>
-                        <button className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack ">
+                        <button onClick={() => alert()} className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack ">
                             Yes, delete
                         </button>
                     </div>
