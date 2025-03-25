@@ -16,6 +16,17 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useStellarContractManager } from '@/lib/stellar/transactions/hooks/useStellarContractManager';
+import albedo from "@albedo-link/intent";
+import {
+  rpc,
+  TransactionBuilder,
+  BASE_FEE,
+  Networks,
+  Operation,
+  Address,
+  xdr
+} from "@stellar/stellar-sdk";
 
 interface ModalProps {
   isOpen: boolean;
@@ -60,7 +71,6 @@ const CustomHR = () => {
   );
 };
 
-// Define o schema de validação
 const createCommunitySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().max(120, "Description must be less than 120 characters"),
@@ -94,31 +104,108 @@ export const StepModal: React.FC<ModalProps> = ({
     setValue('badge', selectedBadge);
   }, [selectedAvatar, selectedBadge, setValue]);
 
-  // const onSubmit = async (data: CreateCommunityForm) => {
-  //   try {
-  //     const response = await fetch('/api/communities', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to create community');
-  //     }
-
-  //     onClose();
-  //     console.log(response);
-
-  //   } catch (error) {
-  //     console.error('Error creating community:', error);
-  //   }
-  // };
-
   const onSubmit = async (data: CreateCommunityForm) => {
-    console.log(data);
+    try {
+      const { pubkey } = await albedo.publicKey({ require_existing: true });
 
+      const FACTORY_CONTRACT_ID = "CB6U2W3AJNUEYFDVT5MEXOTEUEMHM5P64XKN2S5KUHI26HBGJBT7CULH";
+      const RPC_URL = "https://soroban-testnet.stellar.org";
+
+      const server = new rpc.Server(RPC_URL, { allowHttp: true });
+      const account = await server.getAccount(pubkey);
+
+      const saltBuffer = Buffer.alloc(32);
+      for (let i = 0; i < 32; i++) {
+        saltBuffer[i] = Math.floor(Math.random() * 256);
+      }
+      const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
+
+      const adminAddressScVal = new Address(pubkey).toScVal();
+
+      const badgeMapEntries: xdr.ScMapEntry[] = [];
+      data.badges.forEach(badge => {
+        if (badge.name && badge.score) {
+          const badgeIdVector = xdr.ScVal.scvVec([
+            xdr.ScVal.scvString(badge.name),
+            new Address(pubkey).toScVal()
+          ]);
+
+          badgeMapEntries.push(new xdr.ScMapEntry({
+            key: badgeIdVector,
+            val: xdr.ScVal.scvU32(badge.score)
+          }));
+        }
+      });
+
+      const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
+
+      const nameScVal = xdr.ScVal.scvString(data.name);
+      const descriptionScVal = xdr.ScVal.scvString(data.description);
+      const iconScVal = xdr.ScVal.scvString(data.avatar);
+
+      const initArgsArray = [
+        adminAddressScVal,
+        badgeMapScVal,
+        nameScVal,
+        descriptionScVal,
+        iconScVal
+      ];
+
+      const initArgsScVal = xdr.ScVal.scvVec(initArgsArray);
+
+      const transaction = new TransactionBuilder(account, {
+        fee: BASE_FEE,
+        networkPassphrase: Networks.TESTNET
+      })
+        .addOperation(
+          Operation.invokeContractFunction({
+            function: "create_scorer",
+            contract: FACTORY_CONTRACT_ID,
+            args: [
+              new Address(pubkey).toScVal(),
+              saltScVal,
+              xdr.ScVal.scvSymbol("initialize"),
+              initArgsScVal
+            ]
+          })
+        )
+        .setTimeout(30)
+        .build();
+
+      const preparedTransaction = await server.prepareTransaction(transaction);
+      const transactionXDR = preparedTransaction.toXDR();
+
+      const signResult = await albedo.tx({
+        xdr: transactionXDR,
+        network: "testnet",
+        submit: true
+      });
+
+      if (signResult.tx_hash) {
+        let txResponse;
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        do {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          txResponse = await server.getTransaction(signResult.tx_hash);
+          attempts++;
+        } while (
+          txResponse.status === "NOT_FOUND" &&
+          attempts < maxAttempts
+        );
+
+        if (txResponse.status === "SUCCESS") {
+          console.log("Community created successfully!");
+          onClose();
+        } else {
+          console.error("Transaction failed:", txResponse.status);
+        }
+      }
+
+    } catch (error) {
+      console.error("Error creating community:", error);
+    }
   };
 
   const renderStep = () => {
