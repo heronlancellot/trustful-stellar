@@ -4,7 +4,6 @@ import { useState } from "react";
 import { PrimaryButton } from "@/components";
 import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
 import { useAuthContext } from "@/components/auth/Context";
-import { kit } from "@/components/auth/ConnectStellarWallet";
 import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
 import {
     rpc,

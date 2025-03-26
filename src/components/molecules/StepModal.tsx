@@ -75,9 +75,10 @@ const createCommunitySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().max(120, "Description must be less than 120 characters"),
   avatar: z.string().min(1, "Avatar is required"),
-  badge: z.string().min(1, "Badge is required"),
+  badgeType: z.string().min(1, "Badge is required"),
   badges: z.array(z.object({
     name: z.string(),
+    // issuer: z.string(),
     score: z.number()
   }))
 });
@@ -101,7 +102,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     setValue('avatar', selectedAvatar);
-    setValue('badge', selectedBadge);
+    setValue('badgeType', selectedBadge);
   }, [selectedAvatar, selectedBadge, setValue]);
 
   const onSubmit = async (data: CreateCommunityForm) => {
@@ -110,8 +111,8 @@ export const StepModal: React.FC<ModalProps> = ({
 
       const FACTORY_CONTRACT_ID = "CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ";
       const RPC_URL = "https://soroban-testnet.stellar.org";
-
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
+
       const account = await server.getAccount(pubkey);
 
       const saltBuffer = Buffer.alloc(32);
@@ -119,39 +120,25 @@ export const StepModal: React.FC<ModalProps> = ({
         saltBuffer[i] = Math.floor(Math.random() * 256);
       }
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
-
       const adminAddressScVal = new Address(pubkey).toScVal();
 
-      const badgeMapEntries: xdr.ScMapEntry[] = [];
-      data.badges.forEach(badge => {
-        if (badge.name && badge.score) {
-          const badgeIdVector = xdr.ScVal.scvVec([
-            xdr.ScVal.scvString(badge.name),
-            new Address(pubkey).toScVal()
-          ]);
-
-          badgeMapEntries.push(new xdr.ScMapEntry({
-            key: badgeIdVector,
-            val: xdr.ScVal.scvU32(badge.score)
-          }));
-        }
+      const badgeMapEntries: xdr.ScMapEntry[] = data.badges.map(badgeType => {
+        const badgeIdVector = xdr.ScVal.scvVec([
+          xdr.ScVal.scvString(badgeType.name),
+          new Address(pubkey).toScVal()
+        ]);
+        return new xdr.ScMapEntry({ key: badgeIdVector, val: xdr.ScVal.scvU32(badgeType.score) });
       });
 
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
 
-      const nameScVal = xdr.ScVal.scvString(data.name);
-      const descriptionScVal = xdr.ScVal.scvString(data.description);
-      const iconScVal = xdr.ScVal.scvString(data.avatar);
-
-      const initArgsArray = [
+      const initArgsScVal = xdr.ScVal.scvVec([
         adminAddressScVal,
         badgeMapScVal,
-        nameScVal,
-        descriptionScVal,
-        iconScVal
-      ];
-
-      const initArgsScVal = xdr.ScVal.scvVec(initArgsArray);
+        xdr.ScVal.scvString(data.name),
+        xdr.ScVal.scvString(data.description),
+        xdr.ScVal.scvString(data.avatar),
+      ]);
 
       const transaction = new TransactionBuilder(account, {
         fee: BASE_FEE,
@@ -171,40 +158,53 @@ export const StepModal: React.FC<ModalProps> = ({
         )
         .setTimeout(30)
         .build();
+      console.log('///////first');
+
+      console.log(saltScVal);
+      console.log('///////second');
+
+      console.log(new Address(pubkey).toScVal());
+      console.log('///////third');
+
+      console.log(initArgsScVal);
+
 
       const preparedTransaction = await server.prepareTransaction(transaction);
       const transactionXDR = preparedTransaction.toXDR();
 
-      const signResult = await albedo.tx({
+      const result = await albedo.tx({
         xdr: transactionXDR,
         network: "testnet",
         submit: true
       });
 
-      if (signResult.tx_hash) {
-        let txResponse;
-        let attempts = 0;
-        const maxAttempts = 10;
-
-        do {
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          txResponse = await server.getTransaction(signResult.tx_hash);
-          attempts++;
-        } while (
-          txResponse.status === "NOT_FOUND" &&
-          attempts < maxAttempts
-        );
-
-        if (txResponse.status === "SUCCESS") {
-          console.log("Community created successfully!");
-          onClose();
-        } else {
-          console.error("Transaction failed:", txResponse.status);
-        }
+      if (!result.tx_hash) {
+        console.error("No tx_hash returned from Albedo.");
+        return;
       }
 
-    } catch (error) {
-      console.error("Error creating community:", error);
+      let attempts = 0;
+      const maxAttempts = 10;
+      let txResponse;
+
+      do {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        txResponse = await server.getTransaction(result.tx_hash);
+        attempts++;
+      } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
+
+      if (txResponse.status === "SUCCESS") {
+        console.log("✅ Scorer contract created!");
+        console.log("📬 Contract Address:", txResponse.returnValue?.toString());
+        console.log("🔗 Transaction Hash:", result.tx_hash);
+
+
+        onClose();
+      } else {
+        console.error("❌ Transaction failed:", txResponse.status);
+      }
+    } catch (error: any) {
+      console.error("🚨 Error creating community:", error.message);
     }
   };
 
@@ -367,7 +367,7 @@ export const StepModal: React.FC<ModalProps> = ({
               </p>
             </div>
             <CustomHR />
-            {[1, 2, 3, 4, 5].map((num) => (
+            {[1, 2, 3].map((num) => (
               <React.Fragment key={`badge-${num}`}>
                 <div className="flex w-full justify-between items-center">
                   <div>
