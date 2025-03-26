@@ -108,7 +108,7 @@ export const StepModal: React.FC<ModalProps> = ({
     try {
       const { pubkey } = await albedo.publicKey({ require_existing: true });
 
-      const FACTORY_CONTRACT_ID = "CB6U2W3AJNUEYFDVT5MEXOTEUEMHM5P64XKN2S5KUHI26HBGJBT7CULH";
+      const FACTORY_CONTRACT_ID = "CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ";
       const RPC_URL = "https://soroban-testnet.stellar.org";
 
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
