@@ -45,6 +45,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const [newManager, setNewManager] = useState('')
     const [removeManager, setRemoveManager] = useState('')
 
+
     const {
         getCommunitiesBadgesList,
         getCommunitiesMembersList,
@@ -55,7 +56,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         isJoined
     } = useCommunityContext();
 
-    const totalBadgesMemberList = communitiesDetail?.total_badges
+
 
     useEffect(() => {
         if (communityAddress) {
@@ -66,6 +67,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         console.log(communityAddress);
 
     }, [communityAddress]); //eslint-disable-line react-hooks/exhaustive-deps
+
+    const totalBadgesMemberList = communitiesDetail?.total_badges
 
     const statusList = {
         all: 'all',
@@ -79,6 +82,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     if (!communityAddress || !status) {
         return <h1>Carregando...</h1>;
     }
+
 
     const handleJoin = async () => {
         try {
@@ -507,6 +511,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 content: (
                                     <LeaderboardTable
                                         communitiesMembersList={communitiesMembersList}
+                                        totalBadgesMemberList={totalBadgesMemberList}
                                     />
                                 ),
                                 tabNumber: 2,
