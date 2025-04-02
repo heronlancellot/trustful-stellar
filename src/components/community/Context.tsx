@@ -5,6 +5,7 @@ import {
   CommunityQuests,
 } from "./types";
 import { BadgesList, Communities, MembersList } from "@/types/communities";
+import { useAuthContext } from "../auth/Context";
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);
 
@@ -16,6 +17,9 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const [communitiesDetail, setCommunitiesDetail] = useState<Communities | any>();
   const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>([])
   const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>([])
+  const isJoined = communitiesDetail?.isJoined
+  const { userAddress } = useAuthContext()
+  const userAddresFormated = userAddress?.toLowerCase()
 
   useEffect(() => {
     const getCommunities = async () => {
@@ -45,9 +49,9 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     }
   };
 
-  const getCommunitiesSpec = async (status: string) => {
+  const getCommunitiesStatus = async (status: string) => {
     try {
-      const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${status}/GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS`);
+      const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${status}/${userAddresFormated}`);
       const data = await response.json();
 
       setCommunities(data)
@@ -114,7 +118,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         communities,
         setCommunities,
         getCommunities,
-        getCommunitiesSpec,
+        getCommunitiesStatus,
         refetchCommunitiesAll,
         getCommunitiesDetails,
         getCommunitiesBadgesList,
@@ -125,6 +129,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         setCommunitiesMembersList,
         communitiesDetail,
         setCommunitiesDetail,
+        isJoined
       }}
     >
       {props.children}

@@ -1,8 +1,6 @@
 import {
-    ArrowRightIcon,
     CheckIcon,
     ContentTabs,
-    GenericModal,
     PlusIcon,
     PrimaryButton,
     StarIcon,
@@ -50,6 +48,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         communitiesMembersList,
         getCommunitiesDetails,
         communitiesDetail,
+        isJoined
     } = useCommunityContext();
 
     useEffect(() => {
@@ -68,7 +67,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     };
 
     const { all, joined, created, hidden } = statusList;
-
 
     if (!communityAddress || !status) {
         return <h1>Carregando...</h1>;
@@ -95,10 +93,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     };
 
     const handleInviteManager = async (newManager: string) => {
-        // const sender = 'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS'; // Substituir pelo endereço correto do remetente
-        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
-        // const newManager =
-        //     'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
+        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE'; //TO-DO Comparar user logado com os managers que estao vindo do details
 
         const result = await stellarContractManagers.addManager(sender, newManager);
 
@@ -110,10 +105,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     };
 
     const handleRemoveManager = async (newManager: string) => {
-        // const sender = 'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS'; // Substituir pelo endereço correto do remetente
-        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
-        // const newManager =
-        //     'GCBGWBLBFDLBF446VNTCA3HGUG5OVN67P3P35PDEFUFZS4VMAANYGUL2'; // Substituir pelo novo gerente
+        const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE'; //TO-DO Comparar user logado com os managers que estao vindo do details
 
         const result = await stellarContractManagers.removeManager(sender, newManager);
 
@@ -124,7 +116,12 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         }
     };
 
-    const searchedUserBadges = communitiesBadgesList?.map((badge) => ({
+    const newCommunitiesBadgesList = Array.isArray(communitiesBadgesList?.community_badges)
+        ? communitiesBadgesList?.community_badges.map((badge: any) => badge)
+        : []; console.log(newCommunitiesBadgesList);
+
+
+    const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
         badgeName: (
             <div className="flex flex-row items-center h-7">
                 <div className="flex flex-col">
@@ -153,13 +150,34 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 <div>
                     {status === all && (
                         <div className="flex justify-items-center py-2">
-                            <PrimaryButton
-                                className="rounded-lg w-max"
-                                label="Join" //condicional rendering regarding status
-                                icon={<PlusIcon color="black" width={16} height={16} />}
-                                iconPosition={IconPosition.LEFT}
-                                onClick={handleJoinedCommunities}
-                            />
+                            {isJoined ? (
+                                <PrimaryButton
+                                    className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                                    label="Joined"
+                                    icon={
+                                        <PlusIcon
+                                            color={tailwindConfig.theme.extend.colors.brandGreen}
+                                            width={16}
+                                            height={16}
+                                        />
+                                    }
+                                    iconPosition={IconPosition.LEFT}
+                                    onClick={handleExitCommunities}
+                                />
+                            )
+                                :
+                                (
+                                    <PrimaryButton
+                                        className="rounded-lg w-max"
+                                        label='Join' //condicional rendering regarding status
+                                        icon={<PlusIcon color="black" width={16} height={16} />}
+                                        iconPosition={IconPosition.LEFT}
+                                        onClick={handleJoinedCommunities}
+                                    />
+                                )
+
+                            }
+
                         </div>
                     )}
                     {status === created && (

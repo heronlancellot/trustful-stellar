@@ -16,8 +16,9 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useStellarContractManager } from '@/lib/stellar/transactions/hooks/useStellarContractManager';
+import toast from "react-hot-toast";
 import albedo from "@albedo-link/intent";
+
 import {
   rpc,
   TransactionBuilder,
@@ -25,7 +26,8 @@ import {
   Networks,
   Operation,
   Address,
-  xdr
+  xdr,
+  Keypair
 } from "@stellar/stellar-sdk";
 
 interface ModalProps {
@@ -107,7 +109,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const onSubmit = async (data: CreateCommunityForm) => {
     try {
-      const { pubkey } = await albedo.publicKey({ require_existing: true });
+      const { pubkey } = await albedo.publicKey({ require_existing: true }); //Todo-user logged
 
       const FACTORY_CONTRACT_ID = "CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ";
       const RPC_URL = "https://soroban-testnet.stellar.org";
@@ -158,16 +160,6 @@ export const StepModal: React.FC<ModalProps> = ({
         )
         .setTimeout(30)
         .build();
-      console.log('///////first');
-
-      console.log(saltScVal);
-      console.log('///////second');
-
-      console.log(new Address(pubkey).toScVal());
-      console.log('///////third');
-
-      console.log(initArgsScVal);
-
 
       const preparedTransaction = await server.prepareTransaction(transaction);
       const transactionXDR = preparedTransaction.toXDR();
@@ -194,17 +186,16 @@ export const StepModal: React.FC<ModalProps> = ({
       } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
 
       if (txResponse.status === "SUCCESS") {
-        console.log("✅ Scorer contract created!");
-        console.log("📬 Contract Address:", txResponse.returnValue?.toString());
-        console.log("🔗 Transaction Hash:", result.tx_hash);
-
+        console.log("Scorer contract created!");
+        console.log("Contract Address:", txResponse.returnValue?.toString());
+        console.log("Transaction Hash:", result.tx_hash);
 
         onClose();
       } else {
         console.error("❌ Transaction failed:", txResponse.status);
       }
     } catch (error: any) {
-      console.error("🚨 Error creating community:", error.message);
+      toast.error('Invalid badge name. Please use a valid one.')
     }
   };
 

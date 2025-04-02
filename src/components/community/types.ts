@@ -12,8 +12,9 @@ export type CommunityContext = {
   setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<BadgesList[]>>;
   communitiesMembersList: MembersList[];
   setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[]>>;
+  isJoined: boolean;
   getCommunities: () => Promise<void>;
-  getCommunitiesSpec: (status: string) => Promise<void>;
+  getCommunitiesStatus: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;
   getCommunitiesDetails: (communityAddress: string) => Promise<void>;
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;

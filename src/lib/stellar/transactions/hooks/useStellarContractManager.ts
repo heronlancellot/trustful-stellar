@@ -10,12 +10,9 @@ interface UseStellarContractProps {
 export const useStellarContractManager = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractProps) => {
     const executeContractFunction = async (functionName: string, sender: string, newManagerAddress: string) => {
         try {
-            // Get public key via Albedo
-            const { pubkey } = await albedo.publicKey({ require_existing: true });
-
             // Load user account via RPC
             const server = new rpc.Server(rpcUrl, { allowHttp: true });
-            const account = await server.getAccount(pubkey);
+            const account = await server.getAccount(sender);
 
             // Create and prepare transaction
             const transaction = new TransactionBuilder(account, {

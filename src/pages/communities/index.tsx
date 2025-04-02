@@ -28,7 +28,7 @@ import useCommunitiesController from "../../components/community/hooks/controlle
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, setCommunities } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, communities, getCommunitiesStatus, refetchCommunitiesAll, setCommunities } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -54,7 +54,7 @@ export default function CommunitiesPage() {
   useEffect(() => {
     if (status !== statusList.all) {
       async function getComumm() {
-        await getCommunitiesSpec(`${status}`)
+        await getCommunitiesStatus(`${status}`)
       }
       getComumm()
     }
