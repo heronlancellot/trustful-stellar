@@ -88,14 +88,16 @@ export default function LeaderboardTable({ communitiesMembersList }: any) {
     },
   ];
 
-  const rankedSorted = communitiesMembersList
-    .map((member: MembersList, index: number) => ({
+  const rankedSorted = Array.isArray(communitiesMembersList)
+    ? communitiesMembersList.map((member: MembersList, index: number) => ({
       ...member,
-      rank: index + 1
-    }));
+      rank: index + 1,
+    }))
+    : [];
+
 
   const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
-    const formattedUserAddress = `${player.userAddress.slice(0, 10)}...`
+    const formattedUserAddress = `${player.user_address.slice(0, 10)}...`
     return ({
       rank: (
         <div className="flex justify-center items-center relative w-min">

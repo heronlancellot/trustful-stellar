@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
+  CommunityBadge,
   CommunityContext,
   CommunityContextProviderProps,
   CommunityQuests,
 } from "./types";
-import { BadgesList, Communities, MembersList } from "@/types/communities";
+import { BadgesList, Communities, CommunityBadges, MembersList } from "@/types/communities";
 import { useAuthContext } from "../auth/Context";
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);
@@ -15,11 +16,11 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const [communityQuests, setCommunityQuests] = useState<CommunityQuests>({});
   const [communities, setCommunities] = useState<Communities[]>([])
   const [communitiesDetail, setCommunitiesDetail] = useState<Communities | any>();
-  const [communitiesBadgesList, setCommunitiesBadgesList] = useState<BadgesList[]>([])
+  const [communitiesBadgesList, setCommunitiesBadgesList] = useState<CommunityBadges>({ total_badges: 0, community_badges: [] })
   const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>([])
-  const isJoined = communitiesDetail?.isJoined
+  const isJoined = communitiesDetail?.is_joined
   const { userAddress } = useAuthContext()
-  const userAddresFormated = userAddress?.toLowerCase()
+
 
   useEffect(() => {
     const getCommunities = async () => {
@@ -50,6 +51,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   };
 
   const getCommunitiesStatus = async (status: string) => {
+    const userAddresFormated = userAddress?.toLowerCase()
     try {
       const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${status}/${userAddresFormated}`);
       const data = await response.json();

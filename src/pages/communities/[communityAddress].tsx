@@ -8,9 +8,7 @@ import {
     UserIcon,
 } from '@/components';
 import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
-import { RankIcon } from '@/components/atoms/icons/RankIcon';
 import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
-import { IssuerTableCell } from '@/components/atoms/verify-reputation/IssuerTableCell';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { IconPosition } from '@/types/iconPosition';
 import { useRouter } from 'next/router';
@@ -25,6 +23,12 @@ import { useCommunityContext } from '@/components/community/Context';
 ('./components/molecules/leaderboard-table');
 import { useAuthContext } from '@/components/auth/Context';
 import useCommunitiesController from '@/components/community/hooks/controller';
+import toast from "react-hot-toast";
+import { addUser, mainTestnet } from "@/testCall";
+import { kit } from "@/components/auth/ConnectStellarWallet";
+import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
+import { checkIfWalletIsInitialized } from "@/lib/stellar/isFundedStellarWallet";
+
 
 interface DetailsProps {
     params: {
@@ -51,12 +55,16 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         isJoined
     } = useCommunityContext();
 
+    const totalBadgesMemberList = communitiesDetail?.total_badges
+
     useEffect(() => {
         if (communityAddress) {
             getCommunitiesDetails(`${communityAddress}`);
             getCommunitiesBadgesList(`${communityAddress}`);
             getCommunitiesMembersList(`${communityAddress}`);
         }
+        console.log(communityAddress);
+
     }, [communityAddress]); //eslint-disable-line react-hooks/exhaustive-deps
 
     const statusList = {
@@ -71,6 +79,32 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     if (!communityAddress || !status) {
         return <h1>Carregando...</h1>;
     }
+
+    const handleJoin = async () => {
+        try {
+            kit.signTransaction(ALBEDO_ID);
+            const { address } = await kit.getAddress();
+            await checkIfWalletIsInitialized(address);
+            setUserAddress(address);
+
+            console.log("\nAdding user to contract...");
+            const response = await addUser("teste");
+            console.log("Transaction response:", response);
+
+            if (response.success) {
+                console.log("User added successfully!");
+                console.log("Transaction ID:", response.transactionId);
+            } else {
+                console.error("Failed to add user:", response.error);
+                console.error("Error details:", response.errorDetails);
+            }
+        } catch (error) {
+            toast.error(
+                "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+            );
+            setUserAddress("");
+        }
+    };
 
     const handleJoinedCommunities = async () => {
         const result = await stellarContractJoinCommunities.addUser();
@@ -117,8 +151,8 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     };
 
     const newCommunitiesBadgesList = Array.isArray(communitiesBadgesList?.community_badges)
-        ? communitiesBadgesList?.community_badges.map((badge: any) => badge)
-        : []; console.log(newCommunitiesBadgesList);
+        ? communitiesBadgesList.community_badges
+        : [];
 
 
     const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
@@ -169,10 +203,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 (
                                     <PrimaryButton
                                         className="rounded-lg w-max"
-                                        label='Join' //condicional rendering regarding status
+                                        label='Join'
                                         icon={<PlusIcon color="black" width={16} height={16} />}
                                         iconPosition={IconPosition.LEFT}
-                                        onClick={handleJoinedCommunities}
+                                        onClick={handleJoin}
                                     />
                                 )
 
@@ -212,7 +246,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         <div className="flex justify-items-center py-2">
                             <PrimaryButton
                                 className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                                label="Joined" //condicional rendering regarding status
+                                label="Joined"
                                 icon={
                                     <CheckIcon
                                         color={tailwindConfig.theme.extend.colors.brandGreen}
@@ -231,21 +265,21 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     <UserIcon className="w-4" />
                 </div>
                 <div className="text-gray-500">
-                    Created by {communitiesDetail?.creatorAddress?.substring(0, 10)}...
+                    Created by {communitiesDetail?.creator_address?.substring(0, 10)}...
                 </div>
                 <div className="text-gray-500">/</div>
 
                 <div>
                     <UserIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">{communitiesDetail?.totalMembers}</div>
+                <div className="text-gray-500">{communitiesDetail?.total_members}</div>
                 <div className="text-gray-500">partcipants</div>
                 <div className="text-gray-500">/</div>
 
                 <div>
                     <TagIcon className="w-4" />
                 </div>
-                <div className="text-gray-500">{communitiesDetail?.totalBadges}</div>
+                <div className="text-gray-500">{communitiesDetail?.total_badges}</div>
                 <div className="text-gray-500">Badges</div>
             </div>
 
@@ -308,7 +342,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-normal">
-                                                            {item.slice(10)}
+                                                            {`${item.slice(0, 32)}...`}
                                                         </span>
                                                         <span className="text-xs text-whiteOpacity05">
                                                             Manager
@@ -392,6 +426,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                                 content: (
                                     <LeaderboardTable
                                         communitiesMembersList={communitiesMembersList}
+                                        totalBadgesMemberList={totalBadgesMemberList}
                                     />
                                 ),
                                 tabNumber: 2,

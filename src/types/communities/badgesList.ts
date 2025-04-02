@@ -4,7 +4,6 @@ export interface BadgesList {
     name: string;
     score: number;
     type: string;
-
 }
 
 export interface CommunityBadges {

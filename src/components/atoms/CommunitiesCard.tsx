@@ -114,7 +114,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                             <UserIcon />
                         </div>
                         <div className="flex justify-center">
-                            <span>{community?.totalMembers}</span>
+                            <span>{community?.total_badges}</span>
                         </div>
                     </div>
 
@@ -123,7 +123,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                             <TagIcon />
                         </div>
                         <div className="flex justify-center">
-                            <span>{community?.totalBadges}</span>
+                            <span>{community?.total_badges}</span>
                         </div>
                     </div>
                 </div>

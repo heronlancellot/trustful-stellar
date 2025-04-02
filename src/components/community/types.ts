@@ -1,4 +1,4 @@
-import { BadgesList, Communities, MembersList } from "@/types/communities";
+import { BadgesList, Communities, CommunityBadges, MembersList } from "@/types/communities";
 import { ReactNode } from "react";
 
 export type CommunityContext = {
@@ -8,8 +8,8 @@ export type CommunityContext = {
   setCommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
   communitiesDetail: Communities | undefined;
   setCommunitiesDetail: Communities | undefined | any;
-  communitiesBadgesList: BadgesList[];
-  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<BadgesList[]>>;
+  communitiesBadgesList: CommunityBadges;
+  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<CommunityBadges>>;
   communitiesMembersList: MembersList[];
   setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[]>>;
   isJoined: boolean;
