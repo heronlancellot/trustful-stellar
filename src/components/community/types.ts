@@ -6,6 +6,8 @@ export type CommunityContext = {
   setCommunityQuests: (communityQuests: CommunityQuests) => void;
   communities: Communities[];
   setCommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
+  verifyReputationcommunities: Communities[];
+  setVerifyReputationcommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
   communitiesDetail: Communities | undefined;
   setCommunitiesDetail: Communities | undefined | any;
   communitiesBadgesList: CommunityBadges;
@@ -17,6 +19,7 @@ export type CommunityContext = {
   getCommunitiesStatus: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;
   getCommunitiesDetails: (communityAddress: string) => Promise<void>;
+  getVerifyReputationList: (userAddress: string) => Promise<void>;
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;
   getCommunitiesMembersList: (communityAddress: string) => Promise<void>;
 };

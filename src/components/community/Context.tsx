@@ -15,6 +15,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
 ) => {
   const [communityQuests, setCommunityQuests] = useState<CommunityQuests>({});
   const [communities, setCommunities] = useState<Communities[]>([])
+  const [verifyReputationcommunities, setVerifyReputationcommunities] = useState<Communities[]>([])
   const [communitiesDetail, setCommunitiesDetail] = useState<Communities | any>();
   const [communitiesBadgesList, setCommunitiesBadgesList] = useState<CommunityBadges>({ total_badges: 0, community_badges: [] })
   const [communitiesMembersList, setCommunitiesMembersList] = useState<MembersList[]>([])
@@ -62,6 +63,20 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       console.error(error);
     }
   };
+
+  const getVerifyReputationList = async (userAddress: string) => {
+    const userAddresFormated = userAddress?.toLowerCase()
+    try {
+      const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/joined/${userAddresFormated}`);
+      const data = await response.json();
+
+      setVerifyReputationcommunities(data)
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   const getCommunitiesDetails = async (communityAdress: string) => {
     try {
@@ -131,7 +146,10 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         setCommunitiesMembersList,
         communitiesDetail,
         setCommunitiesDetail,
-        isJoined
+        isJoined,
+        getVerifyReputationList,
+        verifyReputationcommunities,
+        setVerifyReputationcommunities
       }}
     >
       {props.children}
