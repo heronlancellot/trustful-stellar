@@ -44,58 +44,18 @@ function getPointsTextColor(rank: number) {
   return colorsMap[rank as keyof typeof colorsMap] || colorsMap.default;
 }
 
-export default function LeaderboardTable({ communitiesMembersList }: any) {
-  const searchedLeadboardData: LeaderboardPlayer[] = [
-    {
-      rank: 1,
-      address: "GD6IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFYWS",
-      points: 500,
-      badges: 20,
-      avatarUrl:
-        "https://gravatar.com/avatar/a67431cf87eabee9b1f61c145e2fa6d3?s=200&d=monsterid&r=x",
-    },
-    {
-      rank: 2,
-      address: "BL7IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDOWFT",
-      points: 300,
-      badges: 16,
-      avatarUrl:
-        "https://gravatar.com/avatar/a67431cf87eabee9b1f61c145e2fa6d3?s=200&d=monsterid&r=x",
-    },
-    {
-      rank: 3,
-      address: "AB3IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFMNK",
-      points: 150,
-      badges: 12,
-      avatarUrl:
-        "https://gravatar.com/avatar/a67431cf87eabee9b1f61c145e2fa6d3?s=200&d=monsterid&r=x",
-    },
-    {
-      rank: 4,
-      address: "LM2IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFMNK",
-      points: 130,
-      badges: 10,
-      avatarUrl:
-        "https://gravatar.com/avatar/a67431cf87eabee9b1f61c145e2fa6d3?s=200&d=monsterid&r=x",
-    },
-    {
-      rank: 5,
-      address: "NJ0IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFMNK",
-      points: 90,
-      badges: 8,
-      avatarUrl:
-        "https://gravatar.com/avatar/a67431cf87eabee9b1f61c145e2fa6d3?s=200&d=monsterid&r=x",
-    },
-  ];
+export default function LeaderboardTable({ communitiesMembersList, totalBadgesMemberList }: any) {
 
-  const rankedSorted = communitiesMembersList
-    .map((member: MembersList, index: number) => ({
+  const rankedSorted = Array.isArray(communitiesMembersList)
+    ? communitiesMembersList.map((member: MembersList, index: number) => ({
       ...member,
-      rank: index + 1
-    }));
+      rank: index + 1,
+    }))
+    : [];
+
 
   const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
-    const formattedUserAddress = `${player.userAddress.slice(0, 10)}...`
+    const formattedUserAddress = `${player.user_address.slice(0, 10)}...`
     return ({
       rank: (
         <div className="flex justify-center items-center relative w-min">
@@ -124,7 +84,7 @@ export default function LeaderboardTable({ communitiesMembersList }: any) {
           <span style={{ color: getPointsTextColor(player.rank) }}>
             {player.badges}
           </span>
-          <span className="text-whiteOpacity05">/ 20</span>
+          <span className="text-whiteOpacity05">/ {totalBadgesMemberList}</span>
         </div>
       ),
     })

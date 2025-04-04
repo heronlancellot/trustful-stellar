@@ -5,3 +5,8 @@ export interface BadgesList {
     score: number;
     type: string;
 }
+
+export interface CommunityBadges {
+    total_badges: number;
+    community_badges: BadgesList[];
+}

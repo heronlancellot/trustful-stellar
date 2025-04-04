@@ -4,7 +4,7 @@ interface User {
 
 export interface MembersList {
     id: number;
-    userAddress: string;
+    user_address: string;
     isManager: boolean;
     isCreator: boolean;
     communityAddress: string;

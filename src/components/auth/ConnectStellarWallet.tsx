@@ -4,6 +4,7 @@ import {
   AlbedoModule,
   StellarWalletsKit,
   WalletNetwork,
+  xBullModule,
 } from "@creit.tech/stellar-wallets-kit";
 import cc from "classcat";
 import { UserDropdown } from "../molecules";
@@ -26,6 +27,21 @@ export const ConnectStellarWallet = ({
   customClassNames = "",
 }: ConnectWalletProps) => {
   const { setUserAddress, userAddress } = useAuthContext();
+
+  const handleConnect = async () => {
+    try {
+      kit.setWallet(ALBEDO_ID);
+      const { address } = await kit.getAddress();
+      await checkIfWalletIsInitialized(address);
+      setUserAddress(address);
+    } catch (error) {
+      toast.error(
+        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+      );
+      setUserAddress("");
+    }
+  };
+
   return userAddress ? (
     <UserDropdown />
   ) : (
@@ -34,19 +50,7 @@ export const ConnectStellarWallet = ({
         "text-base text-brandBlack font-medium bg-brandGreen p-2 px-6 rounded-lg",
         customClassNames,
       ])}
-      onClick={async (e: any) => {
-        try {
-          kit.setWallet(ALBEDO_ID);
-          const { address } = await kit.getAddress();
-          await checkIfWalletIsInitialized(address);
-          setUserAddress(address);
-        } catch (error) {
-          toast.error(
-            "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
-          );
-          setUserAddress("");
-        }
-      }}
+      onClick={handleConnect}
     >
       Connect
     </button>
