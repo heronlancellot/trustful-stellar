@@ -1,4 +1,4 @@
-import { BadgesList, Communities, MembersList } from "@/types/communities";
+import { BadgesList, Communities, CommunityBadges, MembersList } from "@/types/communities";
 import { ReactNode } from "react";
 
 export type CommunityContext = {
@@ -6,16 +6,20 @@ export type CommunityContext = {
   setCommunityQuests: (communityQuests: CommunityQuests) => void;
   communities: Communities[];
   setCommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
+  verifyReputationcommunities: Communities[];
+  setVerifyReputationcommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
   communitiesDetail: Communities | undefined;
   setCommunitiesDetail: Communities | undefined | any;
-  communitiesBadgesList: BadgesList[];
-  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<BadgesList[]>>;
+  communitiesBadgesList: CommunityBadges;
+  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<CommunityBadges>>;
   communitiesMembersList: MembersList[];
   setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[]>>;
+  isJoined: boolean;
   getCommunities: () => Promise<void>;
-  getCommunitiesSpec: (status: string) => Promise<void>;
+  getCommunitiesStatus: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;
   getCommunitiesDetails: (communityAddress: string) => Promise<void>;
+  getVerifyReputationList: (userAddress: string) => Promise<void>;
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;
   getCommunitiesMembersList: (communityAddress: string) => Promise<void>;
 };

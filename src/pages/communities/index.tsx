@@ -25,11 +25,10 @@ import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModa
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { useRouter } from "next/router";
 import useCommunitiesController from "../../components/community/hooks/controller";
-import { useParams, usePathname } from "next/navigation";
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests, communities, getCommunitiesSpec, refetchCommunitiesAll, getCommunities, setCommunities } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, communities, getCommunitiesStatus, refetchCommunitiesAll, setCommunities } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -53,9 +52,9 @@ export default function CommunitiesPage() {
   };
 
   useEffect(() => {
-    if (status !== statusList.all) {
+    if (status !== statusList.all && userAddress) {
       async function getComumm() {
-        await getCommunitiesSpec(`${status}`)
+        await getCommunitiesStatus(`${status}`)
       }
       getComumm()
     }
@@ -122,19 +121,19 @@ export default function CommunitiesPage() {
     fetchBadges();
   }, [fetchBadges]);
 
-  const questIsFullyImported = (questName: string) => {
-    const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
-      ({ isImported }) => isImported === undefined
-    );
-    if (!userAddress || userHasNoBadgesOfThisQuest) {
-      return undefined;
-    }
-    // TODO: Compare user trustful and normal badges with badge set badges.
-    const needToImportBadges = getModalBadges(questName).some(
-      ({ isImported }) => isImported === false
-    );
-    return !needToImportBadges;
-  };
+  // const questIsFullyImported = (questName: string) => {
+  //   const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
+  //     ({ isImported }) => isImported === undefined
+  //   );
+  //   if (!userAddress || userHasNoBadgesOfThisQuest) {
+  //     return undefined;
+  //   }
+  //   // TODO: Compare user trustful and normal badges with badge set badges.
+  //   const needToImportBadges = getModalBadges(questName).some(
+  //     ({ isImported }) => isImported === false
+  //   );
+  //   return !needToImportBadges;
+  // };
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {
@@ -243,10 +242,10 @@ export default function CommunitiesPage() {
                 {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.communityAddress}
+                      key={community.community_address}
                       community={community}
                       onClick={() => router.push({
-                        pathname: `communities/${community.communityAddress}`,
+                        pathname: `communities/${community.community_address}`,
                         query: { status: 'all' }
                       })} />
                   );
@@ -261,10 +260,10 @@ export default function CommunitiesPage() {
                 {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.communityAddress}
+                      key={community.community_address}
                       community={community}
                       onClick={() => router.push({
-                        pathname: `communities/${community.communityAddress}`,
+                        pathname: `communities/${community.community_address}`,
                         query: { status: 'joined' }
                       })}
                     />
@@ -280,10 +279,10 @@ export default function CommunitiesPage() {
                 {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.communityAddress}
+                      key={community.community_address}
                       community={community}
                       onClick={() => router.push({
-                        pathname: `communities/${community.communityAddress}`,
+                        pathname: `communities/${community.community_address}`,
                         query: { status: 'created' }
                       })}
                     />
@@ -299,10 +298,10 @@ export default function CommunitiesPage() {
                 {Array.isArray(communities) && communities?.map((community) => {
                   return (
                     <CommunitiesCard
-                      key={community.communityAddress}
+                      key={community.community_address}
                       community={community}
                       onClick={() => router.push({
-                        pathname: `communities/${community.communityAddress}`,
+                        pathname: `communities/${community.community_address}`,
                         query: { status: 'hidden' }
                       })}
                     />
