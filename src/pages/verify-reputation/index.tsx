@@ -16,10 +16,33 @@ import { useRouter } from 'next/router';
 import { useCommunityContext } from '@/components/community/Context';
 import { CardWrapper } from '@/components/templates/CardWrapper';
 import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
+import CustomModal from '../communities/components/molecules/custom-modal';
+import { TagIcon } from '@/components';
+import useVerifyReputationController, { Badge } from '@/components/verify-reputation/hooks/Controller'
+
+interface VerifyReputationProps {
+  community_address?: string;
+  factory_address?: any;
+  name?: string;
+  description?: string;
+  icon?: string;
+  creator_address?: string;
+  is_hidden?: boolean;
+  blocktimestamp?: string;
+  total_badges?: number;
+  last_indexed_at?: string;
+  id?: string;
+  users_badges_count?: number;
+  users_points?: number;
+}
 
 function VerifyReputationPage() {
   const router = useRouter();
   const [inputText, setInputText] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reputationDetail, setReputationDetail] = useState<VerifyReputationProps | undefined>()
+  const { badgeDetails, getBagdeDetails } = useVerifyReputationController()
+
   const {
     searchedUserAddress,
     setSearchedUserAddress,
@@ -36,7 +59,22 @@ function VerifyReputationPage() {
     await getVerifyReputationList(inputText);
   };
 
-  console.log(typeof verifyReputationcommunities.length);
+  const reputation = [
+    { name: 'one', score: 5, status: 'completed', statusColor: 'bg-darkGreenOpacity01' }
+  ]
+
+  const statusColor = 'bg-darkGreenOpacity01'
+
+  const handleDetailCommunity = (communityAddress: string) => {
+    const filteredCommunity = verifyReputationcommunities.find((item) => item.community_address === communityAddress)
+    setReputationDetail(filteredCommunity)
+    getBagdeDetails(communityAddress)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
 
   return (
@@ -91,19 +129,14 @@ function VerifyReputationPage() {
         ) : (
 
           <div className='mt-8'>
-            <CardWrapper  >
+            <CardWrapper>
               {Array.isArray(verifyReputationcommunities) &&
                 verifyReputationcommunities?.map((community) => {
                   return (
                     <CommunitiesCard
                       key={community.community_address}
                       community={community}
-                      onClick={() =>
-                        router.push({
-                          pathname: `communities/${community.community_address}`,
-                          query: { status: 'all' },
-                        })
-                      }
+                      onClick={() => handleDetailCommunity(community.community_address)}
                     />
                   );
                 })}
@@ -112,42 +145,54 @@ function VerifyReputationPage() {
         )}
       </div>
 
-      {/* <CustomModal
-                title="Stellar Quest"
-                isOpen={isOpen("details")}
-                onClose={() => closeModal("details")}
-                isAsync={false}
-            >
-                <>
-                    <div className="flex p-6 gap-2 items-center">
-                        <div><TagIcon className="w-4" /></div>
-                        <div className="text-gray-500 text-xs">2,000 points /</div>
-                        <div><TagIcon className="w-4" /></div>
-                        <div className="text-gray-500 text-xs">2/20 badges</div>
-                    </div>
-                    <div className="w-[552px] mb-4 ml-4 mr-4 bg-whiteOpacity005 rounded-xl">
-                        <div className="flex flex-col border border-whiteOpacity005 rounded-xl max-h-[440px]">
+      <CustomModal
+        title={`${reputationDetail?.name}`}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        isAsync={false}
+      >
+        <>
+          <div className="flex p-6 gap-2 items-center">
+            <div><TagIcon className="w-4" /></div>
+            <div className="text-gray-500 text-xs">{reputationDetail?.users_points} points /</div>
+            <div><TagIcon className="w-4" /></div>
+            <div className="text-gray-500 text-xs">{`${reputationDetail?.users_badges_count}/${reputationDetail?.total_badges}`} badges</div>
+          </div>
+          <div className="w-[552px] mb-4 ml-4 mr-4 bg-whiteOpacity005 rounded-xl">
+            <div className="flex flex-col border border-whiteOpacity005 rounded-xl max-h-[440px]">
 
-                            <div className="flex justify-between items-center border-b border-whiteOpacity005 px-6 py-4">
-                                <span className="text-sm  text-left">Name</span>
-                                <span className="text-sm w-24 text-right">Score</span>
-                                <span className="text-sm w-24 text-center">Status</span>
-                            </div>
+              <div className="flex justify-between items-center border-b border-whiteOpacity005 px-6 py-4">
+                <span className="text-sm  text-left">Name</span>
+                <span className="text-sm w-24 text-right">Score</span>
+                <span className="text-sm w-24 text-center">Status</span>
+              </div>
 
-                            {reputation.map((item, index) => (
-                                <div key={index} className="flex justify-between items-center px-6 py-4">
-                                    <span className="text-sm text-whiteOpacity05 text-left">{item.name}</span>
-                                    <span className="text-sm text-brandWhite w-24 text-left">{item.score}</span>
-                                    <span className={`text-xs w-24 text-center p-1 rounded-3xl bg-darkGreenOpacity01 ${item.statusColor}`}>
-                                        {item.status}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+              {badgeDetails?.community_badges
+                .map((item: Badge) => (
+                  <div key={item?.community_address} className="flex justify-between items-center px-6 py-4">
+                    <span className="text-sm text-whiteOpacity05 text-left">{item?.name}</span>
+                    <span className="text-sm text-brandWhite w-24 text-left">{item?.score}</span>
+                    <span className={`text-xs w-24 text-center p-1 rounded-3xl bg-darkGreenOpacity01 ${reputation[0]?.statusColor}`}>
+                      {/* {item?.user_has} */}
+                      {`${item.user_has ? 'Completed' : 'Pending'}`}
+                    </span>
+                  </div>
+                ))}
 
-                </>
-            </CustomModal> */}
+              {/* {reputationDetail.map(({ item, index }: any) => (
+                <div key={index} className="flex justify-between items-center px-6 py-4">
+                  <span className="text-sm text-whiteOpacity05 text-left">{item.name}</span>
+                  <span className="text-sm text-brandWhite w-24 text-left">{item.score}</span>
+                  <span className={`text-xs w-24 text-center p-1 rounded-3xl bg-darkGreenOpacity01 ${item.statusColor}`}>
+                    {item.status}
+                  </span>
+                </div>
+              ))} */}
+            </div>
+          </div>
+
+        </>
+      </CustomModal>
       <ActivityIndicatorModal isOpen={isLoading} />
     </PageTemplate>
   );

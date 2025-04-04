@@ -64,8 +64,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             getCommunitiesBadgesList(`${communityAddress}`);
             getCommunitiesMembersList(`${communityAddress}`);
         }
-        console.log(communityAddress);
-
     }, [communityAddress]); //eslint-disable-line react-hooks/exhaustive-deps
 
     const totalBadgesMemberList = communitiesDetail?.total_badges
@@ -173,6 +171,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         ),
         Score: <CommunityTableCell issuerAddress={badge?.score.toString()} />,
         Name: <CommunityTableCell issuerAddress={badge?.name} />,
+        Status: <CommunityTableCell issuerAddress={badge?.user_has ? 'Completed' : 'Pending'} />,
     }));
 
     return (

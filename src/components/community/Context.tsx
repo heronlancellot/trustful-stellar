@@ -105,7 +105,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
 
   const getCommunitiesBadgesList = async (communityAddress: string) => {
     try {
-      const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges`);
+      const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges?user_address=${userAddress}`);
       const data = await response.json();
 
       setCommunitiesBadgesList(data)
