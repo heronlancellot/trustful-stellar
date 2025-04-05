@@ -1,45 +1,46 @@
-'use client'
+'use client';
 
-import { useAuthContext } from "@/components/auth/Context";
-import { useState } from "react";
+import { useAuthContext } from '@/components/auth/Context';
+import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
+import { useState } from 'react';
 
 export type Badge = {
-    issuer: string;
-    community_address: string;
-    name: string;
-    score: number;
-    type: string;
-    created_at: string;
-    user_has: boolean;
+  issuer: string;
+  community_address: string;
+  name: string;
+  score: number;
+  type: string;
+  created_at: string;
+  user_has: boolean;
 };
 
 export type BadgeDTO = {
-    badges_count: number;
-    users_points: number;
-    total_badges: number;
-    community_badges: Badge[];
+  badges_count: number;
+  users_points: number;
+  total_badges: number;
+  community_badges: Badge[];
 };
 
 export default function useVerifyReputationController() {
-    const [badgeDetails, setBadgeDetails] = useState<BadgeDTO | null>(null)
-    const { userAddress } = useAuthContext()
+  const [badgeDetails, setBadgeDetails] = useState<BadgeDTO | null>(null);
+  const { userAddress } = useAuthContext();
 
-    const getBagdeDetails = async (communityAddress: string) => {
-        try {
-            const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities/${communityAddress}/badges?user_address=${userAddress}`);
-            const data: BadgeDTO = await response.json();
+  const getBagdeDetails = async (communityAddress: string) => {
+    try {
+      const response = await fetch(
+        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${communityAddress}/badges?user_address=${userAddress}`
+      );
+      const data: BadgeDTO = await response.json();
 
-            setBadgeDetails(data)
-
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    return {
-        getBagdeDetails,
-        badgeDetails,
-        setBadgeDetails
-
+      setBadgeDetails(data);
+    } catch (error) {
+      console.error(error);
     }
+  };
+
+  return {
+    getBagdeDetails,
+    badgeDetails,
+    setBadgeDetails,
+  };
 }

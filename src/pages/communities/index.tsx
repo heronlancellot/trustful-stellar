@@ -1,34 +1,37 @@
-import {
-  ContentTabs,
-  GenericModal,
-  StarIcon,
-} from "@/components";
-import { useAuthContext } from "@/components/auth/Context";
-import { useCommunityContext } from "@/components/community/Context";
-import { CardWrapper } from "@/components/templates/CardWrapper";
-import { PageTemplate } from "@/components/templates/PageTemplate";
-import { useUsersContext } from "@/components/user/Context";
-import communityClient from "@/lib/http-clients/CommunityClient";
-import usersClient from "@/lib/http-clients/UsersClient";
-import { useCallback, useEffect, useState } from "react";
-import _ from "lodash";
-import { CommunityQuests } from "@/components/community/types";
-import { ImportBadgesModalContent } from "@/components/molecules/ImportBadgesModalContent";
-import { sendSignedTransaction } from "@/lib/stellar/signTransaction";
-import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
-import tailwindConfig from "tailwind.config";
-import { kit } from "@/components/auth/ConnectStellarWallet";
-import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
-import assetClient from "@/lib/http-clients/AssetClient";
-import toast from "react-hot-toast";
-import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
-import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
-import { useRouter } from "next/router";
-import useCommunitiesController from "../../components/community/hooks/controller";
+import { ContentTabs, GenericModal, StarIcon } from '@/components';
+import { useAuthContext } from '@/components/auth/Context';
+import { useCommunityContext } from '@/components/community/Context';
+import { CardWrapper } from '@/components/templates/CardWrapper';
+import { PageTemplate } from '@/components/templates/PageTemplate';
+import { useUsersContext } from '@/components/user/Context';
+import communityClient from '@/lib/http-clients/CommunityClient';
+import usersClient from '@/lib/http-clients/UsersClient';
+import { useCallback, useEffect, useState } from 'react';
+import _ from 'lodash';
+import { CommunityQuests } from '@/components/community/types';
+import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
+import { sendSignedTransaction } from '@/lib/stellar/signTransaction';
+import { WalletIcon } from '@/components/atoms/icons/WalletIcon';
+import tailwindConfig from 'tailwind.config';
+import { kit } from '@/components/auth/ConnectStellarWallet';
+import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
+import assetClient from '@/lib/http-clients/AssetClient';
+import toast from 'react-hot-toast';
+import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
+import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
+import { useRouter } from 'next/router';
+import useCommunitiesController from '../../components/community/hooks/controller';
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests, communities, getCommunitiesStatus, refetchCommunitiesAll, setCommunities } = useCommunityContext();
+  const {
+    setCommunityQuests,
+    communityQuests,
+    communities,
+    getCommunitiesStatus,
+    refetchCommunitiesAll,
+    setCommunities,
+  } = useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -36,56 +39,56 @@ export default function CommunitiesPage() {
     setUserBadgesToImport,
   } = useUsersContext();
 
-  const { inputText, setInputText } = useCommunitiesController()
+  const { inputText, setInputText } = useCommunitiesController();
 
   const [isImportModalOpen, setImportModalOpen] = useState(false);
-  const [selectedQuestName, setSelectedQuestName] = useState("");
+  const [selectedQuestName, setSelectedQuestName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
   const { status } = router.query;
 
   const statusList = {
-    all: "all",
-    joined: "joined",
-    created: "created",
-    hidden: "hidden",
+    all: 'all',
+    joined: 'joined',
+    created: 'created',
+    hidden: 'hidden',
   };
 
   useEffect(() => {
     if (status !== statusList.all && userAddress) {
       async function getComumm() {
-        await getCommunitiesStatus(`${status}`)
+        await getCommunitiesStatus(`${status}`);
       }
-      getComumm()
+      getComumm();
     }
 
     if (status === statusList.all) {
-      refetchCommunitiesAll()
+      refetchCommunitiesAll();
     }
-
   }, [status]); //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const getCommunities = async () => {
       try {
-        const response = await fetch(`https://trustful-stellar-backend-production.up.railway.app/communities`);
+        const response = await fetch(
+          `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+        );
         const data = await response.json();
 
-        setCommunities(data)
-
+        setCommunities(data);
       } catch (error) {
         console.error(error);
       }
     };
 
-    getCommunities()
-  }, []) //eslint-disable-line react-hooks/exhaustive-deps
+    getCommunities();
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBadges = useCallback(async () => {
     try {
       setIsLoading(true);
       const _communityBadges = await communityClient.getCommunityBadges();
-      const quests: CommunityQuests = _.groupBy(_communityBadges, "questName");
+      const quests: CommunityQuests = _.groupBy(_communityBadges, 'questName');
       setCommunityQuests(quests);
       if (userAddress) {
         const _userBadges = await usersClient.getBadges(userAddress);
@@ -105,9 +108,9 @@ export default function CommunitiesPage() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error fetching user badges", {
+      toast.error('Error fetching user badges', {
         duration: 2000,
-        position: "top-right",
+        position: 'top-right',
       });
       setIsLoading(false);
       setCommunityQuests({});
@@ -164,14 +167,14 @@ export default function CommunitiesPage() {
         assetCodesToImport
       );
       await sendSignedTransaction(transaction, userAddress);
-      toast.success("The badges were imported with success");
+      toast.success('The badges were imported with success');
     } catch (error: unknown) {
       if (
         (error as Error)?.message.includes(
-          "Action request was rejected by the user."
+          'Action request was rejected by the user.'
         )
       ) {
-        toast.error("Transaction Rejected by the user");
+        toast.error('Transaction Rejected by the user');
         return;
       } else if (!!(error as Error)?.message) {
         toast.error((error as Error)?.message);
@@ -193,7 +196,7 @@ export default function CommunitiesPage() {
         score,
       })
     );
-    const questBadgesWithIsImported = questBadges.map((questBadge) => {
+    const questBadgesWithIsImported = questBadges.map(questBadge => {
       const isImported = userBadgesImported
         .map(({ assetCode }) => assetCode?.toLocaleLowerCase())
         .includes(questBadge.assetCode?.toLocaleLowerCase());
@@ -212,16 +215,14 @@ export default function CommunitiesPage() {
     return questBadgesWithIsImported;
   };
 
-
-
   return (
     <PageTemplate
       className=""
-      title={"Communities"}
+      title={'Communities'}
       tooltip={{
-        tooltipId: "generate-attestation-tip",
+        tooltipId: 'generate-attestation-tip',
         tooltipText:
-          "Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.",
+          'Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.',
       }}
       isCommunity
     >
@@ -229,27 +230,31 @@ export default function CommunitiesPage() {
         inputText={inputText}
         setInputText={setInputText}
         inputSearch
-        onButtonClick={(tabName) => {
+        onButtonClick={tabName => {
           router.push({
             pathname: router.pathname,
-            query: { status: tabName }
-          })
+            query: { status: tabName },
+          });
         }}
         tabs={{
           All: {
             content: (
               <CardWrapper>
-                {Array.isArray(communities) && communities?.map((community) => {
-                  return (
-                    <CommunitiesCard
-                      key={community.community_address}
-                      community={community}
-                      onClick={() => router.push({
-                        pathname: `communities/${community.community_address}`,
-                        query: { status: 'all' }
-                      })} />
-                  );
-                })}
+                {Array.isArray(communities) &&
+                  communities?.map(community => {
+                    return (
+                      <CommunitiesCard
+                        key={community.community_address}
+                        community={community}
+                        onClick={() =>
+                          router.push({
+                            pathname: `communities/${community.community_address}`,
+                            query: { status: 'all' },
+                          })
+                        }
+                      />
+                    );
+                  })}
               </CardWrapper>
             ),
             tabNumber: 1,
@@ -257,18 +262,21 @@ export default function CommunitiesPage() {
           Joined: {
             content: (
               <CardWrapper>
-                {Array.isArray(communities) && communities?.map((community) => {
-                  return (
-                    <CommunitiesCard
-                      key={community.community_address}
-                      community={community}
-                      onClick={() => router.push({
-                        pathname: `communities/${community.community_address}`,
-                        query: { status: 'joined' }
-                      })}
-                    />
-                  );
-                })}
+                {Array.isArray(communities) &&
+                  communities?.map(community => {
+                    return (
+                      <CommunitiesCard
+                        key={community.community_address}
+                        community={community}
+                        onClick={() =>
+                          router.push({
+                            pathname: `communities/${community.community_address}`,
+                            query: { status: 'joined' },
+                          })
+                        }
+                      />
+                    );
+                  })}
               </CardWrapper>
             ),
             tabNumber: 2,
@@ -276,18 +284,21 @@ export default function CommunitiesPage() {
           Created: {
             content: (
               <CardWrapper>
-                {Array.isArray(communities) && communities?.map((community) => {
-                  return (
-                    <CommunitiesCard
-                      key={community.community_address}
-                      community={community}
-                      onClick={() => router.push({
-                        pathname: `communities/${community.community_address}`,
-                        query: { status: 'created' }
-                      })}
-                    />
-                  );
-                })}
+                {Array.isArray(communities) &&
+                  communities?.map(community => {
+                    return (
+                      <CommunitiesCard
+                        key={community.community_address}
+                        community={community}
+                        onClick={() =>
+                          router.push({
+                            pathname: `communities/${community.community_address}`,
+                            query: { status: 'created' },
+                          })
+                        }
+                      />
+                    );
+                  })}
               </CardWrapper>
             ),
             tabNumber: 3,
@@ -295,18 +306,21 @@ export default function CommunitiesPage() {
           Hidden: {
             content: (
               <CardWrapper>
-                {Array.isArray(communities) && communities?.map((community) => {
-                  return (
-                    <CommunitiesCard
-                      key={community.community_address}
-                      community={community}
-                      onClick={() => router.push({
-                        pathname: `communities/${community.community_address}`,
-                        query: { status: 'hidden' }
-                      })}
-                    />
-                  );
-                })}
+                {Array.isArray(communities) &&
+                  communities?.map(community => {
+                    return (
+                      <CommunitiesCard
+                        key={community.community_address}
+                        community={community}
+                        onClick={() =>
+                          router.push({
+                            pathname: `communities/${community.community_address}`,
+                            query: { status: 'hidden' },
+                          })
+                        }
+                      />
+                    );
+                  })}
               </CardWrapper>
             ),
             tabNumber: 3,
