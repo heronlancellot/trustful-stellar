@@ -9,7 +9,7 @@ export default function useCommunitiesController() {
   const [inputText, setInputText] = useState('');
 
   const stellarContractJoinCommunities = useStellarContract({
-    contractId: `${process.env.COMMUNITIES_CONTRACT ?? 'CBGXFUQCDT2U4AUHNQFPJJEMGARLCW3WJVHFJR4OLONXHBHOWX7JBT5F'}`,
+    contractId: `${process.env.COMMUNITIES_CONTRACT ?? 'CAGKZUKGGVILYOUY6QWLYF6NMHNDTZVXV3V7NJRTWZLWCTYYM2VWDAZY'}`,
     rpcUrl: 'https://soroban-testnet.stellar.org',
     networkType: 'TESTNET',
   });
