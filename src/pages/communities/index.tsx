@@ -71,7 +71,7 @@ export default function CommunitiesPage() {
     const getCommunities = async () => {
       try {
         const response = await fetch(
-          `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
         );
         const data = await response.json();
 

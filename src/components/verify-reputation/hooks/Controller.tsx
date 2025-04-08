@@ -28,7 +28,7 @@ export default function useVerifyReputationController() {
   const getBagdeDetails = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${communityAddress}/badges?user_address=${userAddress}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/badges?user_address=${userAddress}`
       );
       const data: BadgeDTO = await response.json();
 
