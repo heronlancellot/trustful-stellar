@@ -71,7 +71,7 @@ export default function CommunitiesPage() {
     const getCommunities = async () => {
       try {
         const response = await fetch(
-          `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
         );
         const data = await response.json();
 
@@ -84,45 +84,45 @@ export default function CommunitiesPage() {
     getCommunities();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchBadges = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const _communityBadges = await communityClient.getCommunityBadges();
-      const quests: CommunityQuests = _.groupBy(_communityBadges, 'questName');
-      setCommunityQuests(quests);
-      if (userAddress) {
-        const _userBadges = await usersClient.getBadges(userAddress);
-        const _userBadgesImported =
-          await usersClient.getBadgesTrustful(userAddress);
-        setUserBadgesImported(_userBadgesImported);
-        setUserBadgesToImport(
-          _userBadges,
-          _userBadgesImported,
-          _communityBadges
-        );
-        setIsLoading(false);
-      } else {
-        setUserBadgesImported([]);
-        setUserBadgesToImport([], [], []);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Error fetching user badges', {
-        duration: 2000,
-        position: 'top-right',
-      });
-      setIsLoading(false);
-      setCommunityQuests({});
-      setUserBadgesImported([]);
-      setUserBadgesToImport([], [], []);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
+  // const fetchBadges = useCallback(async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const _communityBadges = await communityClient.getCommunityBadges();
+  //     const quests: CommunityQuests = _.groupBy(_communityBadges, 'questName');
+  //     setCommunityQuests(quests);
+  //     if (userAddress) {
+  //       const _userBadges = await usersClient.getBadges(userAddress);
+  //       const _userBadgesImported =
+  //         await usersClient.getBadgesTrustful(userAddress);
+  //       setUserBadgesImported(_userBadgesImported);
+  //       setUserBadgesToImport(
+  //         _userBadges,
+  //         _userBadgesImported,
+  //         _communityBadges
+  //       );
+  //       setIsLoading(false);
+  //     } else {
+  //       setUserBadgesImported([]);
+  //       setUserBadgesToImport([], [], []);
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error('Error fetching user badges', {
+  //       duration: 2000,
+  //       position: 'top-right',
+  //     });
+  //     setIsLoading(false);
+  //     setCommunityQuests({});
+  //     setUserBadgesImported([]);
+  //     setUserBadgesToImport([], [], []);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [userAddress]);
 
-  useEffect(() => {
-    fetchBadges();
-  }, [fetchBadges]);
+  // useEffect(() => {
+  //   fetchBadges();
+  // }, [fetchBadges]);
 
   // const questIsFullyImported = (questName: string) => {
   //   const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
@@ -337,7 +337,7 @@ export default function CommunitiesPage() {
           }}
           onButtonClick={async () => {
             await importBadges();
-            await fetchBadges();
+            // await fetchBadges();
           }}
           disabledButton={isImportButtonDisabled(selectedQuestName)}
           isAsync={true}

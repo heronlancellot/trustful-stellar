@@ -12,9 +12,12 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
     const { userAddress } = useAuthContext()
     const executeContractFunction = async (functionName: string) => {
         try {
+            const { pubkey } = await albedo.publicKey({ require_existing: true });
+
+
             // Load user account via RPC
             const server = new rpc.Server(rpcUrl, { allowHttp: true });
-            const account = await server.getAccount(`${userAddress}`);
+            const account = await server.getAccount(pubkey);
 
             // Create and prepare transaction
             const transaction = new TransactionBuilder(account, {
@@ -26,7 +29,7 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
                         function: functionName,
                         contract: contractId,
                         args: [
-                            new Address(`${userAddress}`).toScVal(),
+                            new Address(pubkey).toScVal(),
                         ]
                     })
                 )

@@ -211,7 +211,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   label="Join"
                   icon={<PlusIcon color="black" width={16} height={16} />}
                   iconPosition={IconPosition.LEFT}
-                  onClick={handleJoin}
+                  onClick={handleJoinedCommunities}
                 />
               )}
             </div>
@@ -472,6 +472,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       headers={['Name', 'Score', 'Status']}
                       data={searchedUserBadges}
                       isLogged
+                      isCreated
                     ></CustomTable>
                   </div>
                 ),
@@ -481,6 +482,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 content: (
                   <LeaderboardTable
                     communitiesMembersList={communitiesMembersList}
+                    totalBadgesMemberList={totalBadgesMemberList}
                   />
                 ),
                 tabNumber: 2,

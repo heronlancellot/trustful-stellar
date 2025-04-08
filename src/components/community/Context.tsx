@@ -37,7 +37,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     const getCommunities = async () => {
       try {
         const response = await fetch(
-          `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
         );
         const data = await response.json();
 
@@ -53,7 +53,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunities = async () => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
       );
       const data = await response.json();
 
@@ -67,7 +67,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     const userAddresFormated = userAddress?.toLowerCase();
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${status}/${userAddresFormated}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${status}/${userAddresFormated}`
       );
       const data = await response.json();
 
@@ -81,7 +81,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     const userAddresFormated = userAddress?.toLowerCase();
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/joined/${userAddresFormated}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/joined/${userAddresFormated}`
       );
       const data = await response.json();
 
@@ -94,7 +94,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunitiesDetails = async (communityAdress: string) => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${communityAdress}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAdress}`
       );
       const data = await response.json();
 
@@ -108,7 +108,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const refetchCommunitiesAll = async () => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
       );
       const data = await response.json();
 
@@ -121,7 +121,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunitiesBadgesList = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${communityAddress}/badges?user_address=${userAddress}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/badges?user_address=${userAddress}`
       );
       const data = await response.json();
 
@@ -134,7 +134,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunitiesMembersList = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `https://trustful-stellar-backend-testnet.up.railway.app/communities/${communityAddress}/members`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/members`
       );
       const data = await response.json();
 

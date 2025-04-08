@@ -1,6 +1,6 @@
 import { camelCaseToUpperCaseWords } from '@/lib/utils/camelCaseToWords';
 import cc from 'classcat';
-import { Check, X } from 'lucide-react';
+import { Check, Trash2, X } from 'lucide-react';
 import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { PlusIcon } from '../atoms';
 import useCommunitiesController from '../community/hooks/controller';
@@ -14,6 +14,7 @@ export interface CustomTableProps<T extends Record<string, any>>
   headersClassnames?: string[];
   status?: any;
   isLogged?: boolean;
+  isCreated?: boolean;
 }
 
 export const CustomTable = <T extends Record<string, any>>({
@@ -23,6 +24,7 @@ export const CustomTable = <T extends Record<string, any>>({
   headers,
   headersClassnames,
   isLogged,
+  isCreated,
 }: CustomTableProps<T>): ReactElement => {
   const hasRowsToDisplay = !!data && data.length > 0;
   const [isNewBadge, setIsNewBadge] = useState(false);
@@ -74,22 +76,24 @@ export const CustomTable = <T extends Record<string, any>>({
     console.log(isDisabled);
   }, [newBadgeData, isDisabled]);
 
-  const handleRemoveBadge = async () => {
-    const nameBadge = 'SQL0280';
-    const issuer = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
-    const score = 5;
+  const handleRemoveBadge = async (badge: any) => {
+    console.log(badge);
 
-    const result = await stellarContractBadges.removeBadge(
-      nameBadge,
-      issuer,
-      score
-    );
+    // const nameBadge = 'SQL0280';
+    // const issuer = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
+    // const score = 5;
 
-    if (result.success) {
-      console.log('Transaction successful:', result.txHash);
-    } else {
-      console.error('Transaction failed:', result.error);
-    }
+    // const result = await stellarContractBadges.removeBadge(
+    //   nameBadge,
+    //   issuer,
+    //   score
+    // );
+
+    // if (result.success) {
+    //   console.log('Transaction successful:', result.txHash);
+    // } else {
+    //   console.error('Transaction failed:', result.error);
+    // }
   };
 
   return (
@@ -121,11 +125,24 @@ export const CustomTable = <T extends Record<string, any>>({
               <tr key={index}>
                 {headers.map(header => {
                   return (
-                    <td key={header} className="px-7 py-4">
-                      {row[header] as ReactNode}
-                    </td>
+                    <>
+                      <td key={header} className="px-7 py-4">
+                        {row[header] as ReactNode}
+                      </td>
+                    </>
                   );
                 })}
+
+                {isCreated && (
+                  <td className="px-7 py-4 text-right">
+                    <button
+                      onClick={() => handleRemoveBadge(row)}
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4 text-whiteOpacity05" />
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })
