@@ -1,17 +1,24 @@
-import { rpc, TransactionBuilder, BASE_FEE, Networks, Operation, Address } from "@stellar/stellar-sdk";
+import { rpc, TransactionBuilder, BASE_FEE, Networks, Operation, Address, xdr } from "@stellar/stellar-sdk";
 import albedo from "@albedo-link/intent";
 import { useAuthContext } from "@/components/auth/Context";
 
-interface UseStellarContractProps {
+interface UseStellarContractBadgeProps {
     contractId: string;
     rpcUrl: string;
     networkType: "TESTNET" | "PUBLIC";
 }
 
-export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractProps) => {
+export const useStellarContractBadge = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractBadgeProps) => {
     const { userAddress } = useAuthContext()
-    const executeContractFunction = async (functionName: string) => {
+
+    const executeContractFunction = async (functionName: string, badgeName: string, issuer: string, score: number) => {
+
+        const nameScVal = xdr.ScVal.scvString(badgeName);
+        const scoreScval = xdr.ScVal.scvU32(score)
+
+
         try {
+            // 1. Obter chave pública via Albedo
             const { pubkey } = await albedo.publicKey({ require_existing: true });
 
 
@@ -30,6 +37,9 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
                         contract: contractId,
                         args: [
                             new Address(pubkey).toScVal(),
+                            nameScVal,
+                            new Address(issuer).toScVal(),
+                            scoreScval
                         ]
                     })
                 )
@@ -58,7 +68,7 @@ export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET"
 
     return {
         executeContractFunction,
-        addUser: () => executeContractFunction('add_user'),
-        removeUser: () => executeContractFunction('remove_user'),
+        addBadge: (badgeName: string, issuer: string, score: number,) => executeContractFunction('add_badge', badgeName, issuer, score),
+        removeBadge: (badgeName: string, issuer: string, score: number,) => executeContractFunction('remove_badge', badgeName, issuer, score),
     };
 }; 

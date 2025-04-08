@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { PlusIcon, StarIcon, TagIcon } from "../atoms/icons";
-import { AwardIcon } from "../atoms/icons/AwardIcon";
-import { GithubIcon } from "../atoms/icons/GithubIcon";
-import { TrophyIcon } from "../atoms/icons/TrophyIcon";
-import { KeyIcon } from "../atoms/icons/KeyIcon";
-import { HeartIcon } from "../atoms/icons/HeartIcon";
-import { UserNinjaIcon } from "../atoms/icons/UserNinjaIcon";
-import { EthereumIcon } from "../atoms/icons/EthereumIcon";
-import { CakeIcon } from "../atoms/icons/CakeIcon";
-import { BankIcon } from "../atoms/icons/BankIcon";
-import { AlertIcon } from "../atoms/icons/AlertIcon";
-import { TrashIcon } from "../atoms/icons/TrashIcon";
-import { CloseIcon } from "../atoms/icons/CloseIcon";
-import Image from "next/image";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import toast from "react-hot-toast";
-import albedo from "@albedo-link/intent";
+import React, { useState, useEffect } from 'react';
+import { PlusIcon, StarIcon, TagIcon } from '../atoms/icons';
+import { AwardIcon } from '../atoms/icons/AwardIcon';
+import { GithubIcon } from '../atoms/icons/GithubIcon';
+import { TrophyIcon } from '../atoms/icons/TrophyIcon';
+import { KeyIcon } from '../atoms/icons/KeyIcon';
+import { HeartIcon } from '../atoms/icons/HeartIcon';
+import { UserNinjaIcon } from '../atoms/icons/UserNinjaIcon';
+import { EthereumIcon } from '../atoms/icons/EthereumIcon';
+import { CakeIcon } from '../atoms/icons/CakeIcon';
+import { BankIcon } from '../atoms/icons/BankIcon';
+import { AlertIcon } from '../atoms/icons/AlertIcon';
+import { TrashIcon } from '../atoms/icons/TrashIcon';
+import { CloseIcon } from '../atoms/icons/CloseIcon';
+import Image from 'next/image';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import toast from 'react-hot-toast';
+import albedo from '@albedo-link/intent';
 
 import {
   rpc,
@@ -27,8 +27,8 @@ import {
   Operation,
   Address,
   xdr,
-  Keypair
-} from "@stellar/stellar-sdk";
+  Keypair,
+} from '@stellar/stellar-sdk';
 
 interface ModalProps {
   isOpen: boolean;
@@ -45,10 +45,10 @@ interface BadgeOption {
 }
 
 const BADGE_OPTIONS: BadgeOption[] = [
-  { id: "stellar", label: "Stellar" },
-  { id: "soroban", label: "Soroban" },
-  { id: "blockful", label: "Blockful" },
-  { id: "custom", label: "Custom" },
+  { id: 'stellar', label: 'Stellar' },
+  { id: 'soroban', label: 'Soroban' },
+  { id: 'blockful', label: 'Blockful' },
+  { id: 'custom', label: 'Custom' },
 ];
 
 const CustomBadge = () => {
@@ -74,15 +74,19 @@ const CustomHR = () => {
 };
 
 const createCommunitySchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().max(120, "Description must be less than 120 characters"),
-  avatar: z.string().min(1, "Avatar is required"),
-  badgeType: z.string().min(1, "Badge is required"),
-  badges: z.array(z.object({
-    name: z.string(),
-    // issuer: z.string(),
-    score: z.number()
-  }))
+  name: z.string().min(1, 'Name is required'),
+  description: z
+    .string()
+    .max(120, 'Description must be less than 120 characters'),
+  avatar: z.string().min(1, 'Avatar is required'),
+  badgeType: z.string().min(1, 'Badge is required'),
+  badges: z.array(
+    z.object({
+      name: z.string(),
+      // issuer: z.string(),
+      score: z.number(),
+    })
+  ),
 });
 
 type CreateCommunityForm = z.infer<typeof createCommunitySchema>;
@@ -95,12 +99,18 @@ export const StepModal: React.FC<ModalProps> = ({
   onBack,
   onConfirm,
 }) => {
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateCommunityForm>({
-    resolver: zodResolver(createCommunitySchema)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<CreateCommunityForm>({
+    resolver: zodResolver(createCommunitySchema),
   });
 
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("");
-  const [selectedBadge, setSelectedBadge] = useState<string>("");
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('');
+  const [selectedBadge, setSelectedBadge] = useState<string>('');
 
   useEffect(() => {
     setValue('avatar', selectedAvatar);
@@ -109,10 +119,13 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const onSubmit = async (data: CreateCommunityForm) => {
     try {
-      const { pubkey } = await albedo.publicKey({ require_existing: true }); //Todo-user logged
+      const { pubkey } = await albedo.publicKey({
+        require_existing: true,
+      }); //Todo-user logged
 
-      const FACTORY_CONTRACT_ID = "CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ";
-      const RPC_URL = "https://soroban-testnet.stellar.org";
+      const FACTORY_CONTRACT_ID =
+        'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
+      const RPC_URL = 'https://soroban-testnet.stellar.org';
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
 
       const account = await server.getAccount(pubkey);
@@ -127,9 +140,12 @@ export const StepModal: React.FC<ModalProps> = ({
       const badgeMapEntries: xdr.ScMapEntry[] = data.badges.map(badgeType => {
         const badgeIdVector = xdr.ScVal.scvVec([
           xdr.ScVal.scvString(badgeType.name),
-          new Address(pubkey).toScVal()
+          new Address(pubkey).toScVal(),
         ]);
-        return new xdr.ScMapEntry({ key: badgeIdVector, val: xdr.ScVal.scvU32(badgeType.score) });
+        return new xdr.ScMapEntry({
+          key: badgeIdVector,
+          val: xdr.ScVal.scvU32(badgeType.score),
+        });
       });
 
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
@@ -144,18 +160,18 @@ export const StepModal: React.FC<ModalProps> = ({
 
       const transaction = new TransactionBuilder(account, {
         fee: BASE_FEE,
-        networkPassphrase: Networks.TESTNET
+        networkPassphrase: Networks.TESTNET,
       })
         .addOperation(
           Operation.invokeContractFunction({
-            function: "create_scorer",
+            function: 'create_scorer',
             contract: FACTORY_CONTRACT_ID,
             args: [
               new Address(pubkey).toScVal(),
               saltScVal,
-              xdr.ScVal.scvSymbol("initialize"),
-              initArgsScVal
-            ]
+              xdr.ScVal.scvSymbol('initialize'),
+              initArgsScVal,
+            ],
           })
         )
         .setTimeout(30)
@@ -166,12 +182,12 @@ export const StepModal: React.FC<ModalProps> = ({
 
       const result = await albedo.tx({
         xdr: transactionXDR,
-        network: "testnet",
-        submit: true
+        network: 'testnet',
+        submit: true,
       });
 
       if (!result.tx_hash) {
-        console.error("No tx_hash returned from Albedo.");
+        console.error('No tx_hash returned from Albedo.');
         return;
       }
 
@@ -183,19 +199,19 @@ export const StepModal: React.FC<ModalProps> = ({
         await new Promise(resolve => setTimeout(resolve, 2000));
         txResponse = await server.getTransaction(result.tx_hash);
         attempts++;
-      } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
+      } while (txResponse.status === 'NOT_FOUND' && attempts < maxAttempts);
 
-      if (txResponse.status === "SUCCESS") {
-        console.log("Scorer contract created!");
-        console.log("Contract Address:", txResponse.returnValue?.toString());
-        console.log("Transaction Hash:", result.tx_hash);
+      if (txResponse.status === 'SUCCESS') {
+        console.log('Scorer contract created!');
+        console.log('Contract Address:', txResponse.returnValue?.toString());
+        console.log('Transaction Hash:', result.tx_hash);
 
         onClose();
       } else {
-        console.error("❌ Transaction failed:", txResponse.status);
+        console.error('❌ Transaction failed:', txResponse.status);
       }
     } catch (error: any) {
-      toast.error('Invalid badge name. Please use a valid one.')
+      toast.error('Invalid badge name. Please use a valid one.');
     }
   };
 
@@ -213,21 +229,28 @@ export const StepModal: React.FC<ModalProps> = ({
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                 />
                 {errors.name && (
-                  <span className="text-red-500 text-sm">{errors.name?.message}</span>
+                  <span className="text-red-500 text-sm">
+                    {errors.name?.message}
+                  </span>
                 )}
               </div>
               <div>
-                <label className="block text-sm mb-2 font-light">Description</label>
+                <label className="block text-sm mb-2 font-light">
+                  Description
+                </label>
                 <textarea
                   {...register('description')}
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008 max-h-[200px] min-h-[100px]"
                   rows={4}
                 />
                 {errors.description && (
-                  <span className="text-red-500 text-sm">{errors.description?.message}</span>
+                  <span className="text-red-500 text-sm">
+                    {errors.description?.message}
+                  </span>
                 )}
                 <div className="text-right text-sm text-gray-400">
-                  {watch('description')?.length || 0}/120
+                  {watch('description')?.length || 0}
+                  /120
                 </div>
               </div>
               <div>
@@ -240,7 +263,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <TrophyIcon />
                         </div>
                       ),
-                      id: "trophy",
+                      id: 'trophy',
                     },
                     {
                       icon: (
@@ -248,7 +271,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <KeyIcon />
                         </div>
                       ),
-                      id: "key",
+                      id: 'key',
                     },
                     {
                       icon: (
@@ -256,7 +279,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <HeartIcon />
                         </div>
                       ),
-                      id: "heart",
+                      id: 'heart',
                     },
                     {
                       icon: (
@@ -264,7 +287,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <EthereumIcon />
                         </div>
                       ),
-                      id: "diamond",
+                      id: 'diamond',
                     },
                     {
                       icon: (
@@ -272,7 +295,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <CakeIcon />
                         </div>
                       ),
-                      id: "cake",
+                      id: 'cake',
                     },
                     {
                       icon: (
@@ -280,7 +303,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <BankIcon />
                         </div>
                       ),
-                      id: "building",
+                      id: 'building',
                     },
                     {
                       icon: (
@@ -288,7 +311,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <AwardIcon />
                         </div>
                       ),
-                      id: "medal",
+                      id: 'medal',
                     },
                     {
                       icon: (
@@ -296,7 +319,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <UserNinjaIcon />
                         </div>
                       ),
-                      id: "user",
+                      id: 'user',
                     },
                     {
                       icon: (
@@ -304,14 +327,15 @@ export const StepModal: React.FC<ModalProps> = ({
                           <GithubIcon />
                         </div>
                       ),
-                      id: "github",
+                      id: 'github',
                     },
                   ].map(({ icon, id }) => (
                     <button
                       key={id}
                       onClick={() => setSelectedAvatar(id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? "ring-2 ring-brandGreen" : ""
-                        }`}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
+                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                      }`}
                     >
                       {icon}
                     </button>
@@ -326,10 +350,10 @@ export const StepModal: React.FC<ModalProps> = ({
                     <div className="flex" key={id}>
                       <button
                         onClick={() => setSelectedBadge(id)}
-                        className={`p-2 w-24 flex items-center justify-center  rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? "bg-darkGreenOpacity01" : ""}`}
+                        className={`p-2 w-24 flex items-center justify-center  rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? 'bg-darkGreenOpacity01' : ''}`}
                       >
                         <span
-                          className={`w-4 h-4 flex items-center bg-whiteOpacity005 justify-center border-2 rounded-full ${selectedBadge == id ? "border-brandGreen" : ""}`}
+                          className={`w-4 h-4 flex items-center bg-whiteOpacity005 justify-center border-2 rounded-full ${selectedBadge == id ? 'border-brandGreen' : ''}`}
                         >
                           {selectedBadge === id && (
                             <span className="w-2 h-2  rounded-full bg-brandGreen"></span>
@@ -358,7 +382,7 @@ export const StepModal: React.FC<ModalProps> = ({
               </p>
             </div>
             <CustomHR />
-            {[1, 2, 3].map((num) => (
+            {[1, 2, 3].map(num => (
               <React.Fragment key={`badge-${num}`}>
                 <div className="flex w-full justify-between items-center">
                   <div>
@@ -372,7 +396,7 @@ export const StepModal: React.FC<ModalProps> = ({
                   <div className="flex items-center justify-between w-1/3">
                     <input
                       {...register(`badges.${num - 1}.score`, {
-                        valueAsNumber: true
+                        valueAsNumber: true,
                       })}
                       type="number"
                       className="bg-whiteOpacity005 rounded-lg p-2 w-full border-whiteOpacity008"
@@ -444,7 +468,7 @@ export const StepModal: React.FC<ModalProps> = ({
             <CustomHR />
             {[1].map((num, index) => (
               <React.Fragment key={num}>
-                {" "}
+                {' '}
                 <div className="flex justify-between items-center gap-4">
                   <input
                     type="number"
@@ -479,7 +503,10 @@ export const StepModal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-grey02 rounded-lg p-6 w-full max-w-md z-50 relative">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-grey02 rounded-lg p-6 w-full max-w-md z-50 relative"
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-space-grotesk">Create community</h2>
           <button onClick={onClose}>
