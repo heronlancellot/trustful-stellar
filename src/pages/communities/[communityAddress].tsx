@@ -28,6 +28,7 @@ import { addUser, mainTestnet } from '@/testCall';
 import { kit } from '@/components/auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
+import { Check } from 'lucide-react';
 
 interface DetailsProps {
   params: {
@@ -176,7 +177,23 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         <div>
           {status === all && (
             <div className="flex justify-items-center py-2">
-              {typeof isJoined !== 'undefined' ? (
+              {typeof isJoined !== 'undefined' && isJoined ? (
+                <PrimaryButton
+                  className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                  label="Joined"
+                  icon={
+                    <Check
+                      color={tailwindConfig.theme.extend.colors.brandGreen}
+                      width={24}
+                      height={24}
+                    />
+                  }
+                  iconPosition={IconPosition.LEFT}
+                  onClick={() =>
+                    handleExitCommunities(communityAddress as string)
+                  }
+                />
+              ) : (
                 <PrimaryButton
                   className="rounded-lg w-max"
                   label="Join"
@@ -184,22 +201,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   iconPosition={IconPosition.LEFT}
                   onClick={() =>
                     handleJoinedCommunities(communityAddress as string)
-                  }
-                />
-              ) : (
-                <PrimaryButton
-                  className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                  label="Joined"
-                  icon={
-                    <PlusIcon
-                      color={tailwindConfig.theme.extend.colors.brandGreen}
-                      width={16}
-                      height={16}
-                    />
-                  }
-                  iconPosition={IconPosition.LEFT}
-                  onClick={() =>
-                    handleExitCommunities(communityAddress as string)
                   }
                 />
               )}
@@ -250,10 +251,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
                   label="Joined"
                   icon={
-                    <PlusIcon
+                    <Check
                       color={tailwindConfig.theme.extend.colors.brandGreen}
-                      width={16}
-                      height={16}
+                      width={24}
+                      height={24}
                     />
                   }
                   iconPosition={IconPosition.LEFT}

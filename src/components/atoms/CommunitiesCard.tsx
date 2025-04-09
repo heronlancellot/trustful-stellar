@@ -14,9 +14,8 @@ import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import toast from 'react-hot-toast';
 import { useAuthContext } from '../auth/Context';
-import { useUsersContext } from '../user/Context';
-import { useCommunityContext } from '../community/Context';
 import { Minus } from 'lucide-react';
+import { CakeIcon } from './icons/CakeIcon';
 
 interface CommunitiesCardProps extends React.ComponentPropsWithoutRef<'div'> {
   community: Communities;
@@ -96,7 +95,16 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       <div className="flex  justify-between items-center p-3">
         <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008 flex items-center justify-center overflow-hidden">
           <div className="w-4 h-4 ">
-            <StarIcon />
+            {community?.icon ? (
+              <img
+                src={community?.icon}
+                alt="icon image"
+                width={24}
+                height={24}
+              />
+            ) : (
+              <CakeIcon />
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -113,7 +121,8 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
 
           <div>
             <button className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out">
-              {typeof community.is_joined !== 'undefined' ? (
+              {!community.is_joined ||
+              typeof community.is_joined === 'undefined' ? (
                 <div className="flex justify-center items-center">
                   <PlusIcon className="transition-all duration-500 ease-in-out" />
                   <span

@@ -5,7 +5,7 @@ const nextConfig = {
     optimizePackageImports: ['@creit.tech/stellar-wallets-kit']
   },
   images: {
-    domains: ['s3-alpha-sig.figma.com', 'fontawesome.com']
+    domains: ['s3-alpha-sig.figma.com', 'fontawesome.com', 'cdn.jsdelivr.net']
   }
 };
 

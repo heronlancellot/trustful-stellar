@@ -10,6 +10,7 @@ export interface Communities {
     total_members: number;
     managers: string[];
     is_joined: boolean;
+    icon: string;
 }
 
 // export interface Communities {

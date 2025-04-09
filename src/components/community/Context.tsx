@@ -33,27 +33,27 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const isJoined = communitiesDetail?.is_joined;
   const { userAddress } = useAuthContext();
 
-  useEffect(() => {
-    const getCommunities = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
-        );
-        const data = await response.json();
+  // useEffect(() => {
+  //   const getCommunities = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
+  //       );
+  //       const data = await response.json();
 
-        setCommunities(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  //       setCommunities(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
-    getCommunities();
-  }, []);
+  //   getCommunities();
+  // }, []);
 
   const getCommunities = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
       );
       const data = await response.json();
 
@@ -111,7 +111,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const refetchCommunitiesAll = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
       );
       const data = await response.json();
 
