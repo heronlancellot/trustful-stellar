@@ -23,27 +23,6 @@ const UserContextProvider: React.FC<UserContextProviderProps> = (
   const [userBadgesToImport, _setUserBadgesToImport] = useState<UserBadge[]>(
     []
   );
-  // const fetchScore = useCallback(async () => {
-  //   if (!!userAddress) {
-  //     try {
-  //       const newScore = await usersClient.getScore(userAddress);
-  //       setUserScore(newScore);
-  //     } catch (error) {
-  //       console.error(error);
-  //       toast.error("Error getting user score", {
-  //         position: "top-right",
-  //         duration: 2000,
-  //       });
-  //       setUserScore(undefined);
-  //     }
-  //   } else if (userAddress === "") {
-  //     setUserScore(undefined);
-  //   }
-  // }, [userAddress]);
-
-  // useEffect(() => {
-  //   fetchScore();
-  // }, [fetchScore]);
 
   const setUserBadgesToImport = (
     _userBadges: UserBadge[],

@@ -30,7 +30,6 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   const { setUserAddress } = useAuthContext();
 
   const handleJoin = async () => {
-    alert('Entrando');
     try {
       kit.signTransaction(ALBEDO_ID);
       const { address } = await kit.getAddress();
@@ -44,10 +43,12 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       if (response.success) {
         console.log('User added successfully!');
         console.log('Transaction ID:', response.transactionId);
+        toast.success('Successful transaction');
       } else {
         console.error('Failed to add user:', response.error);
         console.error('Error details:', response.errorDetails);
       }
+      toast.success('Successful transaction');
     } catch (error) {
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
@@ -57,7 +58,6 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   };
 
   const handleExit = async () => {
-    alert('Saindo');
     try {
       kit.signTransaction(ALBEDO_ID);
       const { address } = await kit.getAddress();
@@ -75,6 +75,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
         console.error('Failed to add user:', response.error);
         console.error('Error details:', response.errorDetails);
       }
+      toast.success('Successful transaction');
     } catch (error) {
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
@@ -82,10 +83,6 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       setUserAddress('');
     }
   };
-
-  useEffect(() => {
-    console.log(community.is_joined);
-  }, [community]);
 
   return (
     <div

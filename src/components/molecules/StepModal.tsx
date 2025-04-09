@@ -207,6 +207,7 @@ export const StepModal: React.FC<ModalProps> = ({
         console.log('Transaction Hash:', result.tx_hash);
 
         onClose();
+        toast.success('Successful transaction');
       } else {
         console.error('❌ Transaction failed:', txResponse.status);
       }

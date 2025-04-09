@@ -162,7 +162,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         }
       );
       const data = await response.json();
-      console.log(data);
 
       getCommunities();
     } catch (error) {
