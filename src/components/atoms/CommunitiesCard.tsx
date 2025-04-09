@@ -121,18 +121,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
 
           <div>
             <button className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out">
-              {!community.is_joined ||
-              typeof community.is_joined === 'undefined' ? (
-                <div className="flex justify-center items-center">
-                  <PlusIcon className="transition-all duration-500 ease-in-out" />
-                  <span
-                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                    onClick={handleJoin}
-                  >
-                    Join
-                  </span>
-                </div>
-              ) : (
+              {!('is_joined' in community) ? (
                 <div className="flex justify-center items-center">
                   <Minus className="transition-all duration-500 ease-in-out" />
                   <span
@@ -140,6 +129,26 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                     onClick={handleExit}
                   >
                     Exit
+                  </span>
+                </div>
+              ) : community.is_joined ? (
+                <div className="flex justify-center items-center">
+                  <Minus className="transition-all duration-500 ease-in-out" />
+                  <span
+                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                    onClick={handleExit}
+                  >
+                    Exit
+                  </span>
+                </div>
+              ) : (
+                <div className="flex justify-center items-center">
+                  <PlusIcon className="transition-all duration-500 ease-in-out" />
+                  <span
+                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                    onClick={handleJoin}
+                  >
+                    Join
                   </span>
                 </div>
               )}
