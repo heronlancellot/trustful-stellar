@@ -91,10 +91,13 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     }
   };
 
-  const getCommunitiesDetails = async (communityAdress: string) => {
+  const getCommunitiesDetails = async (
+    communityAdress: string,
+    userAddress: string
+  ) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAdress}`
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAdress}?user_address=${userAddress}`
       );
       const data = await response.json();
 
@@ -144,6 +147,29 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     }
   };
 
+  const updateHideCommunities = async (communityAddress: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/visibility`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            is_hidden: true,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+
+      getCommunities();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <communityCtx.Provider
       value={{
@@ -167,6 +193,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         getVerifyReputationList,
         verifyReputationcommunities,
         setVerifyReputationcommunities,
+        updateHideCommunities,
       }}
     >
       {props.children}

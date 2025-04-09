@@ -3,25 +3,31 @@
 import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
 import { useStellarContractManager } from '@/lib/stellar/transactions/hooks/useStellarContractManager';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 export default function useCommunitiesController() {
   const [inputText, setInputText] = useState('');
+  const router = useRouter();
+  const { communityAddress } = router.query;
+
+  const communityAddressFormatted =
+    typeof communityAddress === 'string' ? communityAddress.toUpperCase() : '';
 
   const stellarContractJoinCommunities = useStellarContract({
-    contractId: `${process.env.COMMUNITIES_CONTRACT ?? 'CAGKZUKGGVILYOUY6QWLYF6NMHNDTZVXV3V7NJRTWZLWCTYYM2VWDAZY'}`,
+    contractId: communityAddressFormatted,
     rpcUrl: 'https://soroban-testnet.stellar.org',
     networkType: 'TESTNET',
   });
 
   const stellarContractManagers = useStellarContractManager({
-    contractId: `${process.env.MANAGERS_CONTRACT ?? 'CDKBF73BW44S7RTY744H6TIDOKDAAPNHWLC2CFMHGUXIRZSZQ4V2OAGY'}`,
+    contractId: communityAddressFormatted,
     rpcUrl: 'https://soroban-testnet.stellar.org',
     networkType: 'TESTNET',
   });
 
   const stellarContractBadges = useStellarContractBadge({
-    contractId: `${process.env.BADGES_CONTRACT ?? 'CBQIUGALZVL5VZZHQO2IJJIJNWQQ2S2SMKMKIE2WCR6PENAPAQGXSKVK'}`,
+    contractId: communityAddressFormatted,
     rpcUrl: 'https://soroban-testnet.stellar.org',
     networkType: 'TESTNET',
   });
