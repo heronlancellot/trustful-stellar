@@ -28,6 +28,7 @@ import { addUser, mainTestnet } from '@/testCall';
 import { kit } from '@/components/auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
+import { Check } from 'lucide-react';
 
 interface DetailsProps {
   params: {
@@ -53,13 +54,17 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     getCommunitiesDetails,
     communitiesDetail,
     isJoined,
+    updateHideCommunities,
   } = useCommunityContext();
 
   useEffect(() => {
     if (communityAddress) {
-      getCommunitiesDetails(`${communityAddress}`);
       getCommunitiesBadgesList(`${communityAddress}`);
       getCommunitiesMembersList(`${communityAddress}`);
+    }
+
+    if (communityAddress && status) {
+      getCommunitiesDetails(`${communityAddress}`, `${userAddress}`);
     }
   }, [communityAddress]); //eslint-disable-line react-hooks/exhaustive-deps
 
@@ -78,33 +83,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     return <h1>Carregando...</h1>;
   }
 
-  const handleJoin = async () => {
-    try {
-      kit.signTransaction(ALBEDO_ID);
-      const { address } = await kit.getAddress();
-      await checkIfWalletIsInitialized(address);
-      setUserAddress(address);
-
-      console.log('\nAdding user to contract...');
-      const response = await addUser('teste');
-      console.log('Transaction response:', response);
-
-      if (response.success) {
-        console.log('User added successfully!');
-        console.log('Transaction ID:', response.transactionId);
-      } else {
-        console.error('Failed to add user:', response.error);
-        console.error('Error details:', response.errorDetails);
-      }
-    } catch (error) {
-      toast.error(
-        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
-      );
-      setUserAddress('');
-    }
-  };
-
-  const handleJoinedCommunities = async () => {
+  const handleJoinedCommunities = async (communityAddress: string) => {
     const result = await stellarContractJoinCommunities.addUser();
 
     if (result.success) {
@@ -114,7 +93,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
   };
 
-  const handleExitCommunities = async () => {
+  const handleExitCommunities = async (communityAddress: string) => {
     const result = await stellarContractJoinCommunities.removeUser();
 
     if (result.success) {
@@ -125,7 +104,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const handleInviteManager = async (newManager: string) => {
-    const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE'; //TO-DO Comparar user logado com os managers que estao vindo do details
+    const sender = userAddress as string;
 
     const result = await stellarContractManagers.addManager(sender, newManager);
 
@@ -136,12 +115,15 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
   };
 
-  const handleRemoveManager = async (newManager: string) => {
-    const sender = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE'; //TO-DO Comparar user logado com os managers que estao vindo do details
+  const handleRemoveManager = async (removedManager: string) => {
+    const sender = userAddress as string;
+
+    const removedManagerFormatted =
+      typeof removedManager === 'string' ? removedManager.toUpperCase() : '';
 
     const result = await stellarContractManagers.removeManager(
       sender,
-      newManager
+      removedManagerFormatted
     );
 
     if (result.success) {
@@ -156,6 +138,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   )
     ? communitiesBadgesList.community_badges
     : [];
+
+  const handleHideCommunity = (communityAddress: string) => {
+    updateHideCommunities(communityAddress);
+  };
 
   const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
     badgeName: (
@@ -191,19 +177,21 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         <div>
           {status === all && (
             <div className="flex justify-items-center py-2">
-              {isJoined ? (
+              {typeof isJoined !== 'undefined' && isJoined ? (
                 <PrimaryButton
                   className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
                   label="Joined"
                   icon={
-                    <PlusIcon
+                    <Check
                       color={tailwindConfig.theme.extend.colors.brandGreen}
-                      width={16}
-                      height={16}
+                      width={24}
+                      height={24}
                     />
                   }
                   iconPosition={IconPosition.LEFT}
-                  onClick={handleExitCommunities}
+                  onClick={() =>
+                    handleExitCommunities(communityAddress as string)
+                  }
                 />
               ) : (
                 <PrimaryButton
@@ -211,7 +199,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   label="Join"
                   icon={<PlusIcon color="black" width={16} height={16} />}
                   iconPosition={IconPosition.LEFT}
-                  onClick={handleJoinedCommunities}
+                  onClick={() =>
+                    handleJoinedCommunities(communityAddress as string)
+                  }
                 />
               )}
             </div>
@@ -246,18 +236,33 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           )}
           {status === joined && (
             <div className="flex justify-items-center py-2">
-              <PrimaryButton
-                className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                label="Joined"
-                icon={
-                  <CheckIcon
-                    color={tailwindConfig.theme.extend.colors.brandGreen}
-                    width={16}
-                    height={16}
-                  />
-                }
-                iconPosition={IconPosition.LEFT}
-              />
+              {typeof isJoined === 'undefined' || !isJoined ? (
+                <PrimaryButton
+                  className="rounded-lg w-max"
+                  label="Join"
+                  icon={<PlusIcon color="black" width={16} height={16} />}
+                  iconPosition={IconPosition.LEFT}
+                  onClick={() =>
+                    handleJoinedCommunities(communityAddress as string)
+                  }
+                />
+              ) : (
+                <PrimaryButton
+                  className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                  label="Joined"
+                  icon={
+                    <Check
+                      color={tailwindConfig.theme.extend.colors.brandGreen}
+                      width={24}
+                      height={24}
+                    />
+                  }
+                  iconPosition={IconPosition.LEFT}
+                  onClick={() =>
+                    handleExitCommunities(communityAddress as string)
+                  }
+                />
+              )}
             </div>
           )}
         </div>
@@ -304,7 +309,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <button className="text-sm text-center w-[153px] h-[36px] rounded-md bg-darkGreenOpacity01 text-brandGreen pr-2 pl-2">
               No, keep visible
             </button>
-            <button className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack pr-2 pl-2">
+            <button
+              className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack pr-2 pl-2"
+              onClick={() => handleHideCommunity(communityAddress as string)}
+            >
               Yes, hide
             </button>
           </div>
@@ -359,7 +367,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         <div
                           onClick={() => {
                             openModal('deleteBadge');
-                            () => setRemoveManager(item);
+                            setRemoveManager(item);
                           }}
                           className="w-[15px] h-[15px] cursor-pointer"
                         >
@@ -396,7 +404,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               No, keep it
             </button>
             <button
-              onClick={() => alert()}
+              onClick={() => handleRemoveManager(removeManager)}
               className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack "
             >
               Yes, delete

@@ -1,6 +1,5 @@
 import { rpc, TransactionBuilder, BASE_FEE, Networks, Operation, Address } from "@stellar/stellar-sdk";
 import albedo from "@albedo-link/intent";
-import { useAuthContext } from "@/components/auth/Context";
 
 interface UseStellarContractProps {
     contractId: string;
@@ -9,7 +8,6 @@ interface UseStellarContractProps {
 }
 
 export const useStellarContract = ({ contractId, rpcUrl, networkType = "TESTNET" }: UseStellarContractProps) => {
-    const { userAddress } = useAuthContext()
     const executeContractFunction = async (functionName: string) => {
         try {
             const { pubkey } = await albedo.publicKey({ require_existing: true });

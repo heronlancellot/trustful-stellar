@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from "react";
-import { DisconnectIcon, UserIcon } from "@/components/atoms";
-import { useAuthContext } from "@/components/auth/Context";
-import tailwindConfig from "tailwind.config";
-import cc from "classcat";
-import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
-import { clearLocalStorageUserAddress } from "@/lib/local-storage/auth";
-import { useRouter } from "next/router";
+import { useState, useRef, useEffect } from 'react';
+import { DisconnectIcon, UserIcon } from '@/components/atoms';
+import { useAuthContext } from '@/components/auth/Context';
+import tailwindConfig from 'tailwind.config';
+import cc from 'classcat';
+import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
+import { useRouter } from 'next/router';
 
 export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,13 +21,13 @@ export const UserDropdown = () => {
   };
 
   const disconnect = () => {
-    setUserAddress("");
+    setUserAddress('');
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -42,10 +41,10 @@ export const UserDropdown = () => {
         <div
           className={cc([
             {
-              "text-brandWhite border bg-whiteOpacity008": !isOpen,
-              "text-brandBlack bg-brandGreen": isOpen,
+              'text-brandWhite border bg-whiteOpacity008': !isOpen,
+              'text-brandBlack bg-brandGreen': isOpen,
             },
-            "border-whiteOpacity008 rounded-lg p-2",
+            'border-whiteOpacity008 rounded-lg p-2',
           ])}
         >
           <div className="flex items-center justify-center gap-2">
@@ -57,7 +56,7 @@ export const UserDropdown = () => {
                   : tailwindConfig.theme.extend.colors.brandGreen
               }
             />
-            <h2>{getEllipsedAddress(userAddress || "")}</h2>
+            <h2>{getEllipsedAddress(userAddress || '')}</h2>
           </div>
         </div>
       </button>
@@ -72,7 +71,7 @@ export const UserDropdown = () => {
             <button
               onClick={() => {
                 router.push({
-                  pathname: "/verify-reputation",
+                  pathname: '/verify-reputation',
                   query: { searchAddress: userAddress },
                 });
               }}

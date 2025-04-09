@@ -71,7 +71,7 @@ export default function CommunitiesPage() {
     const getCommunities = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
+          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
         );
         const data = await response.json();
 

@@ -18,10 +18,11 @@ export type CommunityContext = {
   getCommunities: () => Promise<void>;
   getCommunitiesStatus: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;
-  getCommunitiesDetails: (communityAddress: string) => Promise<void>;
+  getCommunitiesDetails: (communityAddress: string, userAddress?: string) => Promise<void>;
   getVerifyReputationList: (userAddress: string) => Promise<void>;
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;
   getCommunitiesMembersList: (communityAddress: string) => Promise<void>;
+  updateHideCommunities: (communityAddress: string) => Promise<void>;
 };
 
 export type CommunityContextProviderProps = {

@@ -207,6 +207,7 @@ export const StepModal: React.FC<ModalProps> = ({
         console.log('Transaction Hash:', result.tx_hash);
 
         onClose();
+        toast.success('Successful transaction');
       } else {
         console.error('❌ Transaction failed:', txResponse.status);
       }
@@ -260,10 +261,18 @@ export const StepModal: React.FC<ModalProps> = ({
                     {
                       icon: (
                         <div className="w-5 items-center justify-center">
+                          <StarIcon />
+                        </div>
+                      ),
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/star.svg',
+                    },
+                    {
+                      icon: (
+                        <div className="w-5 items-center justify-center">
                           <TrophyIcon />
                         </div>
                       ),
-                      id: 'trophy',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/trophy.svg',
                     },
                     {
                       icon: (
@@ -271,7 +280,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <KeyIcon />
                         </div>
                       ),
-                      id: 'key',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/key.svg',
                     },
                     {
                       icon: (
@@ -279,7 +288,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <HeartIcon />
                         </div>
                       ),
-                      id: 'heart',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/heart.svg',
                     },
                     {
                       icon: (
@@ -287,7 +296,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <EthereumIcon />
                         </div>
                       ),
-                      id: 'diamond',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/etherum.svg',
                     },
                     {
                       icon: (
@@ -295,7 +304,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <CakeIcon />
                         </div>
                       ),
-                      id: 'cake',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/birthday.svg',
                     },
                     {
                       icon: (
@@ -303,7 +312,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <BankIcon />
                         </div>
                       ),
-                      id: 'building',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/lib.svg',
                     },
                     {
                       icon: (
@@ -311,15 +320,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <AwardIcon />
                         </div>
                       ),
-                      id: 'medal',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <UserNinjaIcon />
-                        </div>
-                      ),
-                      id: 'user',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/badge.svg',
                     },
                     {
                       icon: (
@@ -327,7 +328,7 @@ export const StepModal: React.FC<ModalProps> = ({
                           <GithubIcon />
                         </div>
                       ),
-                      id: 'github',
+                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/github.svg',
                     },
                   ].map(({ icon, id }) => (
                     <button
