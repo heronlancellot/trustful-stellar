@@ -93,7 +93,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
 
   const getCommunitiesDetails = async (
     communityAdress: string,
-    userAddress: string
+    userAddress?: string
   ) => {
     try {
       const response = await fetch(
