@@ -100,6 +100,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
         <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008 flex items-center justify-center overflow-hidden">
           <div className="w-4 h-4 ">
             {community?.icon ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={community?.icon}
                 alt="icon image"
