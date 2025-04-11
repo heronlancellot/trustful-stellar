@@ -1,18 +1,33 @@
-import { Tabs } from "@/components/organisms/types";
-import cc from "classcat";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { SearchIconPrimary } from "../atoms";
-import { SearchBar } from "../search/SearchBar";
-import useCommunitiesController from "../community/hooks/controller";
-import { useCommunityContext } from "../community/Context";
+import { Tabs } from '@/components/organisms/types';
+import cc from 'classcat';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { SearchIconPrimary } from '../atoms';
+import { SearchBar } from '../search/SearchBar';
+import useCommunitiesController from '../community/hooks/controller';
+import { useCommunityContext } from '../community/Context';
 
+export interface TabProps {
+  content: React.ReactNode;
+  tabNumber: number;
+  trigger?: React.ReactNode;
+  disabled?: boolean;
+}
 
-export interface ContentTabsProps extends React.ComponentPropsWithoutRef<"div"> {
+export interface ContentTabsProps {
+  tabs: Record<string, TabProps>;
+  onButtonClick?: (tabName: string) => void;
+  inputText?: string;
+  setInputText?: (text: string) => void;
+  inputSearch?: boolean;
+}
+
+export interface ContentTabsProps
+  extends React.ComponentPropsWithoutRef<'div'> {
   tabs: Tabs;
   inputText?: string;
   onButtonClick?: (value: string) => void;
   inputSearch?: Boolean;
-  setInputText?: any
+  setInputText?: any;
 }
 
 export const ContentTabs: React.FC<ContentTabsProps> = ({
@@ -26,14 +41,14 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
 
-  const { getCommunitiesDetails } = useCommunityContext()
+  const { getCommunitiesDetails } = useCommunityContext();
 
   const onSearch = async () => {
-    await getCommunitiesDetails(inputText)
-  }
+    await getCommunitiesDetails(inputText);
+  };
 
   return (
-    <div className={cc([className, "w-screen h-max bg-brandBlack"])} {...props}>
+    <div className={cc([className, 'w-screen h-max bg-brandBlack'])} {...props}>
       <nav className="flex nav-bar px-12 justify-between cursor-pointer items-center">
         <div className="flex">
           {Object.entries(tabs)
@@ -43,12 +58,15 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
                 <div
                   key={tabName}
                   className={cc([
-                    { "tab-active": tabName == selectedTab },
-                    "tab p-2 px-4"
+                    { 'tab-active': tabName == selectedTab },
+                    { 'opacity-50 cursor-not-allowed': tabProps.disabled },
+                    'tab p-2 px-4',
                   ])}
                   onClick={() => {
-                    setSelectedTab(tabName);
-                    onButtonClick?.(tabName.toLowerCase())
+                    if (!tabProps.disabled) {
+                      setSelectedTab(tabName);
+                      onButtonClick?.(tabName.toLowerCase());
+                    }
                   }}
                 >
                   {tabProps.trigger ? tabProps.trigger : <span>{tabName}</span>}
@@ -59,19 +77,21 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
         <div className="py-4">
           {inputSearch && (
             <SearchBar
-              placeholder={"Paste the address..."}
+              placeholder={'Paste the address...'}
               onButtonClick={onSearch}
               inputText={inputText}
               onChangeInputText={setInputText}
             />
           )}
-
         </div>
       </nav>
       <div className="w-full pt-8">
         {Object.entries(tabs).map(([tabName, tabProps]) => {
           return (
-            <div key={tabName} className={cc({ hidden: selectedTab !== tabName })}>
+            <div
+              key={tabName}
+              className={cc({ hidden: selectedTab !== tabName })}
+            >
               {tabProps.content}
             </div>
           );

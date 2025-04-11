@@ -258,6 +258,7 @@ export default function CommunitiesPage() {
               </CardWrapper>
             ),
             tabNumber: 1,
+            disabled: false,
           },
           Joined: {
             content: (
@@ -280,6 +281,7 @@ export default function CommunitiesPage() {
               </CardWrapper>
             ),
             tabNumber: 2,
+            disabled: !userAddress,
           },
           Created: {
             content: (
@@ -302,6 +304,7 @@ export default function CommunitiesPage() {
               </CardWrapper>
             ),
             tabNumber: 3,
+            disabled: !userAddress,
           },
           Hidden: {
             content: (
@@ -324,6 +327,7 @@ export default function CommunitiesPage() {
               </CardWrapper>
             ),
             tabNumber: 3,
+            disabled: !userAddress,
           },
         }}
       ></ContentTabs>
