@@ -13,21 +13,13 @@ export interface TabProps {
   disabled?: boolean;
 }
 
-export interface ContentTabsProps {
+export interface ContentTabsProps
+  extends React.ComponentPropsWithoutRef<'div'> {
   tabs: Record<string, TabProps>;
   onButtonClick?: (tabName: string) => void;
   inputText?: string;
   setInputText?: (text: string) => void;
   inputSearch?: boolean;
-}
-
-export interface ContentTabsProps
-  extends React.ComponentPropsWithoutRef<'div'> {
-  tabs: Tabs;
-  inputText?: string;
-  onButtonClick?: (value: string) => void;
-  inputSearch?: Boolean;
-  setInputText?: any;
 }
 
 export const ContentTabs: React.FC<ContentTabsProps> = ({
@@ -75,7 +67,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
             })}
         </div>
         <div className="py-4">
-          {inputSearch && (
+          {inputSearch && setInputText && (
             <SearchBar
               placeholder={'Paste the address...'}
               onButtonClick={onSearch}
