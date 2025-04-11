@@ -1,11 +1,11 @@
-import { CustomTable } from "@/components/organisms/CustomTable";
-import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
-import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
-import tailwindConfig from "tailwind.config";
-import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
-import { RankIcon } from "@/components/atoms/icons/RankIcon";
-import { MembersList } from "@/types/communities";
-import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
+import { CustomTable } from '@/components/organisms/CustomTable';
+import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
+import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
+import tailwindConfig from 'tailwind.config';
+import { IssuerTableCell } from '@/components/atoms/verify-reputation/IssuerTableCell';
+import { RankIcon } from '@/components/atoms/icons/RankIcon';
+import { MembersList } from '@/types/communities';
+import { CommunityTableCell } from '@/components/molecules/CommunityTableCell';
 
 type LeaderboardPlayer = {
   rank: number;
@@ -44,19 +44,20 @@ function getPointsTextColor(rank: number) {
   return colorsMap[rank as keyof typeof colorsMap] || colorsMap.default;
 }
 
-export default function LeaderboardTable({ communitiesMembersList, totalBadgesMemberList }: any) {
-
+export default function LeaderboardTable({
+  communitiesMembersList,
+  totalBadgesMemberList,
+}: any) {
   const rankedSorted = Array.isArray(communitiesMembersList)
     ? communitiesMembersList.map((member: MembersList, index: number) => ({
-      ...member,
-      rank: index + 1,
-    }))
+        ...member,
+        rank: index + 1,
+      }))
     : [];
 
-
   const leaderboardRenderData = rankedSorted?.map((player: MembersList) => {
-    const formattedUserAddress = `${player.user_address.slice(0, 10)}...`
-    return ({
+    const formattedUserAddress = `${player.user_address.slice(0, 10)}...`;
+    return {
       rank: (
         <div className="flex justify-center items-center relative w-min">
           <RankIcon
@@ -87,7 +88,7 @@ export default function LeaderboardTable({ communitiesMembersList, totalBadgesMe
           <span className="text-whiteOpacity05">/ {totalBadgesMemberList}</span>
         </div>
       ),
-    })
+    };
   });
 
   return (
@@ -105,8 +106,8 @@ export default function LeaderboardTable({ communitiesMembersList, totalBadgesMe
           />
         }
         className="mt-6"
-        headers={["rank", "address", "points", "badges"]}
-        headersClassnames={["w-[8%]"]}
+        headers={['rank', 'address', 'points', 'badges']}
+        headersClassnames={['w-[8%]']}
         data={leaderboardRenderData}
       ></CustomTable>
     </div>

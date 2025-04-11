@@ -5,6 +5,10 @@ import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { PlusIcon } from '../atoms';
 import useCommunitiesController from '../community/hooks/controller';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
+import { useCommunityContext } from '../community/Context';
+import { useRouter } from 'next/router';
+import toast from 'react-hot-toast';
+import { error } from 'console';
 
 export interface CustomTableProps<T extends Record<string, any>>
   extends React.ComponentPropsWithoutRef<'div'> {
@@ -29,6 +33,8 @@ export const CustomTable = <T extends Record<string, any>>({
   const hasRowsToDisplay = !!data && data.length > 0;
   const [isNewBadge, setIsNewBadge] = useState(false);
   const { stellarContractBadges } = useCommunitiesController();
+  const router = useRouter();
+  const { communityAddress } = router.query;
   const [newBadgeData, setNewBadgeData] = useState<{
     name: string;
     issuer: string;
@@ -38,6 +44,8 @@ export const CustomTable = <T extends Record<string, any>>({
     issuer: '',
     score: '',
   });
+
+  const { getCommunitiesBadgesList } = useCommunityContext();
 
   const isDisabled =
     !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
@@ -64,17 +72,15 @@ export const CustomTable = <T extends Record<string, any>>({
 
     if (result.success) {
       console.log('Transaction successful:', result.txHash);
+      toast.success('Transaction Successful!');
+      getCommunitiesBadgesList(`${communityAddress}`);
     } else {
       console.error('Transaction failed:', result.error);
+      toast.error(result.error);
     }
 
     setIsNewBadge(false);
   };
-
-  useEffect(() => {
-    console.log(newBadgeData.score);
-    console.log(isDisabled);
-  }, [newBadgeData, isDisabled]);
 
   const handleRemoveBadge = async (badge: any) => {
     console.log(badge);
