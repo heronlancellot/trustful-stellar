@@ -26,9 +26,13 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   className,
   ...props
 }) => {
-  const { setUserAddress } = useAuthContext();
+  const { userAddress, setUserAddress } = useAuthContext();
 
   const handleJoin = async () => {
+    if (!userAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
     try {
       kit.signTransaction(ALBEDO_ID);
       const { address } = await kit.getAddress();
@@ -120,7 +124,13 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
           </div>
 
           <div>
-            <button className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out">
+            <button
+              className={cc([
+                'overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
+                { 'opacity-50 cursor-not-allowed': !userAddress },
+              ])}
+              disabled={!userAddress}
+            >
               {!('is_joined' in community) ? (
                 <div className="flex justify-center items-center">
                   <Minus className="transition-all duration-500 ease-in-out" />

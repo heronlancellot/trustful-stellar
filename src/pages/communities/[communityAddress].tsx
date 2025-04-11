@@ -17,7 +17,7 @@ import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
 import { useModal } from '@/hooks/useModal';
 import { CustomModal } from './components/molecules/custom-modal';
 import LeaderboardTable from '../../components/molecules/leaderboard-table';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { CommunityTableCell } from '../../components/molecules/CommunityTableCell';
 import { useCommunityContext } from '@/components/community/Context';
 ('./components/molecules/leaderboard-table');
@@ -29,6 +29,7 @@ import { kit } from '@/components/auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import { Check } from 'lucide-react';
+import cc from 'classcat';
 
 interface DetailsProps {
   params: {
@@ -179,7 +180,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div className="flex justify-items-center py-2">
               {typeof isJoined !== 'undefined' && isJoined ? (
                 <PrimaryButton
-                  className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                  className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
                   label="Joined"
                   icon={
                     <Check
@@ -195,13 +196,20 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 />
               ) : (
                 <PrimaryButton
-                  className="rounded-lg w-max"
+                  className={cc([
+                    'rounded-lg w-max',
+                    {
+                      'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                        !userAddress,
+                    },
+                  ])}
                   label="Join"
                   icon={<PlusIcon color="black" width={16} height={16} />}
                   iconPosition={IconPosition.LEFT}
                   onClick={() =>
                     handleJoinedCommunities(communityAddress as string)
                   }
+                  disabled={!userAddress}
                 />
               )}
             </div>
@@ -238,17 +246,24 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div className="flex justify-items-center py-2">
               {typeof isJoined === 'undefined' || !isJoined ? (
                 <PrimaryButton
-                  className="rounded-lg w-max"
+                  className={cc([
+                    'rounded-lg w-max',
+                    {
+                      'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                        !userAddress,
+                    },
+                  ])}
                   label="Join"
                   icon={<PlusIcon color="black" width={16} height={16} />}
                   iconPosition={IconPosition.LEFT}
                   onClick={() =>
                     handleJoinedCommunities(communityAddress as string)
                   }
+                  disabled={!userAddress}
                 />
               ) : (
                 <PrimaryButton
-                  className=" rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                  className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
                   label="Joined"
                   icon={
                     <Check
