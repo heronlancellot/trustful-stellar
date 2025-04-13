@@ -105,7 +105,7 @@ export const CustomTable = <T extends Record<string, any>>({
               <th
                 key={header}
                 className={cc([
-                  'text-left py-4 px-7',
+                  'text-left py-4 px-7 border-none',
                   headersClassnames?.[index],
                 ])}
               >
@@ -115,6 +115,11 @@ export const CustomTable = <T extends Record<string, any>>({
               </th>
             );
           })}
+          {isCreated && (
+            <th className="text-right py-4 px-7 border-none">
+              <span className="text-whiteOpacity05 text-sm font-light"></span>
+            </th>
+          )}
         </tr>
       </thead>
 
@@ -123,15 +128,11 @@ export const CustomTable = <T extends Record<string, any>>({
           data.map((row, index) => {
             return (
               <tr key={index}>
-                {headers.map(header => {
-                  return (
-                    <>
-                      <td key={header} className="px-7 py-4">
-                        {row[header] as ReactNode}
-                      </td>
-                    </>
-                  );
-                })}
+                {headers.map(header => (
+                  <td key={`${index}-${header}`} className="px-7 py-4">
+                    {row[header] as ReactNode}
+                  </td>
+                ))}
 
                 {isCreated && (
                   <td className="px-7 py-4 text-right">
@@ -148,15 +149,20 @@ export const CustomTable = <T extends Record<string, any>>({
           })
         ) : (
           <tr className={cc([{ hidden: hasRowsToDisplay }])}>
-            <td colSpan={headers.length}>{childrenForEmptyTable}</td>
+            <td colSpan={isCreated ? headers.length + 1 : headers.length}>
+              {childrenForEmptyTable}
+            </td>
           </tr>
         )}
         {isLogged && (
           <tr>
-            <td colSpan={headers.length} className="py-2">
+            <td
+              colSpan={isCreated ? headers.length + 1 : headers.length}
+              className="py-2"
+            >
               {isNewBadge ? (
                 <form onSubmit={handleSubmit}>
-                  <div className="flex gap-2 items-center w-full">
+                  <div className="flex gap-2 items-center w-full ml-4">
                     <input
                       type="text"
                       placeholder="Badge name"
@@ -210,7 +216,7 @@ export const CustomTable = <T extends Record<string, any>>({
                   </div>
                 </form>
               ) : (
-                <div className="flex gap-2 py-2 items-center">
+                <div className="flex gap-2 py-2 items-center ml-10 ">
                   <PlusIcon className="text-whiteOpacity05" />
                   <button onClick={() => setIsNewBadge(true)}>New Badge</button>
                 </div>

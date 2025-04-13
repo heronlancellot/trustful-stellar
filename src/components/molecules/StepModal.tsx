@@ -29,6 +29,7 @@ import {
   xdr,
   Keypair,
 } from '@stellar/stellar-sdk';
+import { useCommunityContext } from '../community/Context';
 
 interface ModalProps {
   isOpen: boolean;
@@ -208,6 +209,10 @@ export const StepModal: React.FC<ModalProps> = ({
 
         onClose();
         toast.success('Successful transaction');
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         console.error('❌ Transaction failed:', txResponse.status);
       }
