@@ -5,10 +5,6 @@ import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { PlusIcon } from '../atoms';
 import useCommunitiesController from '../community/hooks/controller';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
-import { useCommunityContext } from '../community/Context';
-import { useRouter } from 'next/router';
-import toast from 'react-hot-toast';
-import { error } from 'console';
 
 export interface CustomTableProps<T extends Record<string, any>>
   extends React.ComponentPropsWithoutRef<'div'> {
@@ -33,8 +29,6 @@ export const CustomTable = <T extends Record<string, any>>({
   const hasRowsToDisplay = !!data && data.length > 0;
   const [isNewBadge, setIsNewBadge] = useState(false);
   const { stellarContractBadges } = useCommunitiesController();
-  const router = useRouter();
-  const { communityAddress } = router.query;
   const [newBadgeData, setNewBadgeData] = useState<{
     name: string;
     issuer: string;
@@ -44,8 +38,6 @@ export const CustomTable = <T extends Record<string, any>>({
     issuer: '',
     score: '',
   });
-
-  const { getCommunitiesBadgesList } = useCommunityContext();
 
   const isDisabled =
     !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
@@ -72,15 +64,17 @@ export const CustomTable = <T extends Record<string, any>>({
 
     if (result.success) {
       console.log('Transaction successful:', result.txHash);
-      toast.success('Transaction Successful!');
-      getCommunitiesBadgesList(`${communityAddress}`);
     } else {
       console.error('Transaction failed:', result.error);
-      toast.error(result.error);
     }
 
     setIsNewBadge(false);
   };
+
+  useEffect(() => {
+    console.log(newBadgeData.score);
+    console.log(isDisabled);
+  }, [newBadgeData, isDisabled]);
 
   const handleRemoveBadge = async (badge: any) => {
     console.log(badge);
@@ -111,7 +105,7 @@ export const CustomTable = <T extends Record<string, any>>({
               <th
                 key={header}
                 className={cc([
-                  'text-left py-4 px-7',
+                  'text-left py-4 px-7 border-none',
                   headersClassnames?.[index],
                 ])}
               >
@@ -121,6 +115,11 @@ export const CustomTable = <T extends Record<string, any>>({
               </th>
             );
           })}
+          {isCreated && (
+            <th className="text-right py-4 px-7 border-none">
+              <span className="text-whiteOpacity05 text-sm font-light"></span>
+            </th>
+          )}
         </tr>
       </thead>
 
@@ -129,15 +128,11 @@ export const CustomTable = <T extends Record<string, any>>({
           data.map((row, index) => {
             return (
               <tr key={index}>
-                {headers.map(header => {
-                  return (
-                    <>
-                      <td key={header} className="px-7 py-4">
-                        {row[header] as ReactNode}
-                      </td>
-                    </>
-                  );
-                })}
+                {headers.map(header => (
+                  <td key={`${index}-${header}`} className="px-7 py-4">
+                    {row[header] as ReactNode}
+                  </td>
+                ))}
 
                 {isCreated && (
                   <td className="px-7 py-4 text-right">
@@ -154,15 +149,20 @@ export const CustomTable = <T extends Record<string, any>>({
           })
         ) : (
           <tr className={cc([{ hidden: hasRowsToDisplay }])}>
-            <td colSpan={headers.length}>{childrenForEmptyTable}</td>
+            <td colSpan={isCreated ? headers.length + 1 : headers.length}>
+              {childrenForEmptyTable}
+            </td>
           </tr>
         )}
         {isLogged && (
           <tr>
-            <td colSpan={headers.length} className="py-2">
+            <td
+              colSpan={isCreated ? headers.length + 1 : headers.length}
+              className="py-2"
+            >
               {isNewBadge ? (
                 <form onSubmit={handleSubmit}>
-                  <div className="flex gap-2 items-center w-full">
+                  <div className="flex gap-2 items-center w-full ml-4">
                     <input
                       type="text"
                       placeholder="Badge name"
@@ -216,7 +216,7 @@ export const CustomTable = <T extends Record<string, any>>({
                   </div>
                 </form>
               ) : (
-                <div className="flex gap-2 py-2 items-center">
+                <div className="flex gap-2 py-2 items-center ml-10 ">
                   <PlusIcon className="text-whiteOpacity05" />
                   <button onClick={() => setIsNewBadge(true)}>New Badge</button>
                 </div>
