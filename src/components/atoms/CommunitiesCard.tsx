@@ -8,7 +8,7 @@ import {
   TagIcon,
   UserIcon,
 } from './icons';
-import { addUser, mainTestnet } from '@/testCall';
+import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
 import { kit } from '../auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
@@ -17,16 +17,28 @@ import { useAuthContext } from '../auth/Context';
 import { Minus } from 'lucide-react';
 import { CakeIcon } from './icons/CakeIcon';
 
-interface CommunitiesCardProps extends React.ComponentPropsWithoutRef<'div'> {
+interface CommunitiesCardProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
   community: Communities;
+  onClick?: () => void;
+  currentTab?: 'all' | 'joined' | 'created' | 'hidden';
 }
 
 export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   community,
   className,
+  onClick,
+  currentTab = 'all',
   ...props
 }) => {
   const { userAddress, setUserAddress } = useAuthContext();
+
+  const formattedContractAddress = community.community_address.toUpperCase();
+
+  const stellarContractJoinCommunities = useStellarContract({
+    contractId: formattedContractAddress,
+    rpcUrl: 'https://soroban-testnet.stellar.org',
+    networkType: 'TESTNET',
+  });
 
   const handleJoin = async () => {
     if (!userAddress) {
@@ -34,24 +46,14 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       return;
     }
     try {
-      kit.signTransaction(ALBEDO_ID);
-      const { address } = await kit.getAddress();
-      await checkIfWalletIsInitialized(address);
-      setUserAddress(address);
-
-      console.log('\nAdding user to contract...');
-      const response = await addUser('teste');
-      console.log('Transaction response:', response);
-
-      if (response.success) {
-        console.log('User added successfully!');
-        console.log('Transaction ID:', response.transactionId);
-        toast.success('Successful transaction');
+      const result = await stellarContractJoinCommunities.addUser();
+      if (result.success) {
+        toast.success('Successfully joined community');
+        console.log('Transaction successful:', result.txHash);
       } else {
-        console.error('Failed to add user:', response.error);
-        console.error('Error details:', response.errorDetails);
+        toast.error('Failed to join community');
+        console.error('Transaction failed:', result.error);
       }
-      toast.success('Successful transaction');
     } catch (error) {
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
@@ -61,24 +63,20 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   };
 
   const handleExit = async () => {
+    if (!userAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
     try {
-      kit.signTransaction(ALBEDO_ID);
-      const { address } = await kit.getAddress();
-      await checkIfWalletIsInitialized(address);
-      setUserAddress(address);
+      const result = await stellarContractJoinCommunities.removeUser();
 
-      console.log('\nAdding user to contract...');
-      const response = await addUser('teste');
-      console.log('Transaction response:', response);
-
-      if (response.success) {
-        console.log('User added successfully!');
-        console.log('Transaction ID:', response.transactionId);
+      if (result.success) {
+        toast.success('Successfully left community');
+        console.log('Transaction successful:', result.txHash);
       } else {
-        console.error('Failed to add user:', response.error);
-        console.error('Error details:', response.errorDetails);
+        toast.error('Failed to leave community');
+        console.error('Transaction failed:', result.error);
       }
-      toast.success('Successful transaction');
     } catch (error) {
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
@@ -90,7 +88,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   return (
     <div
       className={cc([
-        'group rounded-lg flex flex-col border border-whiteOpacity008 max-w-sm w-[376px] h-[212px] bg-whiteOpacity005 hover:bg-whiteOpacity008 hover:cursor-pointer transition-colors duration-300 ease-linear',
+        'group rounded-lg flex flex-col border border-whiteOpacity008 max-w-sm w-[376px] h-[212px] bg-whiteOpacity005 hover:bg-whiteOpacity008 transition-colors duration-300 ease-linear',
         className,
       ])}
       {...props}
@@ -114,8 +112,10 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
         </div>
         <div className="flex items-center gap-1">
           <div>
-            <button className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center gap-2 group-hover:justify-start px-3 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out">
-              <div className="flex justify-center items-center">
+            <button
+              className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center gap-2 group-hover:justify-start px-3 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out"
+              onClick={onClick}
+            >              <div className="flex justify-center items-center">
                 <InformationIcon className="transition-all duration-500 ease-in-out" />
                 <span className="hidden font-inter text-sm group-hover:inline-block ml-2  group-hover:opacity-100 transition-all duration-500 ease-in-out">
                   Info
@@ -124,47 +124,49 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             </button>
           </div>
 
-          <div>
-            <button
-              className={cc([
-                'overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
-                { 'opacity-50 cursor-not-allowed': !userAddress },
-              ])}
-              disabled={!userAddress}
-            >
-              {!('is_joined' in community) ? (
-                <div className="flex justify-center items-center">
-                  <Minus className="transition-all duration-500 ease-in-out" />
-                  <span
-                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                    onClick={handleExit}
-                  >
-                    Exit
-                  </span>
-                </div>
-              ) : community.is_joined ? (
-                <div className="flex justify-center items-center">
-                  <Minus className="transition-all duration-500 ease-in-out" />
-                  <span
-                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                    onClick={handleExit}
-                  >
-                    Exit
-                  </span>
-                </div>
-              ) : (
-                <div className="flex justify-center items-center">
-                  <PlusIcon className="transition-all duration-500 ease-in-out" />
-                  <span
-                    className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                    onClick={handleJoin}
-                  >
-                    Join
-                  </span>
-                </div>
-              )}
-            </button>
-          </div>
+          {currentTab !== 'created' && (
+            <div>
+              <button
+                className={cc([
+                  'overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
+                  { 'opacity-50 cursor-not-allowed': !userAddress },
+                ])}
+                disabled={!userAddress}
+              >
+                {!('is_joined' in community) ? (
+                  <div className="flex justify-center items-center">
+                    <Minus className="transition-all duration-500 ease-in-out" />
+                    <span
+                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                      onClick={handleExit}
+                    >
+                      Exit
+                    </span>
+                  </div>
+                ) : community.is_joined ? (
+                  <div className="flex justify-center items-center">
+                    <Minus className="transition-all duration-500 ease-in-out" />
+                    <span
+                      className="hidden font-inter text-sm group-hover:inline-block group-hover:opacity-100 transition-all duration-500 ease-in-out "
+                      onClick={handleExit}
+                    >
+                      Exit
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center">
+                    <PlusIcon className="transition-all duration-500 ease-in-out" />
+                    <span
+                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                      onClick={handleJoin}
+                    >
+                      Join
+                    </span>
+                  </div>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col p-3 gap-1 justify-center">

@@ -188,7 +188,7 @@ function VerifyReputationPage() {
 
               {badgeDetails?.community_badges.map((item: Badge) => (
                 <div
-                  key={`${item?.community_address}-${item.created_at}`}
+                  key={item?.community_address}
                   className="flex justify-between items-center px-6 py-4"
                 >
                   <span className="text-sm text-whiteOpacity05 text-left">

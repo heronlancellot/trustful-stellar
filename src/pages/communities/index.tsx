@@ -6,7 +6,7 @@ import { PageTemplate } from '@/components/templates/PageTemplate';
 import { useUsersContext } from '@/components/user/Context';
 import communityClient from '@/lib/http-clients/CommunityClient';
 import usersClient from '@/lib/http-clients/UsersClient';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import _ from 'lodash';
 import { CommunityQuests } from '@/components/community/types';
 import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
@@ -29,7 +29,6 @@ export default function CommunitiesPage() {
     communityQuests,
     communities,
     getCommunitiesStatus,
-    refetchCommunitiesAll,
     setCommunities,
   } = useCommunityContext();
   const {
@@ -41,11 +40,14 @@ export default function CommunitiesPage() {
 
   const { inputText, setInputText } = useCommunitiesController();
 
-  const [isImportModalOpen, setImportModalOpen] = useState(false);
-  const [selectedQuestName, setSelectedQuestName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { status } = router.query;
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataFetched, setDataFetched] = useState(false);
+
+  const [isImportModalOpen, setImportModalOpen] = useState(false);
+  const [selectedQuestName, setSelectedQuestName] = useState('');
 
   const statusList = {
     all: 'all',
@@ -54,89 +56,39 @@ export default function CommunitiesPage() {
     hidden: 'hidden',
   };
 
-  useEffect(() => {
-    if (status !== statusList.all && userAddress) {
-      async function getComumm() {
-        await getCommunitiesStatus(`${status}`);
-      }
-      getComumm();
+  const fetchCommunities = async (fetchFunction: () => Promise<void>) => {
+    setIsLoading(true);
+    try {
+      await fetchFunction();
+      const minDelay = new Promise(resolve => setTimeout(resolve, 800));
+      await minDelay;
+    } catch (error) {
+      console.error('Failed to fetch communities:', error);
+      toast.error('Error loading communities');
+    } finally {
+      setIsLoading(false);
+      setDataFetched(true);
     }
-
-    if (status === statusList.all) {
-      refetchCommunitiesAll();
-    }
-  }, [status]); //eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   useEffect(() => {
-    const getCommunities = async () => {
-      try {
+    if (!router.isReady) return;
+
+    const currentStatus = (status as string) || statusList.all;
+
+    if (currentStatus !== statusList.all && userAddress) {
+      fetchCommunities(() => getCommunitiesStatus(currentStatus));
+    } else {
+      fetchCommunities(async () => {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
         );
         const data = await response.json();
-
         setCommunities(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    getCommunities();
-  }, []); //eslint-disable-line react-hooks/exhaustive-deps
-
-  // const fetchBadges = useCallback(async () => {
-  //   try {
-  //     setIsLoading(true);
-  //     const _communityBadges = await communityClient.getCommunityBadges();
-  //     const quests: CommunityQuests = _.groupBy(_communityBadges, 'questName');
-  //     setCommunityQuests(quests);
-  //     if (userAddress) {
-  //       const _userBadges = await usersClient.getBadges(userAddress);
-  //       const _userBadgesImported =
-  //         await usersClient.getBadgesTrustful(userAddress);
-  //       setUserBadgesImported(_userBadgesImported);
-  //       setUserBadgesToImport(
-  //         _userBadges,
-  //         _userBadgesImported,
-  //         _communityBadges
-  //       );
-  //       setIsLoading(false);
-  //     } else {
-  //       setUserBadgesImported([]);
-  //       setUserBadgesToImport([], [], []);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error('Error fetching user badges', {
-  //       duration: 2000,
-  //       position: 'top-right',
-  //     });
-  //     setIsLoading(false);
-  //     setCommunityQuests({});
-  //     setUserBadgesImported([]);
-  //     setUserBadgesToImport([], [], []);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [userAddress]);
-
-  // useEffect(() => {
-  //   fetchBadges();
-  // }, [fetchBadges]);
-
-  // const questIsFullyImported = (questName: string) => {
-  //   const userHasNoBadgesOfThisQuest = getModalBadges(questName).every(
-  //     ({ isImported }) => isImported === undefined
-  //   );
-  //   if (!userAddress || userHasNoBadgesOfThisQuest) {
-  //     return undefined;
-  //   }
-  //   // TODO: Compare user trustful and normal badges with badge set badges.
-  //   const needToImportBadges = getModalBadges(questName).some(
-  //     ({ isImported }) => isImported === false
-  //   );
-  //   return !needToImportBadges;
-  // };
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, userAddress, router.isReady]);
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {
@@ -215,10 +167,47 @@ export default function CommunitiesPage() {
     return questBadgesWithIsImported;
   };
 
+  const renderCommunityCards = (targetStatus: string) => {
+    if (!dataFetched || isLoading) {
+      return (
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+          {[1, 2, 3, 4, 5, 6].map(index => (
+            <div
+              key={index}
+              className="bg-whiteOpacity005 rounded-lg h-48"
+            ></div>
+          ))}
+        </div>
+      );
+    }
+
+    if (!Array.isArray(communities) || communities.length === 0) {
+      return (
+        <div className="w-full text-center py-12 text-gray-400">
+          No communities found
+        </div>
+      );
+    }
+
+    return communities.map(community => (
+      <CommunitiesCard
+        key={community.community_address}
+        community={community}
+        onClick={() =>
+          router.push({
+            pathname: `communities/${community.community_address}`,
+            query: { status: targetStatus },
+          })
+        }
+        currentTab={targetStatus as 'all' | 'joined' | 'created' | 'hidden'}
+      />
+    ));
+  };
+
   return (
     <PageTemplate
-      className=""
-      title={'Communities'}
+      className="pb-4"
+      title="Communities"
       tooltip={{
         tooltipId: 'generate-attestation-tip',
         tooltipText:
@@ -238,93 +227,27 @@ export default function CommunitiesPage() {
         }}
         tabs={{
           All: {
-            content: (
-              <CardWrapper>
-                {Array.isArray(communities) &&
-                  communities?.map(community => {
-                    return (
-                      <CommunitiesCard
-                        key={community.community_address}
-                        community={community}
-                        onClick={() =>
-                          router.push({
-                            pathname: `communities/${community.community_address}`,
-                            query: { status: 'all' },
-                          })
-                        }
-                      />
-                    );
-                  })}
-              </CardWrapper>
-            ),
+            content: <CardWrapper>{renderCommunityCards('all')}</CardWrapper>,
             tabNumber: 1,
             disabled: false,
           },
           Joined: {
             content: (
-              <CardWrapper>
-                {Array.isArray(communities) &&
-                  communities?.map(community => {
-                    return (
-                      <CommunitiesCard
-                        key={community.community_address}
-                        community={community}
-                        onClick={() =>
-                          router.push({
-                            pathname: `communities/${community.community_address}`,
-                            query: { status: 'joined' },
-                          })
-                        }
-                      />
-                    );
-                  })}
-              </CardWrapper>
+              <CardWrapper>{renderCommunityCards('joined')}</CardWrapper>
             ),
             tabNumber: 2,
             disabled: !userAddress,
           },
           Created: {
             content: (
-              <CardWrapper>
-                {Array.isArray(communities) &&
-                  communities?.map(community => {
-                    return (
-                      <CommunitiesCard
-                        key={community.community_address}
-                        community={community}
-                        onClick={() =>
-                          router.push({
-                            pathname: `communities/${community.community_address}`,
-                            query: { status: 'created' },
-                          })
-                        }
-                      />
-                    );
-                  })}
-              </CardWrapper>
+              <CardWrapper>{renderCommunityCards('created')}</CardWrapper>
             ),
             tabNumber: 3,
             disabled: !userAddress,
           },
           Hidden: {
             content: (
-              <CardWrapper>
-                {Array.isArray(communities) &&
-                  communities?.map(community => {
-                    return (
-                      <CommunitiesCard
-                        key={community.community_address}
-                        community={community}
-                        onClick={() =>
-                          router.push({
-                            pathname: `communities/${community.community_address}`,
-                            query: { status: 'hidden' },
-                          })
-                        }
-                      />
-                    );
-                  })}
-              </CardWrapper>
+              <CardWrapper>{renderCommunityCards('hidden')}</CardWrapper>
             ),
             tabNumber: 3,
             disabled: !userAddress,
@@ -341,7 +264,6 @@ export default function CommunitiesPage() {
           }}
           onButtonClick={async () => {
             await importBadges();
-            // await fetchBadges();
           }}
           disabledButton={isImportButtonDisabled(selectedQuestName)}
           isAsync={true}
@@ -381,7 +303,7 @@ export default function CommunitiesPage() {
           </div>
         </GenericModal>
       )}
-      <ActivityIndicatorModal isOpen={isLoading} />
+      <ActivityIndicatorModal isOpen={isLoading && !dataFetched} />
     </PageTemplate>
   );
 }
