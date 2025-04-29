@@ -124,9 +124,7 @@ export const StepModal: React.FC<ModalProps> = ({
         require_existing: true,
       }); //Todo-user logged
 
-      const FACTORY_CONTRACT_ID =
-        'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
-      const RPC_URL = 'https://soroban-testnet.stellar.org';
+      const RPC_URL = `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}` as any;
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
 
       const account = await server.getAccount(pubkey);
@@ -166,7 +164,7 @@ export const StepModal: React.FC<ModalProps> = ({
         .addOperation(
           Operation.invokeContractFunction({
             function: 'create_scorer',
-            contract: FACTORY_CONTRACT_ID,
+            contract: `${process.env.FACTORY_CONTRACT_ID}`,
             args: [
               new Address(pubkey).toScVal(),
               saltScVal,
@@ -183,7 +181,8 @@ export const StepModal: React.FC<ModalProps> = ({
 
       const result = await albedo.tx({
         xdr: transactionXDR,
-        network: 'testnet',
+        network:
+          `${process.env.NEXT_PUBLIC_NETWORK_TYPE?.toLowerCase()}` as any,
         submit: true,
       });
 

@@ -16,20 +16,20 @@ export default function useCommunitiesController() {
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: communityAddressFormatted,
-    rpcUrl: 'https://soroban-testnet.stellar.org',
-    networkType: 'TESTNET',
+    rpcUrl: `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}`,
+    networkType: `${process.env.NEXT_PUBLIC_NETWORK_TYPE}` as any,
   });
 
   const stellarContractManagers = useStellarContractManager({
     contractId: communityAddressFormatted,
-    rpcUrl: 'https://soroban-testnet.stellar.org',
-    networkType: 'TESTNET',
+    rpcUrl: `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}`,
+    networkType: `${process.env.NEXT_PUBLIC_NETWORK_TYPE}` as any,
   });
 
   const stellarContractBadges = useStellarContractBadge({
     contractId: communityAddressFormatted,
-    rpcUrl: 'https://soroban-testnet.stellar.org',
-    networkType: 'TESTNET',
+    rpcUrl: `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}`,
+    networkType: `${process.env.NEXT_PUBLIC_NETWORK_TYPE}` as any,
   });
 
   return {
