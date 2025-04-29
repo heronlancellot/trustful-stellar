@@ -17,7 +17,8 @@ import { useAuthContext } from '../auth/Context';
 import { Minus } from 'lucide-react';
 import { CakeIcon } from './icons/CakeIcon';
 
-interface CommunitiesCardProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
+interface CommunitiesCardProps
+  extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
   community: Communities;
   onClick?: () => void;
   currentTab?: 'all' | 'joined' | 'created' | 'hidden';
@@ -36,8 +37,8 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
-    rpcUrl: 'https://soroban-testnet.stellar.org',
-    networkType: 'TESTNET',
+    rpcUrl: `${process.env.NEXT_PUBLIC_NETWORK_TYPE}`,
+    networkType: `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}` as any,
   });
 
   const handleJoin = async () => {
@@ -115,7 +116,9 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             <button
               className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center gap-2 group-hover:justify-start px-3 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out"
               onClick={onClick}
-            >              <div className="flex justify-center items-center">
+            >
+              {' '}
+              <div className="flex justify-center items-center">
                 <InformationIcon className="transition-all duration-500 ease-in-out" />
                 <span className="hidden font-inter text-sm group-hover:inline-block ml-2  group-hover:opacity-100 transition-all duration-500 ease-in-out">
                   Info
