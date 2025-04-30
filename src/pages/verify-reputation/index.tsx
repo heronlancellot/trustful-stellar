@@ -4,7 +4,7 @@ import { SearchBar } from '@/components/search/SearchBar';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { ProfileBox } from '@/components/organisms/ProfileBox';
 import { PageTemplate } from '@/components/templates/PageTemplate';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   SearchContextProvider,
   useSearchContext,
@@ -62,6 +62,16 @@ function VerifyReputationPage() {
   const onSearch = async () => {
     await getVerifyReputationList(inputText);
   };
+
+  useEffect(() => {
+    const userAddressFromQuery = router.query.searchAddress as string;
+    const addressToUse = userAddressFromQuery || searchedUserAddress;
+
+    if (addressToUse) {
+      setInputText(addressToUse);
+      getVerifyReputationList(addressToUse);
+    }
+  }, [router.query, searchedUserAddress]);
 
   const reputation = [
     {
