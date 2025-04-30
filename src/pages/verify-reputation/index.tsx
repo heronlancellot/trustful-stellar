@@ -4,7 +4,7 @@ import { SearchBar } from '@/components/search/SearchBar';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { ProfileBox } from '@/components/organisms/ProfileBox';
 import { PageTemplate } from '@/components/templates/PageTemplate';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   SearchContextProvider,
   useSearchContext,
@@ -21,6 +21,7 @@ import { TagIcon } from '@/components';
 import useVerifyReputationController, {
   Badge,
 } from '@/components/verify-reputation/hooks/Controller';
+import { useAuthContext } from '@/components/auth/Context';
 
 interface VerifyReputationProps {
   community_address?: string;
@@ -46,6 +47,7 @@ function VerifyReputationPage() {
     VerifyReputationProps | undefined
   >();
   const { badgeDetails, getBagdeDetails } = useVerifyReputationController();
+  const { userAddress } = useAuthContext();
 
   const {
     searchedUserAddress,
@@ -62,6 +64,16 @@ function VerifyReputationPage() {
   const onSearch = async () => {
     await getVerifyReputationList(inputText);
   };
+
+  useEffect(() => {
+    const userAddressFromQuery = router.query.searchAddress as string;
+    const addressToUse = userAddressFromQuery || userAddress || searchedUserAddress;
+
+    if (addressToUse) {
+      setInputText(addressToUse);
+      getVerifyReputationList(addressToUse);
+    }
+  }, [router.query, userAddress, searchedUserAddress]);
 
   const reputation = [
     {
