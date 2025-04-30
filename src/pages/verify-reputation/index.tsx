@@ -21,6 +21,7 @@ import { TagIcon } from '@/components';
 import useVerifyReputationController, {
   Badge,
 } from '@/components/verify-reputation/hooks/Controller';
+import { useAuthContext } from '@/components/auth/Context';
 
 interface VerifyReputationProps {
   community_address?: string;
@@ -46,6 +47,7 @@ function VerifyReputationPage() {
     VerifyReputationProps | undefined
   >();
   const { badgeDetails, getBagdeDetails } = useVerifyReputationController();
+  const { userAddress } = useAuthContext();
 
   const {
     searchedUserAddress,
@@ -65,13 +67,13 @@ function VerifyReputationPage() {
 
   useEffect(() => {
     const userAddressFromQuery = router.query.searchAddress as string;
-    const addressToUse = userAddressFromQuery || searchedUserAddress;
+    const addressToUse = userAddressFromQuery || userAddress || searchedUserAddress;
 
     if (addressToUse) {
       setInputText(addressToUse);
       getVerifyReputationList(addressToUse);
     }
-  }, [router.query, searchedUserAddress]);
+  }, [router.query, userAddress, searchedUserAddress]);
 
   const reputation = [
     {
