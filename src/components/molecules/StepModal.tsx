@@ -112,19 +112,61 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const [selectedAvatar, setSelectedAvatar] = useState<string>('');
   const [selectedBadge, setSelectedBadge] = useState<string>('');
+  const [badgeCount, setBadgeCount] = useState<number>(3);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setValue('avatar', selectedAvatar);
     setValue('badgeType', selectedBadge);
   }, [selectedAvatar, selectedBadge, setValue]);
 
+  useEffect(() => {
+    for (let i = 0; i < badgeCount; i++) {
+      if (!watch(`badges.${i}`)) {
+        setValue(`badges.${i}`, { name: '', score: 0 });
+      }
+    }
+  }, [badgeCount, setValue, watch]);
+
+  const addNewBadge = () => {
+    setBadgeCount(prevCount => prevCount + 1);
+  };
+
+  const handleAvatarSelect = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedAvatar(id);
+  };
+
+  const handleBadgeSelect = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedBadge(id);
+  };
+
   const onSubmit = async (data: CreateCommunityForm) => {
+    if (currentStep !== 3) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
+      const filteredBadges = data.badges.filter(badge => badge && badge.name && badge.name.trim() !== '');
+
+      if (filteredBadges.length === 0) {
+        toast.error('At least one badge is required.');
+        setIsSubmitting(false);
+        return;
+      }
+
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
       }); //Todo-user logged
 
-      const RPC_URL = `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}` as any;
+      const FACTORY_CONTRACT_ID = process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ID || 'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
+      const RPC_URL = process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org';
+
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
 
       const account = await server.getAccount(pubkey);
@@ -136,7 +178,7 @@ export const StepModal: React.FC<ModalProps> = ({
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
 
-      const badgeMapEntries: xdr.ScMapEntry[] = data.badges.map(badgeType => {
+      const badgeMapEntries: xdr.ScMapEntry[] = filteredBadges.map(badgeType => {
         const badgeIdVector = xdr.ScVal.scvVec([
           xdr.ScVal.scvString(badgeType.name),
           new Address(pubkey).toScVal(),
@@ -164,7 +206,7 @@ export const StepModal: React.FC<ModalProps> = ({
         .addOperation(
           Operation.invokeContractFunction({
             function: 'create_scorer',
-            contract: `${process.env.FACTORY_CONTRACT_ID}`,
+            contract: FACTORY_CONTRACT_ID,
             args: [
               new Address(pubkey).toScVal(),
               saltScVal,
@@ -181,13 +223,13 @@ export const StepModal: React.FC<ModalProps> = ({
 
       const result = await albedo.tx({
         xdr: transactionXDR,
-        network:
-          `${process.env.NEXT_PUBLIC_NETWORK_TYPE?.toLowerCase()}` as any,
+        network: 'testnet',
         submit: true,
       });
 
       if (!result.tx_hash) {
         console.error('No tx_hash returned from Albedo.');
+        setIsSubmitting(false);
         return;
       }
 
@@ -206,6 +248,7 @@ export const StepModal: React.FC<ModalProps> = ({
         console.log('Contract Address:', txResponse.returnValue?.toString());
         console.log('Transaction Hash:', result.tx_hash);
 
+        setIsSubmitting(false);
         onClose();
         toast.success('Successful transaction');
 
@@ -214,8 +257,11 @@ export const StepModal: React.FC<ModalProps> = ({
         }, 1000);
       } else {
         console.error('❌ Transaction failed:', txResponse.status);
+        setIsSubmitting(false);
+        toast.error('Transaction failed');
       }
     } catch (error: any) {
+      setIsSubmitting(false);
       toast.error('Invalid badge name. Please use a valid one.');
     }
   };
@@ -231,6 +277,7 @@ export const StepModal: React.FC<ModalProps> = ({
                 <input
                   {...register('name')}
                   type="text"
+                  formNoValidate
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                 />
                 {errors.name && (
@@ -247,6 +294,10 @@ export const StepModal: React.FC<ModalProps> = ({
                   {...register('description')}
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008 max-h-[200px] min-h-[100px]"
                   rows={4}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    register('description').onChange(e);
+                  }}
                 />
                 {errors.description && (
                   <span className="text-red-500 text-sm">
@@ -337,10 +388,10 @@ export const StepModal: React.FC<ModalProps> = ({
                   ].map(({ icon, id }) => (
                     <button
                       key={id}
-                      onClick={() => setSelectedAvatar(id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
-                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
-                      }`}
+                      type="button"
+                      onClick={(e) => handleAvatarSelect(e, id)}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                        }`}
                     >
                       {icon}
                     </button>
@@ -354,14 +405,15 @@ export const StepModal: React.FC<ModalProps> = ({
                   {BADGE_OPTIONS.map(({ id, label }) => (
                     <div className="flex" key={id}>
                       <button
-                        onClick={() => setSelectedBadge(id)}
-                        className={`p-2 w-24 flex items-center justify-center  rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? 'bg-darkGreenOpacity01' : ''}`}
+                        type="button"
+                        onClick={(e) => handleBadgeSelect(e, id)}
+                        className={`p-2 w-24 flex items-center justify-center rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? 'bg-darkGreenOpacity01' : ''}`}
                       >
                         <span
                           className={`w-4 h-4 flex items-center bg-whiteOpacity005 justify-center border-2 rounded-full ${selectedBadge == id ? 'border-brandGreen' : ''}`}
                         >
                           {selectedBadge === id && (
-                            <span className="w-2 h-2  rounded-full bg-brandGreen"></span>
+                            <span className="w-2 h-2 rounded-full bg-brandGreen"></span>
                           )}
                         </span>
                         <span className="ml-2 font-light text-sm">{label}</span>
@@ -387,13 +439,14 @@ export const StepModal: React.FC<ModalProps> = ({
               </p>
             </div>
             <CustomHR />
-            {[1, 2, 3].map(num => (
+            {Array.from({ length: badgeCount }, (_, i) => i + 1).map(num => (
               <React.Fragment key={`badge-${num}`}>
                 <div className="flex w-full justify-between items-center">
                   <div>
                     <input
                       {...register(`badges.${num - 1}.name`)}
                       type="text"
+                      formNoValidate
                       placeholder={`Badge Name #${num}`}
                       className="bg-whiteOpacity005 rounded-lg p-2"
                     />
@@ -402,20 +455,49 @@ export const StepModal: React.FC<ModalProps> = ({
                     <input
                       {...register(`badges.${num - 1}.score`, {
                         valueAsNumber: true,
+                        onChange: (e) => {
+                          const value = e.target.value;
+                          if (value === '') {
+                            e.target.value = '';
+                            setValue(`badges.${num - 1}.score`, 0);
+                          } else {
+                            setValue(`badges.${num - 1}.score`, parseInt(value) || 0);
+                          }
+                        }
                       })}
                       type="number"
+                      defaultValue=""
+                      placeholder="Score"
+                      formNoValidate
                       className="bg-whiteOpacity005 rounded-lg p-2 w-full border-whiteOpacity008"
                     />
-                    <button className="text-gray-400 ml-2">
+                    <button
+                      type="button"
+                      onClick={(e) => e.preventDefault()}
+                      className="text-gray-400 ml-2"
+                    >
                       <div className="w-6">
                         <TrashIcon />
                       </div>
                     </button>
                   </div>
                 </div>
-                {num < 6 && <CustomHR />}
+                {num < badgeCount && <CustomHR />}
               </React.Fragment>
             ))}
+            {selectedBadge === 'custom' && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  addNewBadge();
+                }}
+                className="mt-4 flex flex-row items-center gap-2 text-sm text-whiteOpacity05"
+              >
+                <PlusIcon className="text-whiteOpacity05" /> New badge
+              </button>
+            )}
           </div>
         );
       case 3:
@@ -506,6 +588,12 @@ export const StepModal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Prevent form submission on Next click
+  const handleNextClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onNext();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
       <form
@@ -514,7 +602,13 @@ export const StepModal: React.FC<ModalProps> = ({
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-space-grotesk">Create community</h2>
-          <button onClick={onClose}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onClose();
+            }}
+          >
             <div className="w-4 ">
               <CloseIcon />
             </div>
@@ -537,7 +631,7 @@ export const StepModal: React.FC<ModalProps> = ({
           {currentStep < 3 ? (
             <button
               type="button"
-              onClick={onNext}
+              onClick={handleNextClick}
               className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
             >
               Next
@@ -545,9 +639,10 @@ export const StepModal: React.FC<ModalProps> = ({
           ) : (
             <button
               type="submit"
+              disabled={isSubmitting}
               className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
             >
-              Confirm
+              {isSubmitting ? 'Processing...' : 'Confirm'}
             </button>
           )}
         </div>
