@@ -84,7 +84,7 @@ export default function LeaderboardTable({ communitiesMembersList, totalBadgesMe
           <span style={{ color: getPointsTextColor(player.rank) }}>
             {player.badges}
           </span>
-          <span className="text-whiteOpacity05">/ {totalBadgesMemberList}</span>
+          <span className="text-whiteOpacity05">{player.points} / {player.badges_count}</span>
         </div>
       ),
     })
