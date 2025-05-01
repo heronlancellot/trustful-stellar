@@ -5,6 +5,7 @@ import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { PlusIcon } from '../atoms';
 import useCommunitiesController from '../community/hooks/controller';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
+import toast from 'react-hot-toast';
 
 export interface CustomTableProps<T extends Record<string, any>>
   extends React.ComponentPropsWithoutRef<'div'> {
@@ -28,72 +29,87 @@ export const CustomTable = <T extends Record<string, any>>({
 }: CustomTableProps<T>): ReactElement => {
   const hasRowsToDisplay = !!data && data.length > 0;
   const [isNewBadge, setIsNewBadge] = useState(false);
-  const { stellarContractBadges } = useCommunitiesController();
-  const [newBadgeData, setNewBadgeData] = useState<{
-    name: string;
-    issuer: string;
-    score?: number | string;
-  }>({
+  const { stellarContractBadges, stellarContractRemoveBadges } = useCommunitiesController();
+
+  const [newBadgeData, setNewBadgeData] = useState({
     name: '',
     issuer: '',
     score: '',
   });
 
-  const isDisabled =
-    !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
+  const isFormValid = newBadgeData.name && newBadgeData.issuer && newBadgeData.score;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setNewBadgeData({ name: '', issuer: '', score: '' });
-
-    if (
-      newBadgeData.score === undefined ||
-      typeof newBadgeData.score === 'string'
-    ) {
+    if (!isFormValid || typeof newBadgeData.score === 'string' && !newBadgeData.score) {
       return;
     }
 
-    console.log('Badge enviado:', newBadgeData);
+    const score = Number(newBadgeData.score);
 
-    const result = await stellarContractBadges.addBadge(
-      newBadgeData.name,
-      newBadgeData.issuer,
-      newBadgeData.score
-    );
+    try {
+      const result = await stellarContractBadges.addBadge(
+        newBadgeData.name,
+        newBadgeData.issuer,
+        score
+      );
 
-    if (result.success) {
-      console.log('Transaction successful:', result.txHash);
-    } else {
-      console.error('Transaction failed:', result.error);
+      if (result.success) {
+        console.log(`Badge ${newBadgeData.name} added successfully`);
+        toast.success(`Badge ${newBadgeData.name} added successfully`);
+        setIsNewBadge(false);
+        setNewBadgeData({ name: '', issuer: '', score: '' });
+      } else {
+        console.error('Failed to add badge:', result.error);
+      }
+    } catch (error) {
+      console.error('Error processing badge addition:', error);
     }
-
-    setIsNewBadge(false);
   };
 
-  useEffect(() => {
-    console.log(newBadgeData.score);
-    console.log(isDisabled);
-  }, [newBadgeData, isDisabled]);
+  const handleBadgeInputChange = (field: 'name' | 'issuer' | 'score', value: string) => {
+    setNewBadgeData({
+      ...newBadgeData,
+      [field]: value
+    });
+  };
 
   const handleRemoveBadge = async (badge: any) => {
-    console.log(badge);
+    try {
+      const badgeName = badge.Name?.props?.issuerAddress || '';
+      const score = badge.Score?.props?.issuerAddress ?
+        Number(badge.Score.props.issuerAddress) :
+        (badgeName.length > 0 ? Number(badgeName.charAt(badgeName.length - 1)) : undefined);
 
-    // const nameBadge = 'SQL0280';
-    // const issuer = 'GCPZPQYGG3QBIRA5ZIKLD3WQWFGESFA453TUXHRMP7NZYTTERIK2CXGE';
-    // const score = 5;
+      const issuerAddress = "GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS";
 
-    // const result = await stellarContractBadges.removeBadge(
-    //   nameBadge,
-    //   issuer,
-    //   score
-    // );
+      if (!badgeName || !issuerAddress || score === undefined || isNaN(score)) {
+        console.error('Insufficient data for badge removal');
+        return;
+      }
 
-    // if (result.success) {
-    //   console.log('Transaction successful:', result.txHash);
-    // } else {
-    //   console.error('Transaction failed:', result.error);
-    // }
+      if (!stellarContractRemoveBadges) {
+        console.error('Badge removal service not available');
+        return;
+      }
+
+      const result = await stellarContractRemoveBadges.removeBadge(
+        badgeName,
+        issuerAddress
+      );
+
+      if (result.success) {
+        console.log(`Badge ${badgeName} successfully removed`);
+        // Update interface (could add window.location.reload() or other updates)
+      } else {
+        console.error('Transaction failed:', result.error);
+        alert(`Failed to remove badge: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error in removal operation:', error);
+      alert('An error occurred while processing the badge removal.');
+    }
   };
 
   return (
@@ -138,9 +154,10 @@ export const CustomTable = <T extends Record<string, any>>({
                   <td className="px-7 py-4 text-right">
                     <button
                       onClick={() => handleRemoveBadge(row)}
-                      className="hover:opacity-70 transition-opacity"
+                      className="p-2 rounded-lg bg-whiteOpacity005 hover:bg-red-500/20 transition-colors"
+                      title="Remove badge"
                     >
-                      <Trash2 className="w-4 h-4 text-whiteOpacity05" />
+                      <Trash2 className="w-4 h-4 text-whiteOpacity05 hover:text-red-400" />
                     </button>
                   </td>
                 )}
@@ -161,64 +178,55 @@ export const CustomTable = <T extends Record<string, any>>({
               className="py-2"
             >
               {isNewBadge ? (
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="w-full">
                   <div className="flex gap-2 items-center w-full ml-4">
                     <input
                       type="text"
                       placeholder="Badge name"
                       value={newBadgeData.name}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          name: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
+                      onChange={e => handleBadgeInputChange('name', e.target.value)}
+                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
+                      autoFocus
                     />
                     <input
                       type="text"
                       placeholder="Issuer"
                       value={newBadgeData.issuer}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          issuer: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
+                      onChange={e => handleBadgeInputChange('issuer', e.target.value)}
+                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
                     />
                     <input
                       type="number"
                       placeholder="Score"
                       value={newBadgeData.score}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          score: Number(e.target.value),
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
+                      onChange={e => handleBadgeInputChange('score', e.target.value)}
+                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
                     />
                     <button
                       type="submit"
-                      className="p-2 rounded-lg"
-                      disabled={!isDisabled}
+                      className={`p-2.5 rounded-lg transition-colors ${isFormValid ? 'bg-brandGreen text-darkBackground hover:opacity-90' : 'bg-whiteOpacity005 text-whiteOpacity05'}`}
+                      disabled={!isFormValid}
                     >
-                      <Check className="text-white w-4 h-4" />
+                      <Check className="w-4 h-4" />
                     </button>
                     <button
                       type="button"
-                      className="p-2 rounded-lg"
+                      className="p-2.5 rounded-lg bg-whiteOpacity005 hover:bg-whiteOpacity008 transition-colors"
                       onClick={() => setIsNewBadge(false)}
                     >
-                      <X className="text-white w-4 h-4" />
+                      <X className="w-4 h-4 text-white" />
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="flex gap-2 py-2 items-center ml-10 ">
+                <div className="flex gap-2 py-2 items-center ml-10">
                   <PlusIcon className="text-whiteOpacity05" />
-                  <button onClick={() => setIsNewBadge(true)}>New Badge</button>
+                  <button
+                    onClick={() => setIsNewBadge(true)}
+                    className="text-whiteOpacity05 hover:text-white transition-colors"
+                  >
+                    New badge
+                  </button>
                 </div>
               )}
             </td>

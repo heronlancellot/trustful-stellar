@@ -41,8 +41,8 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
-    rpcUrl: `${process.env.NEXT_PUBLIC_NETWORK_TYPE}`,
-    networkType: `${process.env.NEXT_PUBLIC_NETWORK_RPCURL}` as any,
+    rpcUrl: process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
+    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
   });
 
   const handleJoin = async () => {

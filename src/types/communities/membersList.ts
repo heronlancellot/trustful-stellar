@@ -13,5 +13,6 @@ export interface MembersList {
     badges: number;
 
     points: number;
+    badges_count: number;
     rank: number;
 }
