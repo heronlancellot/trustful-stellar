@@ -1,35 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { PlusIcon, StarIcon, TagIcon } from '../atoms/icons';
-import { AwardIcon } from '../atoms/icons/AwardIcon';
-import { GithubIcon } from '../atoms/icons/GithubIcon';
-import { TrophyIcon } from '../atoms/icons/TrophyIcon';
-import { KeyIcon } from '../atoms/icons/KeyIcon';
-import { HeartIcon } from '../atoms/icons/HeartIcon';
-import { UserNinjaIcon } from '../atoms/icons/UserNinjaIcon';
-import { EthereumIcon } from '../atoms/icons/EthereumIcon';
-import { CakeIcon } from '../atoms/icons/CakeIcon';
-import { BankIcon } from '../atoms/icons/BankIcon';
-import { AlertIcon } from '../atoms/icons/AlertIcon';
-import { TrashIcon } from '../atoms/icons/TrashIcon';
-import { CloseIcon } from '../atoms/icons/CloseIcon';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import toast from 'react-hot-toast';
+import { useAuthContext } from '@/components/auth/Context';
+import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
+import { useBadgeStore } from '@/store/badgeStore';
 import albedo from '@albedo-link/intent';
-
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  rpc,
-  TransactionBuilder,
+  Address,
   BASE_FEE,
   Networks,
   Operation,
-  Address,
+  rpc,
+  TransactionBuilder,
   xdr,
-  Keypair,
 } from '@stellar/stellar-sdk';
-import { useCommunityContext } from '../community/Context';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import * as z from 'zod';
+import { PlusIcon, StarIcon, TagIcon } from '../atoms/icons';
+import { AlertIcon } from '../atoms/icons/AlertIcon';
+import { AwardIcon } from '../atoms/icons/AwardIcon';
+import { BankIcon } from '../atoms/icons/BankIcon';
+import { CakeIcon } from '../atoms/icons/CakeIcon';
+import { CloseIcon } from '../atoms/icons/CloseIcon';
+import { EthereumIcon } from '../atoms/icons/EthereumIcon';
+import { GithubIcon } from '../atoms/icons/GithubIcon';
+import { HeartIcon } from '../atoms/icons/HeartIcon';
+import { KeyIcon } from '../atoms/icons/KeyIcon';
+import { TrashIcon } from '../atoms/icons/TrashIcon';
+import { TrophyIcon } from '../atoms/icons/TrophyIcon';
+import useBadgeInfoController, { Badge } from '../badge-info/hooks/Controller';
 
 interface ModalProps {
   isOpen: boolean;
@@ -84,7 +84,7 @@ const createCommunitySchema = z.object({
   badges: z.array(
     z.object({
       name: z.string(),
-      // issuer: z.string(),
+      issuer: z.string(),
       score: z.number(),
     })
   ),
@@ -104,32 +104,164 @@ export const StepModal: React.FC<ModalProps> = ({
     register,
     handleSubmit,
     setValue,
+    getValues,
     watch,
     formState: { errors },
+    trigger,
+    unregister,
   } = useForm<CreateCommunityForm>({
+    mode: 'onBlur',
     resolver: zodResolver(createCommunitySchema),
   });
-
+  const { userAddress } = useAuthContext();
   const [selectedAvatar, setSelectedAvatar] = useState<string>('');
-  const [selectedBadge, setSelectedBadge] = useState<string>('');
+  const [selectedBadge, setSelectedBadge] = useState<string[]>([]);
   const [badgeCount, setBadgeCount] = useState<number>(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { getBadgesByTypes } = useBadgeInfoController();
+  const [badgeTypeDetails, setBadgeTypeDetails] = useState<Badge[]>([]);
+  const [loadingBadgeListType, setLoadingBadgeListType] = useState(false);
+  const { badges, setBadges, removeBadge } = useBadgeStore();
+
+  const ICONS_MAPPER = [
+    {
+      icon: (
+        <div className="w-5 items-center justify-center">
+          <StarIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/star.svg',
+    },
+    {
+      icon: (
+        <div className="w-5 items-center justify-center">
+          <TrophyIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/trophy.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <KeyIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/key.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <HeartIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/heart.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <EthereumIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/etherum.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <CakeIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/birthday.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <BankIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/lib.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <AwardIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/badge.svg',
+    },
+    {
+      icon: (
+        <div className="w-4 items-center justify-center">
+          <GithubIcon />
+        </div>
+      ),
+      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/github.svg',
+    },
+  ];
 
   useEffect(() => {
     setValue('avatar', selectedAvatar);
-    setValue('badgeType', selectedBadge);
+    setValue('badgeType', selectedBadge.join(','));
   }, [selectedAvatar, selectedBadge, setValue]);
 
   useEffect(() => {
-    for (let i = 0; i < badgeCount; i++) {
+    const currentFields = watch('badges') || [];
+    currentFields.forEach((_, index) => {
+      unregister(`badges.${index}`);
+    });
+
+    badges.forEach((badge, index) => {
+      setValue(`badges.${index}`, {
+        name: badge.name,
+        issuer: badge.issuer,
+        score: badge.score,
+      });
+    });
+
+    for (let i = badges?.length; i < badgeCount; i++) {
       if (!watch(`badges.${i}`)) {
-        setValue(`badges.${i}`, { name: '', score: 0 });
+        setValue(`badges.${i}`, { name: '', issuer: '', score: 0 });
       }
     }
-  }, [badgeCount, setValue, watch]);
+  }, [badges, badgeCount, setValue, watch, unregister]);
+
+  useEffect(() => {
+    if (badges?.length > 0) {
+      setBadgeTypeDetails(badges);
+      setBadgeCount(badges?.length);
+    }
+  }, [badges]);
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      const fetchAndSetBadges = async () => {
+        setLoadingBadgeListType(true);
+        try {
+          const details = await getBadgesByTypes(selectedBadge);
+          if (details) {
+            setBadges(details);
+          }
+        } catch (error) {
+          console.error('Error fetching badge details:', error);
+        } finally {
+          setLoadingBadgeListType(false);
+        }
+      };
+
+      if (badges?.length === 0) {
+        fetchAndSetBadges();
+        setLoadingBadgeListType(false);
+      }
+    }
+  }, [currentStep]);
 
   const addNewBadge = () => {
-    setBadgeCount(prevCount => prevCount + 1);
+    const newBadge = {
+      name: '',
+      issuer: '',
+      score: 0,
+    } as Badge;
+    useBadgeStore.getState().addBadge(newBadge);
+    setBadgeCount(prev => prev + 1);
   };
 
   const handleAvatarSelect = (e: React.MouseEvent, id: string) => {
@@ -138,10 +270,38 @@ export const StepModal: React.FC<ModalProps> = ({
     setSelectedAvatar(id);
   };
 
-  const handleBadgeSelect = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedBadge(id);
+  const updateBadgesFromSelection = async (selectedTypes: string[]) => {
+    if (selectedTypes.length > 0) {
+      const newBadges = await getBadgesByTypes(selectedTypes);
+      setBadges(newBadges);
+    } else {
+      setBadges([]);
+    }
+  };
+
+  const handleBadgeSelect = (
+    e: React.MouseEvent | React.ChangeEvent,
+    id: string
+  ) => {
+    const newSelectedBadges = selectedBadge.includes(id)
+      ? selectedBadge.filter(badge => badge !== id)
+      : [...selectedBadge, id];
+
+    setSelectedBadge(newSelectedBadges);
+    updateBadgesFromSelection(newSelectedBadges);
+  };
+
+  const clearAllBadges = () => {
+    setBadges([]);
+    setBadgeCount(0);
+    setSelectedBadge([]);
+
+    const currentFields = watch('badges') || [];
+    currentFields.forEach((_, index) => {
+      unregister(`badges.${index}`);
+    });
+
+    useBadgeStore.getState().clearBadges();
   };
 
   const onSubmit = async (data: CreateCommunityForm) => {
@@ -152,7 +312,9 @@ export const StepModal: React.FC<ModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const filteredBadges = data.badges.filter(badge => badge && badge.name && badge.name.trim() !== '');
+      const filteredBadges = data.badges.filter(
+        badge => badge && badge.name && badge.name.trim() !== ''
+      );
 
       if (filteredBadges.length === 0) {
         toast.error('At least one badge is required.');
@@ -164,8 +326,11 @@ export const StepModal: React.FC<ModalProps> = ({
         require_existing: true,
       }); //Todo-user logged
 
-      const FACTORY_CONTRACT_ID = process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ID || 'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
-      const RPC_URL = process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org';
+      const FACTORY_CONTRACT_ID =
+        process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ID ||
+        'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
+      const RPC_URL =
+        process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org';
 
       const server = new rpc.Server(RPC_URL, { allowHttp: true });
 
@@ -178,16 +343,18 @@ export const StepModal: React.FC<ModalProps> = ({
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
 
-      const badgeMapEntries: xdr.ScMapEntry[] = filteredBadges.map(badgeType => {
-        const badgeIdVector = xdr.ScVal.scvVec([
-          xdr.ScVal.scvString(badgeType.name),
-          new Address(pubkey).toScVal(),
-        ]);
-        return new xdr.ScMapEntry({
-          key: badgeIdVector,
-          val: xdr.ScVal.scvU32(badgeType.score),
-        });
-      });
+      const badgeMapEntries: xdr.ScMapEntry[] = filteredBadges.map(
+        badgeType => {
+          const badgeIdVector = xdr.ScVal.scvVec([
+            xdr.ScVal.scvString(badgeType.name),
+            new Address(pubkey).toScVal(),
+          ]);
+          return new xdr.ScMapEntry({
+            key: badgeIdVector,
+            val: xdr.ScVal.scvU32(badgeType.score),
+          });
+        }
+      );
 
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
 
@@ -250,6 +417,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
         setIsSubmitting(false);
         onClose();
+        clearAllBadges();
         toast.success('Successful transaction');
 
         setTimeout(() => {
@@ -264,6 +432,18 @@ export const StepModal: React.FC<ModalProps> = ({
       setIsSubmitting(false);
       toast.error('Invalid badge name. Please use a valid one.');
     }
+  };
+
+  const handleRemoveBadge = (index: number) => {
+    removeBadge(index);
+    setBadgeCount(prev => prev - 1);
+    unregister(`badges.${index}`);
+
+    const remainingFields =
+      watch('badges')?.filter((_, i) => i !== index) || [];
+    remainingFields.forEach((field, i) => {
+      setValue(`badges.${i}`, field);
+    });
   };
 
   const renderStep = () => {
@@ -294,7 +474,7 @@ export const StepModal: React.FC<ModalProps> = ({
                   {...register('description')}
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008 max-h-[200px] min-h-[100px]"
                   rows={4}
-                  onChange={(e) => {
+                  onChange={e => {
                     e.stopPropagation();
                     register('description').onChange(e);
                   }}
@@ -312,115 +492,59 @@ export const StepModal: React.FC<ModalProps> = ({
               <div>
                 <label className="block text-sm mb-2">Avatar</label>
                 <div className="flex gap-1.5 w-8 h-10 rounded">
-                  {[
-                    {
-                      icon: (
-                        <div className="w-5 items-center justify-center">
-                          <StarIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/star.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-5 items-center justify-center">
-                          <TrophyIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/trophy.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <KeyIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/key.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <HeartIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/heart.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <EthereumIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/etherum.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <CakeIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/birthday.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <BankIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/lib.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <AwardIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/badge.svg',
-                    },
-                    {
-                      icon: (
-                        <div className="w-4 items-center justify-center">
-                          <GithubIcon />
-                        </div>
-                      ),
-                      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/github.svg',
-                    },
-                  ].map(({ icon, id }) => (
+                  {ICONS_MAPPER.map(({ icon, id }) => (
                     <button
                       key={id}
                       type="button"
-                      onClick={(e) => handleAvatarSelect(e, id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
-                        }`}
+                      onClick={e => handleAvatarSelect(e, id)}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
+                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                      }`}
                     >
                       {icon}
                     </button>
                   ))}
                 </div>
+                {errors.avatar && (
+                  <span className="text-red-500 text-sm">
+                    {errors.avatar?.message}
+                  </span>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm mb-2">Badges</label>
-                <div className="flex gap-1">
+                <div className="flex gap-4">
                   {BADGE_OPTIONS.map(({ id, label }) => (
                     <div className="flex" key={id}>
-                      <button
-                        type="button"
-                        onClick={(e) => handleBadgeSelect(e, id)}
-                        className={`p-2 w-24 flex items-center justify-center rounded-lg border border-whiteOpacity008 hover:border-gray-600 transition-colors ${selectedBadge == id ? 'bg-darkGreenOpacity01' : ''}`}
-                      >
+                      <label className="flex items-center cursor-pointer gap-x-0.5 flex-nowrap">
+                        <input
+                          type="checkbox"
+                          checked={selectedBadge.includes(id)}
+                          onChange={e => handleBadgeSelect(e, id)}
+                          className="hidden"
+                        />
                         <span
-                          className={`w-4 h-4 flex items-center bg-whiteOpacity005 justify-center border-2 rounded-full ${selectedBadge == id ? 'border-brandGreen' : ''}`}
+                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${
+                            selectedBadge.includes(id)
+                              ? 'border-brandGreen bg-darkGreenOpacity01'
+                              : 'border-whiteOpacity008'
+                          }`}
                         >
-                          {selectedBadge === id && (
-                            <span className="w-2 h-2 rounded-full bg-brandGreen"></span>
+                          {selectedBadge.includes(id) && (
+                            <span className="w-2.5 h-2.5 bg-brandGreen"></span>
                           )}
                         </span>
                         <span className="ml-2 font-light text-sm">{label}</span>
-                      </button>
+                      </label>
                     </div>
                   ))}
                 </div>
+                {errors.badgeType && (
+                  <span className="text-red-500 text-sm">
+                    {errors.badgeType?.message}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -429,91 +553,117 @@ export const StepModal: React.FC<ModalProps> = ({
             <CustomHR />
           </>
         );
-      case 2:
+      case 2: {
         return (
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <p className="font-light text-xs text-whiteOpacity05">Badge</p>
-              <p className="font-light text-xs text-whiteOpacity05 mr-28">
-                Score
-              </p>
-            </div>
-            <CustomHR />
-            {Array.from({ length: badgeCount }, (_, i) => i + 1).map(num => (
-              <React.Fragment key={`badge-${num}`}>
-                <div className="flex w-full justify-between items-center">
-                  <div>
-                    <input
-                      {...register(`badges.${num - 1}.name`)}
-                      type="text"
-                      formNoValidate
-                      placeholder={`Badge Name #${num}`}
-                      className="bg-whiteOpacity005 rounded-lg p-2"
-                    />
+          <>
+            <div className="space-y-4 p-1 h-full w-full overflow-y-auto min-h-80 max-h-80 overflow-x-hidden">
+              {loadingBadgeListType ? (
+                <>Loading...</>
+              ) : (
+                <>
+                  <div className="grid grid-cols-[140px_100px_80px] gap-3 overflow-x-hidden w-full">
+                    <span className="font-light text-xs text-whiteOpacity05">
+                      Badge
+                    </span>
+                    <span className="font-light text-xs text-whiteOpacity05">
+                      Issuer
+                    </span>
+                    <span className="font-light text-xs text-whiteOpacity05">
+                      Score
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between w-1/3">
-                    <input
-                      {...register(`badges.${num - 1}.score`, {
-                        valueAsNumber: true,
-                        onChange: (e) => {
-                          const value = e.target.value;
-                          if (value === '') {
-                            e.target.value = '';
-                            setValue(`badges.${num - 1}.score`, 0);
-                          } else {
-                            setValue(`badges.${num - 1}.score`, parseInt(value) || 0);
-                          }
-                        }
-                      })}
-                      type="number"
-                      defaultValue=""
-                      placeholder="Score"
-                      formNoValidate
-                      className="bg-whiteOpacity005 rounded-lg p-2 w-full border-whiteOpacity008"
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => e.preventDefault()}
-                      className="text-gray-400 ml-2"
-                    >
-                      <div className="w-6">
-                        <TrashIcon />
+                  <CustomHR />
+
+                  {Array.from({ length: badgeCount }, (_, index) => (
+                    <React.Fragment key={`badge-${index}`}>
+                      <div className="grid grid-cols-[140px_100px_80px] gap-3">
+                        <div>
+                          <input
+                            {...register(`badges.${index}.name`)}
+                            type="text"
+                            formNoValidate
+                            placeholder={`Badge Name #${index + 1}`}
+                            defaultValue={badgeTypeDetails[index]?.name || ''}
+                            className="bg-whiteOpacity005 rounded-lg p-2 max-w-full"
+                          />
+                        </div>
+                        <div className="h-full flex items-center">
+                          {badgeTypeDetails[index]?.issuer !== ''
+                            ? getEllipsedAddress(
+                                badgeTypeDetails[index]?.issuer || ''
+                              )
+                            : ''}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <input
+                            {...register(`badges.${index}.score`, {
+                              valueAsNumber: true,
+                              onChange: e => {
+                                const value = e.target.value;
+                                if (value === '') {
+                                  e.target.value = '';
+                                  setValue(`badges.${index}.score`, 0);
+                                } else {
+                                  setValue(
+                                    `badges.${index}.score`,
+                                    parseInt(value) || 0
+                                  );
+                                }
+                              },
+                            })}
+                            type="number"
+                            defaultValue={badgeTypeDetails[index]?.score || ''}
+                            placeholder="Score"
+                            formNoValidate
+                            className="bg-whiteOpacity005 rounded-lg p-2 flex-1 max-w-20 border-whiteOpacity008"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveBadge(index)}
+                            className="text-gray-400 ml-2 shrink-0"
+                          >
+                            <div className="w-6">
+                              <TrashIcon />
+                            </div>
+                          </button>
+                        </div>
                       </div>
-                    </button>
-                  </div>
-                </div>
-                {num < badgeCount && <CustomHR />}
-              </React.Fragment>
-            ))}
-            {selectedBadge === 'custom' && (
+                      {index < badges?.length - 1 && <CustomHR />}
+                    </React.Fragment>
+                  ))}
+                </>
+              )}
+            </div>
+            {selectedBadge.includes('custom') && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  addNewBadge();
-                }}
-                className="mt-4 flex flex-row items-center gap-2 text-sm text-whiteOpacity05"
+                onClick={addNewBadge}
+                className="mt-4 text-brandGreen"
               >
-                <PlusIcon className="text-whiteOpacity05" /> New badge
+                + Add Badge
               </button>
             )}
-          </div>
+          </>
         );
-      case 3:
+      }
+      case 3: {
+        const avatar = watch('avatar');
+        const badges = watch('badges');
+        const description = watch('description');
+        const name = watch('name');
+        const icon =
+          avatar && ICONS_MAPPER.find(icon => icon.id === avatar)?.icon;
+
         return (
           <div className="space-y-4 h-96">
             <div className="w-16 h-16 bg-whiteOpacity008 rounded-full flex items-center justify-center">
-              <div className="w-6">
-                <StarIcon />
-              </div>
+              {icon}
             </div>
-            <h2 className="text-xl font-bold font-space-grotesk">
-              Stellar Quests
+            <h2 className="text-xl font-bold font-space-grotesk break-words">
+              {name}
             </h2>
-            <p className="text-whiteOpacity05 text-sm font-light">
-              Integer malesuada leo nisi, quis ullamcorper mauris elementum ut.
-              Suspendisse eget libero iaculis, maximus velit vitae.
+            <p className="text-whiteOpacity05 text-sm font-light break-words whitespace-normal">
+              {description}
             </p>
             <div className="flex flex-row items-center gap-2">
               <div className="w-5 h-5 overflow-hidden rounded-full">
@@ -527,19 +677,20 @@ export const StepModal: React.FC<ModalProps> = ({
               </div>
               <div>
                 <p className="font-light text-sm text-whiteOpacity05">
-                  Created by 012312...1ED8
+                  Created by {getEllipsedAddress(userAddress || '')}
                 </p>
               </div>
             </div>
             <div className="flex flex-row items-center gap-3 text-whiteOpacity05">
               <TagIcon />
               <p className="text-sm font-light text-whiteOpacity05">
-                20 badges
+                {badges?.length} badges
               </p>
             </div>
             <CustomBadge />
           </div>
         );
+      }
 
       case 4:
         return (
@@ -588,9 +739,14 @@ export const StepModal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Prevent form submission on Next click
-  const handleNextClick = (e: React.MouseEvent) => {
+  const handleNextClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+
+    const isValid = await trigger();
+    if (!isValid) {
+      return;
+    }
+
     onNext();
   };
 
@@ -604,7 +760,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <h2 className="text-xl font-space-grotesk">Create community</h2>
           <button
             type="button"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               onClose();
             }}
