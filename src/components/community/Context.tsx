@@ -1,17 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import {
-  CommunityBadge,
   CommunityContext,
   CommunityContextProviderProps,
   CommunityQuests,
 } from './types';
 import {
-  BadgesList,
   Communities,
   CommunityBadges,
   MembersList,
 } from '@/types/communities';
 import { useAuthContext } from '../auth/Context';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);
 
@@ -19,6 +18,9 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   props: CommunityContextProviderProps
 ) => {
   const [communityQuests, setCommunityQuests] = useState<CommunityQuests>({});
+  const { userAddress } = useAuthContext();
+  const queryClient = useQueryClient();
+
   const [communities, setCommunities] = useState<Communities[]>([]);
   const [verifyReputationcommunities, setVerifyReputationcommunities] =
     useState<Communities[]>([]);
@@ -30,25 +32,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const [communitiesMembersList, setCommunitiesMembersList] = useState<
     MembersList[]
   >([]);
+
   const isJoined = communitiesDetail?.is_joined;
-  const { userAddress } = useAuthContext();
-
-  // useEffect(() => {
-  //   const getCommunities = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities`
-  //       );
-  //       const data = await response.json();
-
-  //       setCommunities(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   getCommunities();
-  // }, []);
 
   const getCommunities = async () => {
     try {
@@ -58,6 +43,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setCommunities(data);
+
+      queryClient.setQueryData(['communities', userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -72,6 +59,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setCommunities(data);
+
+      queryClient.setQueryData(['communities', status, userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -86,6 +75,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setVerifyReputationcommunities(data);
+
+      queryClient.setQueryData(['communities', 'verify-reputation', userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -103,6 +94,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
 
       setCommunitiesDetail(data);
       setCommunities([data]);
+
+      queryClient.setQueryData(['community-details', communityAdress, userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -116,6 +109,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setCommunities(data);
+
+      queryClient.setQueryData(['communities', userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -129,6 +124,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setCommunitiesBadgesList(data);
+
+      queryClient.setQueryData(['community-badges', communityAddress, userAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -142,6 +139,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
       const data = await response.json();
 
       setCommunitiesMembersList(data);
+
+      queryClient.setQueryData(['community-members', communityAddress], data);
     } catch (error) {
       console.error(error);
     }
@@ -162,6 +161,8 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         }
       );
       const data = await response.json();
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
 
       getCommunities();
     } catch (error) {
@@ -200,12 +201,16 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   );
 };
 
-const useCommunityContext = () => {
-  const ctx = useContext(communityCtx);
-  if (ctx === undefined) {
-    throw new Error('userAuthContext: ctx is undefined');
+export const useCommunityContext = () => {
+  const context = useContext(communityCtx);
+
+  if (context === undefined) {
+    throw new Error(
+      'useCommunityContext must be used within a CommunityContextProvider'
+    );
   }
-  return ctx;
+
+  return context;
 };
 
-export { useCommunityContext, CommunityContextProvider };
+export { CommunityContextProvider };

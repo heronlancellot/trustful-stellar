@@ -21,14 +21,13 @@ import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModa
 import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
 import { useRouter } from 'next/router';
 import useCommunitiesController from '../../components/community/hooks/controller';
+import { useCommunities, useCommunitiesByStatus } from '@/lib/hooks/api/useCommunities';
 
 export default function CommunitiesPage() {
   const { userAddress, setUserAddress } = useAuthContext();
   const {
     setCommunityQuests,
     communityQuests,
-    communities,
-    getCommunitiesStatus,
     setCommunities,
   } = useCommunityContext();
   const {
@@ -56,39 +55,36 @@ export default function CommunitiesPage() {
     hidden: 'hidden',
   };
 
-  const fetchCommunities = async (fetchFunction: () => Promise<void>) => {
-    setIsLoading(true);
-    try {
-      await fetchFunction();
-      const minDelay = new Promise(resolve => setTimeout(resolve, 800));
-      await minDelay;
-    } catch (error) {
-      console.error('Failed to fetch communities:', error);
-      toast.error('Error loading communities');
-    } finally {
-      setIsLoading(false);
-      setDataFetched(true);
-    }
-  };
+  const currentStatus = (status as string) || statusList.all;
+
+  const { data: allCommunities, isLoading: isLoadingAllCommunities } = useCommunities(userAddress);
+  const { data: statusCommunities, isLoading: isLoadingStatusCommunities } = useCommunitiesByStatus(
+    currentStatus !== statusList.all ? currentStatus : '',
+    userAddress
+  );
+
+  const communities = currentStatus !== statusList.all && userAddress ? statusCommunities : allCommunities;
 
   useEffect(() => {
-    if (!router.isReady) return;
-
-    const currentStatus = (status as string) || statusList.all;
-
-    if (currentStatus !== statusList.all && userAddress) {
-      fetchCommunities(() => getCommunitiesStatus(currentStatus));
-    } else {
-      fetchCommunities(async () => {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
-        );
-        const data = await response.json();
-        setCommunities(data);
-      });
+    if (communities) {
+      setCommunities(communities);
+      setDataFetched(true);
+      setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, userAddress, router.isReady]);
+  }, [communities, setCommunities]);
+
+  useEffect(() => {
+    if (isLoadingAllCommunities || isLoadingStatusCommunities) {
+      setIsLoading(true);
+      setDataFetched(false);
+    } else {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setDataFetched(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingAllCommunities, isLoadingStatusCommunities]);
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {
