@@ -16,6 +16,8 @@ import toast from 'react-hot-toast';
 import { useAuthContext } from '../auth/Context';
 import { Minus } from 'lucide-react';
 import { CakeIcon } from './icons/CakeIcon';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCommunityContext } from '../community/Context';
 
 interface CommunitiesCardProps
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
@@ -32,16 +34,21 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
   ...props
 }) => {
   const { userAddress, setUserAddress } = useAuthContext();
+  const queryClient = useQueryClient();
+  const { getCommunities } = useCommunityContext();
 
   const formattedContractAddress = community.community_address.toUpperCase();
 
-  const hideExitButton = (currentTab === 'joined' || currentTab === 'all') &&
+  const hideExitButton =
+    (currentTab === 'joined' || currentTab === 'all') &&
     userAddress &&
-    community.creator_address.toLocaleLowerCase() === userAddress.toLocaleLowerCase();
+    community.creator_address.toLocaleLowerCase() ===
+      userAddress.toLocaleLowerCase();
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
-    rpcUrl: process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
+    rpcUrl:
+      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
     networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
   });
 
@@ -55,6 +62,37 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       if (result.success) {
         toast.success('Successfully joined community');
         console.log('Transaction successful:', result.txHash);
+
+        queryClient.invalidateQueries({ queryKey: ['communities'] });
+        queryClient.invalidateQueries({
+          queryKey: ['communities', 'joined', userAddress],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [
+            'community-details',
+            community.community_address,
+            userAddress,
+          ],
+        });
+
+        await getCommunities();
+
+        setTimeout(() => {
+          queryClient.resetQueries();
+        }, 500);
+
+        const currentData = queryClient.getQueryData([
+          'communities',
+          userAddress,
+        ]) as Communities[] | undefined;
+        if (currentData) {
+          const updatedData = currentData.map(c =>
+            c.community_address === community.community_address
+              ? { ...c, is_joined: true }
+              : c
+          );
+          queryClient.setQueryData(['communities', userAddress], updatedData);
+        }
       } else {
         toast.error('Failed to join community');
         console.error('Transaction failed:', result.error);
@@ -78,6 +116,37 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       if (result.success) {
         toast.success('Successfully left community');
         console.log('Transaction successful:', result.txHash);
+
+        queryClient.invalidateQueries({ queryKey: ['communities'] });
+        queryClient.invalidateQueries({
+          queryKey: ['communities', 'joined', userAddress],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [
+            'community-details',
+            community.community_address,
+            userAddress,
+          ],
+        });
+
+        await getCommunities();
+
+        setTimeout(() => {
+          queryClient.resetQueries();
+        }, 500);
+
+        const currentData = queryClient.getQueryData([
+          'communities',
+          userAddress,
+        ]) as Communities[] | undefined;
+        if (currentData) {
+          const updatedData = currentData.map(c =>
+            c.community_address === community.community_address
+              ? { ...c, is_joined: false }
+              : c
+          );
+          queryClient.setQueryData(['communities', userAddress], updatedData);
+        }
       } else {
         toast.error('Failed to leave community');
         console.error('Transaction failed:', result.error);

@@ -31,9 +31,14 @@ import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import { ArrowLeft, Check, EyeOff, LockIcon } from 'lucide-react';
 import cc from 'classcat';
-import { useCommunityBadges, useCommunityDetails, useCommunityMembers } from '@/lib/hooks/api/useCommunityDetails';
+import {
+  useCommunityBadges,
+  useCommunityDetails,
+  useCommunityMembers,
+} from '@/lib/hooks/api/useCommunityDetails';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateCommunityVisibility } from '@/lib/hooks/api/useCommunities';
+import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
 
 interface DetailsProps {
   params: {
@@ -51,18 +56,14 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const [newManager, setNewManager] = useState('');
   const [removeManager, setRemoveManager] = useState('');
   const queryClient = useQueryClient();
+  const [isHiding, setIsHiding] = useState(false);
 
-  const { data: communitiesDetail, isLoading: isLoadingDetails } = useCommunityDetails(
-    communityAddress as string,
-    userAddress
-  );
-  const { data: communitiesBadgesList, isLoading: isLoadingBadges } = useCommunityBadges(
-    communityAddress as string,
-    userAddress
-  );
-  const { data: communitiesMembersList, isLoading: isLoadingMembers } = useCommunityMembers(
-    communityAddress as string
-  );
+  const { data: communitiesDetail, isLoading: isLoadingDetails } =
+    useCommunityDetails(communityAddress as string, userAddress);
+  const { data: communitiesBadgesList, isLoading: isLoadingBadges } =
+    useCommunityBadges(communityAddress as string, userAddress);
+  const { data: communitiesMembersList, isLoading: isLoadingMembers } =
+    useCommunityMembers(communityAddress as string);
 
   const { mutate: updateHideCommunities } = useUpdateCommunityVisibility();
 
@@ -81,11 +82,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { all, joined, created, hidden } = statusList;
 
   if (!communityAddress || !status) {
-    return <h1>Carregando...</h1>;
+    return <h1>Loading...</h1>;
   }
 
   if (isLoadingDetails || isLoadingBadges || isLoadingMembers) {
-    return <h1>Carregando...</h1>;
+    return <h1>Loading...</h1>;
   }
 
   const handleJoinedCommunities = async (communityAddress: string) => {
@@ -212,8 +213,39 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     ? communitiesBadgesList.community_badges
     : [];
 
-  const handleHideCommunity = (communityAddress: string) => {
-    updateHideCommunities(communityAddress);
+  const handleHideCommunity = async (communityAddress: string) => {
+    setIsHiding(true);
+    try {
+      await updateHideCommunities(communityAddress);
+      toast.success('Community hidden successfully');
+
+      setCommunitiesDetail((prev: any) => ({
+        ...prev,
+        is_hidden: true,
+      }));
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'joined', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'created', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'hidden', userAddress],
+      });
+
+      setTimeout(() => {
+        router.push('/communities?status=hidden');
+      }, 1000);
+    } catch (error) {
+      toast.error('Failed to hide community');
+      console.error('Error hiding community:', error);
+    } finally {
+      setIsHiding(false);
+      closeModal('hideCommunity');
+    }
   };
 
   const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
@@ -639,6 +671,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           </div>
         </>
       </CustomModal>
+
+      {/* Loading indicator for hide community operation */}
+      <ActivityIndicatorModal isOpen={isHiding} />
     </div>
   );
 }
