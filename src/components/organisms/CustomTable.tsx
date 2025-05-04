@@ -5,7 +5,11 @@ import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { PlusIcon } from '../atoms';
 import useCommunitiesController from '../community/hooks/controller';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
-import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
+import { useAuthContext } from '../auth/Context';
+import { toast } from 'react-hot-toast';
+import { useCommunityContext } from '../community/Context';
 
 export interface CustomTableProps<T extends Record<string, any>>
   extends React.ComponentPropsWithoutRef<'div'> {
@@ -30,67 +34,125 @@ export const CustomTable = <T extends Record<string, any>>({
   const hasRowsToDisplay = !!data && data.length > 0;
   const [isNewBadge, setIsNewBadge] = useState(false);
   const { stellarContractBadges, stellarContractRemoveBadges } = useCommunitiesController();
-
-  const [newBadgeData, setNewBadgeData] = useState({
+  const { getCommunitiesBadgesList } = useCommunityContext();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { communityAddress } = router.query;
+  const { userAddress } = useAuthContext();
+  const [newBadgeData, setNewBadgeData] = useState<{
+    name: string;
+    issuer: string;
+    score?: number | string;
+  }>({
     name: '',
     issuer: '',
     score: '',
   });
 
-  const isFormValid = newBadgeData.name && newBadgeData.issuer && newBadgeData.score;
+  const isDisabled =
+    !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isFormValid || typeof newBadgeData.score === 'string' && !newBadgeData.score) {
+    setNewBadgeData({ name: '', issuer: '', score: '' });
+
+    if (
+      newBadgeData.score === undefined ||
+      typeof newBadgeData.score === 'string'
+    ) {
       return;
     }
 
-    const score = Number(newBadgeData.score);
+    console.log('Badge enviado:', newBadgeData);
 
-    try {
-      const result = await stellarContractBadges.addBadge(
-        newBadgeData.name,
-        newBadgeData.issuer,
-        score
-      );
+    const result = await stellarContractBadges.addBadge(
+      newBadgeData.name,
+      newBadgeData.issuer,
+      newBadgeData.score
+    );
 
-      if (result.success) {
-        console.log(`Badge ${newBadgeData.name} added successfully`);
-        toast.success(`Badge ${newBadgeData.name} added successfully`);
-        setIsNewBadge(false);
-        setNewBadgeData({ name: '', issuer: '', score: '' });
-      } else {
-        console.error('Failed to add badge:', result.error);
+    if (result.success) {
+      console.log('Transaction successful:', result.txHash);
+
+      toast.success(`Badge ${newBadgeData.name} added successfully`);
+      setIsNewBadge(false);
+
+      if (communityAddress) {
+        const communityAddressStr = communityAddress.toString();
+
+        queryClient.invalidateQueries({
+          queryKey: ['community-badges', communityAddressStr, userAddress]
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['community-details', communityAddressStr, userAddress]
+        });
+
+        setTimeout(async () => {
+          if (getCommunitiesBadgesList) {
+            await getCommunitiesBadgesList(communityAddressStr);
+          }
+        }, 1000);
       }
-    } catch (error) {
-      console.error('Error processing badge addition:', error);
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+    } else {
+      console.error('Transaction failed:', result.error);
+      toast.error(`Failed to add badge: ${result.error}`);
     }
   };
 
-  const handleBadgeInputChange = (field: 'name' | 'issuer' | 'score', value: string) => {
-    setNewBadgeData({
-      ...newBadgeData,
-      [field]: value
-    });
-  };
+  useEffect(() => {
+    console.log(newBadgeData.score);
+    console.log(isDisabled);
+  }, [newBadgeData, isDisabled]);
 
   const handleRemoveBadge = async (badge: any) => {
     try {
-      const badgeName = badge.Name?.props?.issuerAddress || '';
-      const score = badge.Score?.props?.issuerAddress ?
-        Number(badge.Score.props.issuerAddress) :
-        (badgeName.length > 0 ? Number(badgeName.charAt(badgeName.length - 1)) : undefined);
+      console.log('Badge to remove:', badge);
+
+      let badgeName = '';
+      if (badge.Name) {
+        if (typeof badge.Name === 'object' && badge.Name.props) {
+          badgeName = badge.Name.props.issuerAddress || badge.Name.props.children;
+        } else {
+          badgeName = badge.Name;
+        }
+      } else if (badge.name) {
+        badgeName = badge.name;
+      } else if (badge.badgeName) {
+        if (typeof badge.badgeName === 'object' && badge.badgeName.props) {
+          const children = badge.badgeName.props.children;
+          if (Array.isArray(children)) {
+            for (const child of children) {
+              if (typeof child === 'object' && child.props && child.props.children) {
+                badgeName = child.props.children;
+                break;
+              }
+            }
+          } else {
+            badgeName = children;
+          }
+        } else {
+          badgeName = badge.badgeName;
+        }
+      }
 
       const issuerAddress = "GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS";
 
-      if (!badgeName || !issuerAddress || score === undefined || isNaN(score)) {
-        console.error('Insufficient data for badge removal');
+      console.log('Extracted data:', { badgeName, issuerAddress });
+
+      if (!badgeName) {
+        console.error('Badge name missing');
+        alert('Cannot remove badge: Missing badge name');
         return;
       }
 
       if (!stellarContractRemoveBadges) {
         console.error('Badge removal service not available');
+        alert('Badge removal service not available');
         return;
       }
 
@@ -101,7 +163,29 @@ export const CustomTable = <T extends Record<string, any>>({
 
       if (result.success) {
         console.log(`Badge ${badgeName} successfully removed`);
-        // Update interface (could add window.location.reload() or other updates)
+
+        toast.success(`Badge ${badgeName} successfully removed`);
+
+        if (communityAddress) {
+          const communityAddressStr = communityAddress.toString();
+
+          queryClient.invalidateQueries({
+            queryKey: ['community-badges', communityAddressStr, userAddress]
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ['community-details', communityAddressStr, userAddress]
+          });
+
+          setTimeout(async () => {
+            if (getCommunitiesBadgesList) {
+              await getCommunitiesBadgesList(communityAddressStr);
+            }
+          }, 1000);
+        }
+
+        queryClient.invalidateQueries({ queryKey: ['communities'] });
+        queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
       } else {
         console.error('Transaction failed:', result.error);
         alert(`Failed to remove badge: ${result.error}`);
@@ -154,10 +238,9 @@ export const CustomTable = <T extends Record<string, any>>({
                   <td className="px-7 py-4 text-right">
                     <button
                       onClick={() => handleRemoveBadge(row)}
-                      className="p-2 rounded-lg bg-whiteOpacity005 hover:bg-red-500/20 transition-colors"
-                      title="Remove badge"
+                      className="hover:opacity-70 transition-opacity"
                     >
-                      <Trash2 className="w-4 h-4 text-whiteOpacity05 hover:text-red-400" />
+                      <Trash2 className="w-4 h-4 text-whiteOpacity05" />
                     </button>
                   </td>
                 )}
@@ -178,55 +261,64 @@ export const CustomTable = <T extends Record<string, any>>({
               className="py-2"
             >
               {isNewBadge ? (
-                <form onSubmit={handleSubmit} className="w-full">
+                <form onSubmit={handleSubmit}>
                   <div className="flex gap-2 items-center w-full ml-4">
                     <input
                       type="text"
                       placeholder="Badge name"
                       value={newBadgeData.name}
-                      onChange={e => handleBadgeInputChange('name', e.target.value)}
-                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
-                      autoFocus
+                      onChange={e =>
+                        setNewBadgeData({
+                          ...newBadgeData,
+                          name: e.target.value,
+                        })
+                      }
+                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                     />
                     <input
                       type="text"
                       placeholder="Issuer"
                       value={newBadgeData.issuer}
-                      onChange={e => handleBadgeInputChange('issuer', e.target.value)}
-                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
+                      onChange={e =>
+                        setNewBadgeData({
+                          ...newBadgeData,
+                          issuer: e.target.value,
+                        })
+                      }
+                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                     />
                     <input
                       type="number"
                       placeholder="Score"
                       value={newBadgeData.score}
-                      onChange={e => handleBadgeInputChange('score', e.target.value)}
-                      className="w-full bg-whiteOpacity008 rounded-lg p-2"
+                      onChange={e =>
+                        setNewBadgeData({
+                          ...newBadgeData,
+                          score: Number(e.target.value),
+                        })
+                      }
+                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                     />
                     <button
                       type="submit"
-                      className={`p-2.5 rounded-lg transition-colors ${isFormValid ? 'bg-brandGreen text-darkBackground hover:opacity-90' : 'bg-whiteOpacity005 text-whiteOpacity05'}`}
-                      disabled={!isFormValid}
+                      className="p-2 rounded-lg"
+                      disabled={!isDisabled}
                     >
-                      <Check className="w-4 h-4" />
+                      <Check className="text-white w-4 h-4" />
                     </button>
                     <button
                       type="button"
-                      className="p-2.5 rounded-lg bg-whiteOpacity005 hover:bg-whiteOpacity008 transition-colors"
+                      className="p-2 rounded-lg"
                       onClick={() => setIsNewBadge(false)}
                     >
-                      <X className="w-4 h-4 text-white" />
+                      <X className="text-white w-4 h-4" />
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="flex gap-2 py-2 items-center ml-10">
+                <div className="flex gap-2 py-2 items-center ml-10 ">
                   <PlusIcon className="text-whiteOpacity05" />
-                  <button
-                    onClick={() => setIsNewBadge(true)}
-                    className="text-whiteOpacity05 hover:text-white transition-colors"
-                  >
-                    New badge
-                  </button>
+                  <button onClick={() => setIsNewBadge(true)}>New Badge</button>
                 </div>
               )}
             </td>
