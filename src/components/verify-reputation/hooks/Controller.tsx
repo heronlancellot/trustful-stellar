@@ -1,10 +1,10 @@
 'use client';
 
 import { useAuthContext } from '@/components/auth/Context';
-import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
 import { useState } from 'react';
 
 export type Badge = {
+  message?: any;
   issuer: string;
   community_address: string;
   name: string;
