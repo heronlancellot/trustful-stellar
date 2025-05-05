@@ -18,7 +18,7 @@ import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
 import { useModal } from '@/hooks/useModal';
 import { CustomModal } from './components/molecules/custom-modal';
 import LeaderboardTable from '../../components/molecules/leaderboard-table';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { CommunityTableCell } from '../../components/molecules/CommunityTableCell';
 import { useCommunityContext } from '@/components/community/Context';
 ('./components/molecules/leaderboard-table');
@@ -31,6 +31,14 @@ import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import { ArrowLeft, Check, EyeOff, LockIcon } from 'lucide-react';
 import cc from 'classcat';
+import {
+  useCommunityBadges,
+  useCommunityDetails,
+  useCommunityMembers,
+} from '@/lib/hooks/api/useCommunityDetails';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUpdateCommunityVisibility } from '@/lib/hooks/api/useCommunities';
+import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
 
 interface DetailsProps {
   params: {
@@ -47,31 +55,21 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { status, communityAddress } = router.query;
   const [newManager, setNewManager] = useState('');
   const [removeManager, setRemoveManager] = useState('');
+  const queryClient = useQueryClient();
+  const [isHiding, setIsHiding] = useState(false);
 
-  const {
-    getCommunitiesBadgesList,
-    getCommunitiesMembersList,
-    communitiesBadgesList,
-    communitiesMembersList,
-    getCommunitiesDetails,
-    communitiesDetail,
-    isJoined,
-    updateHideCommunities,
-    setCommunitiesDetail,
-  } = useCommunityContext();
+  const { data: communitiesDetail, isLoading: isLoadingDetails } =
+    useCommunityDetails(communityAddress as string, userAddress);
+  const { data: communitiesBadgesList, isLoading: isLoadingBadges } =
+    useCommunityBadges(communityAddress as string, userAddress);
+  const { data: communitiesMembersList, isLoading: isLoadingMembers } =
+    useCommunityMembers(communityAddress as string);
 
-  useEffect(() => {
-    if (communityAddress) {
-      getCommunitiesBadgesList(`${communityAddress}`);
-      getCommunitiesMembersList(`${communityAddress}`);
-    }
+  const { mutate: updateHideCommunities } = useUpdateCommunityVisibility();
 
-    if (communityAddress && status) {
-      getCommunitiesDetails(`${communityAddress}`, `${userAddress}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [communityAddress]);
+  const { setCommunitiesDetail } = useCommunityContext();
 
+  const isJoined = communitiesDetail?.is_joined;
   const totalBadgesMemberList = communitiesDetail?.total_badges;
 
   const statusList = {
@@ -84,7 +82,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { all, joined, created, hidden } = statusList;
 
   if (!communityAddress || !status) {
-    return <h1>Carregando...</h1>;
+    return <h1>Loading...</h1>;
+  }
+
+  if (isLoadingDetails || isLoadingBadges || isLoadingMembers) {
+    return <h1>Loading...</h1>;
   }
 
   const handleJoinedCommunities = async (communityAddress: string) => {
@@ -97,6 +99,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         ...prev,
         is_joined: true,
       }));
+
+      queryClient.invalidateQueries({
+        queryKey: ['community-details', communityAddress, userAddress],
+      });
 
       console.log('Transaction successful:', result.txHash);
       closeModal('managers');
@@ -117,6 +123,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         ...prev,
         is_joined: false,
       }));
+
+      queryClient.invalidateQueries({
+        queryKey: ['community-details', communityAddress, userAddress],
+      });
 
       console.log('Transaction successful:', result.txHash);
       closeModal('managers');
@@ -146,6 +156,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         }
 
         return prev;
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['community-details', communityAddress, userAddress],
       });
 
       console.log('Transaction successful:', result.txHash);
@@ -180,6 +194,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         };
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ['community-details', communityAddress, userAddress],
+      });
+
       console.log('Transaction successful:', result.txHash);
       closeModal('deleteBadge');
     } else {
@@ -195,8 +213,39 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     ? communitiesBadgesList.community_badges
     : [];
 
-  const handleHideCommunity = (communityAddress: string) => {
-    updateHideCommunities(communityAddress);
+  const handleHideCommunity = async (communityAddress: string) => {
+    setIsHiding(true);
+    try {
+      await updateHideCommunities(communityAddress);
+      toast.success('Community hidden successfully');
+
+      setCommunitiesDetail((prev: any) => ({
+        ...prev,
+        is_hidden: true,
+      }));
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'joined', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'created', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'hidden', userAddress],
+      });
+
+      setTimeout(() => {
+        router.push('/communities?status=hidden');
+      }, 1000);
+    } catch (error) {
+      toast.error('Failed to hide community');
+      console.error('Error hiding community:', error);
+    } finally {
+      setIsHiding(false);
+      closeModal('hideCommunity');
+    }
   };
 
   const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
@@ -595,7 +644,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         title="Delete badge?"
         isOpen={isOpen('deleteBadge')}
         onClose={() => closeModal('deleteBadge')}
-        // onButtonClick={}
         isAsync={false}
         headerBackgroundColor="bg-whiteOpacity008"
       >
@@ -623,6 +671,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           </div>
         </>
       </CustomModal>
+
+      {/* Loading indicator for hide community operation */}
+      <ActivityIndicatorModal isOpen={isHiding} />
     </div>
   );
 }
