@@ -43,7 +43,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
     (currentTab === 'joined' || currentTab === 'all') &&
     userAddress &&
     community.creator_address.toLocaleLowerCase() ===
-      userAddress.toLocaleLowerCase();
+    userAddress.toLocaleLowerCase();
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
@@ -200,7 +200,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             </button>
           </div>
 
-          {currentTab !== 'created' && !hideExitButton && (
+          {currentTab !== 'created' && currentTab !== 'hidden' && !hideExitButton && (
             <div>
               <button
                 className={cc([
