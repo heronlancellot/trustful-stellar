@@ -387,6 +387,44 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   )}
                 </div>
               )}
+              {status === hidden && (
+                <div className="flex justify-items-center">
+                  {typeof isJoined === 'undefined' || !isJoined ? (
+                    <PrimaryButton
+                      className={cc([
+                        'rounded-lg w-max',
+                        {
+                          'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                            !userAddress,
+                        },
+                      ])}
+                      label="Join"
+                      icon={<PlusIcon color="black" width={16} height={16} />}
+                      iconPosition={IconPosition.LEFT}
+                      onClick={() =>
+                        handleJoinedCommunities(communityAddress as string)
+                      }
+                      disabled={!userAddress}
+                    />
+                  ) : (
+                    <PrimaryButton
+                      className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                      label="Joined"
+                      icon={
+                        <Check
+                          color={tailwindConfig.theme.extend.colors.brandGreen}
+                          width={24}
+                          height={24}
+                        />
+                      }
+                      iconPosition={IconPosition.LEFT}
+                      onClick={() =>
+                        handleExitCommunities(communityAddress as string)
+                      }
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <h3 className="text-gray-500 text-base pl-12">{`${communitiesDetail?.description}`}</h3>
@@ -505,6 +543,47 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           ></ContentTabs>
         )}
         {status === joined && (
+          <ContentTabs
+            tabs={{
+              Badges: {
+                content: (
+                  <div className="px-12">
+                    <CustomTable
+                      childrenForEmptyTable={
+                        <TableEmptyScreen
+                          icon={
+                            <SearchIcon
+                              color={
+                                tailwindConfig.theme.extend.colors
+                                  .whiteOpacity05
+                              }
+                            />
+                          }
+                          title="Search to start"
+                          description="Check a user's reputation by searching for their address"
+                        />
+                      }
+                      className="mt-6"
+                      headers={['Name', 'Score', 'Status']}
+                      data={searchedUserBadges}
+                    ></CustomTable>
+                  </div>
+                ),
+                tabNumber: 1,
+              },
+              Leaderboard: {
+                content: (
+                  <LeaderboardTable
+                    communitiesMembersList={communitiesMembersList}
+                    totalBadgesMemberList={totalBadgesMemberList}
+                  />
+                ),
+                tabNumber: 2,
+              },
+            }}
+          ></ContentTabs>
+        )}
+        {status === hidden && (
           <ContentTabs
             tabs={{
               Badges: {
