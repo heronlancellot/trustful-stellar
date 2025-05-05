@@ -83,9 +83,9 @@ const createCommunitySchema = z.object({
   badgeType: z.string().min(1, 'Badge is required'),
   badges: z.array(
     z.object({
-      name: z.string(),
-      issuer: z.string(),
-      score: z.number(),
+      name: z.string().min(1, 'Required'),
+      issuer: z.string().min(1, 'Required'),
+      score: z.number().min(1, 'Required'),
     })
   ),
 });
@@ -104,7 +104,6 @@ export const StepModal: React.FC<ModalProps> = ({
     register,
     handleSubmit,
     setValue,
-    getValues,
     watch,
     formState: { errors },
     trigger,
@@ -252,7 +251,7 @@ export const StepModal: React.FC<ModalProps> = ({
         setLoadingBadgeListType(false);
       }
     }
-  }, [currentStep]);
+  }, [badges?.length, currentStep, getBadgesByTypes, selectedBadge, setBadges]);
 
   const addNewBadge = () => {
     const newBadge = {
@@ -457,7 +456,6 @@ export const StepModal: React.FC<ModalProps> = ({
                 <input
                   {...register('name')}
                   type="text"
-                  formNoValidate
                   className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
                 />
                 {errors.name && (
@@ -577,55 +575,96 @@ export const StepModal: React.FC<ModalProps> = ({
                   {Array.from({ length: badgeCount }, (_, index) => (
                     <React.Fragment key={`badge-${index}`}>
                       <div className="grid grid-cols-[140px_100px_80px] gap-3">
-                        <div>
+                        <div className="flex- flex-col">
                           <input
-                            {...register(`badges.${index}.name`)}
+                            {...register(`badges.${index}.name`, {
+                              required: 'Required',
+                            })}
                             type="text"
-                            formNoValidate
                             placeholder={`Badge Name #${index + 1}`}
                             defaultValue={badgeTypeDetails[index]?.name || ''}
-                            className="bg-whiteOpacity005 rounded-lg p-2 max-w-full"
+                            className="bg-whiteOpacity005 px-2 max-h-10 h-10 rounded-lg  max-w-full"
                           />
+                          {errors?.badges && errors.badges[index]?.name && (
+                            <span className="text-red-500 text-[10px] mt-1">
+                              {errors.badges[index]?.name?.message}
+                            </span>
+                          )}
                         </div>
-                        <div className="h-full flex items-center">
-                          {badgeTypeDetails[index]?.issuer !== ''
-                            ? getEllipsedAddress(
+                        <div className="h-full flex flex-col">
+                          {badgeTypeDetails[index]?.issuer !== '' ? (
+                            <div className="py-2 overflow-hidden">
+                              {getEllipsedAddress(
                                 badgeTypeDetails[index]?.issuer || ''
-                              )
-                            : ''}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <input
-                            {...register(`badges.${index}.score`, {
-                              valueAsNumber: true,
-                              onChange: e => {
-                                const value = e.target.value;
-                                if (value === '') {
-                                  e.target.value = '';
-                                  setValue(`badges.${index}.score`, 0);
-                                } else {
-                                  setValue(
-                                    `badges.${index}.score`,
-                                    parseInt(value) || 0
-                                  );
-                                }
-                              },
-                            })}
-                            type="number"
-                            defaultValue={badgeTypeDetails[index]?.score || ''}
-                            placeholder="Score"
-                            formNoValidate
-                            className="bg-whiteOpacity005 rounded-lg p-2 flex-1 max-w-20 border-whiteOpacity008"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveBadge(index)}
-                            className="text-gray-400 ml-2 shrink-0"
-                          >
-                            <div className="w-6">
-                              <TrashIcon />
+                              )}
                             </div>
-                          </button>
+                          ) : (
+                            <input
+                              {...register(`badges.${index}.issuer`, {
+                                required: 'Required',
+                                onChange: e => {
+                                  const value = e.target.value;
+                                  if (value !== '') {
+                                    e.target.value = '';
+                                    setValue(`badges.${index}.issuer`, value);
+                                  }
+                                },
+                              })}
+                              type="text"
+                              defaultValue={
+                                badgeTypeDetails[index]?.issuer || ''
+                              }
+                              placeholder={`Issuer #${index + 1}`}
+                              className="bg-whiteOpacity005 max-h-10 rounded-lg p-2 flex-1 border-whiteOpacity008 w-full"
+                            />
+                          )}
+                          {errors?.badges && errors.badges[index]?.issuer && (
+                            <span className="text-red-500 text-[10px]  mt-1">
+                              {errors.badges[index]?.issuer?.message}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between">
+                            <input
+                              {...register(`badges.${index}.score`, {
+                                valueAsNumber: true,
+                                required: 'Required',
+                                onChange: e => {
+                                  const value = e.target.value;
+                                  if (value === '') {
+                                    e.target.value = '';
+                                    setValue(`badges.${index}.score`, 0);
+                                  } else {
+                                    setValue(
+                                      `badges.${index}.score`,
+                                      parseInt(value) || 0
+                                    );
+                                  }
+                                },
+                              })}
+                              type="number"
+                              defaultValue={
+                                badgeTypeDetails[index]?.score || ''
+                              }
+                              placeholder="Score"
+                              className="bg-whiteOpacity005 max-h-10 rounded-lg p-2 flex-1 max-w-20 border-whiteOpacity008"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveBadge(index)}
+                              className="text-gray-400 ml-2 shrink-0"
+                            >
+                              <div className="w-6">
+                                <TrashIcon />
+                              </div>
+                            </button>
+                          </div>
+                          {errors?.badges && errors.badges[index]?.score && (
+                            <span className="text-red-500 text-[10px] mt-1">
+                              {errors.badges[index]?.score?.message}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {index < badges?.length - 1 && <CustomHR />}
@@ -744,6 +783,10 @@ export const StepModal: React.FC<ModalProps> = ({
 
     const isValid = await trigger();
     if (!isValid) {
+      badges.map(item => {
+        if (item.message) return toast.error(item.message);
+      });
+
       return;
     }
 
