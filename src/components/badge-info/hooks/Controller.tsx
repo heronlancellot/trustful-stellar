@@ -38,18 +38,13 @@ export default function useBadgeInfoController() {
         fetch(
           `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/badges/${type}`
         ).then(async (response: CustomResponse) => {
-          if (response?.statusCode === 404) {
-            console.error(
-              `${response?.statusCode} Error fetching badge ${type}`
-            );
-            return null;
-          }
           return response.json();
         })
       );
 
       const results = await Promise.all(promises);
       const flattenedResults = results.filter(result => result !== null).flat();
+
       setBadgeTypeDetails(flattenedResults);
       return flattenedResults;
     } catch (error) {
