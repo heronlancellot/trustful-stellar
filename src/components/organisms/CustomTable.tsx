@@ -55,52 +55,63 @@ export const CustomTable = <T extends Record<string, any>>({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setNewBadgeData({ name: '', issuer: '', score: '' });
+    try {
+      setNewBadgeData({ name: '', issuer: '', score: '' });
 
-    if (
-      newBadgeData.score === undefined ||
-      typeof newBadgeData.score === 'string'
-    ) {
-      return;
-    }
+      if (
+        newBadgeData.score === undefined ||
+        typeof newBadgeData.score === 'string' ||
+        !newBadgeData.name ||
+        !newBadgeData.issuer
+      ) {
+        toast.error('Please fill all badge fields correctly');
+        return;
+      }
 
-    console.log('Badge enviado:', newBadgeData);
+      console.log('Badge enviado:', newBadgeData);
 
-    const result = await stellarContractBadges.addBadge(
-      newBadgeData.name,
-      newBadgeData.issuer,
-      newBadgeData.score
-    );
+      const result = await stellarContractBadges.addBadge(
+        newBadgeData.name,
+        newBadgeData.issuer,
+        newBadgeData.score
+      );
 
-    if (result.success) {
-      console.log('Transaction successful:', result.txHash);
+      if (result.success) {
+        console.log('Transaction successful - TX Hash:', result.txHash);
+        toast.success(`Badge ${newBadgeData.name} added successfully`);
+        setIsNewBadge(false);
 
-      toast.success(`Badge ${newBadgeData.name} added successfully`);
-      setIsNewBadge(false);
+        if (communityAddress) {
+          const communityAddressStr = communityAddress.toString();
 
-      if (communityAddress) {
-        const communityAddressStr = communityAddress.toString();
+          queryClient.invalidateQueries({
+            queryKey: ['community-badges', communityAddressStr, userAddress]
+          });
 
-        queryClient.invalidateQueries({
-          queryKey: ['community-badges', communityAddressStr, userAddress]
-        });
+          queryClient.invalidateQueries({
+            queryKey: ['community-details', communityAddressStr, userAddress]
+          });
 
-        queryClient.invalidateQueries({
-          queryKey: ['community-details', communityAddressStr, userAddress]
-        });
+          queryClient.invalidateQueries({ queryKey: ['communities'] });
+          queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
 
-        setTimeout(async () => {
           if (getCommunitiesBadgesList) {
             await getCommunitiesBadgesList(communityAddressStr);
           }
-        }, 1000);
-      }
 
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
-    } else {
-      console.error('Transaction failed:', result.error);
-      toast.error(`Failed to add badge: ${result.error}`);
+          setTimeout(async () => {
+            if (getCommunitiesBadgesList) {
+              await getCommunitiesBadgesList(communityAddressStr);
+            }
+          }, 5000);
+        }
+      } else {
+        console.error('Transaction failed:', result.error);
+        toast.error(`Failed to add badge: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error adding badge:', error);
+      toast.error(`An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -162,13 +173,13 @@ export const CustomTable = <T extends Record<string, any>>({
       );
 
       if (result.success) {
-        console.log(`Badge ${badgeName} successfully removed`);
-
+        console.log(`Badge ${badgeName} successfully removed - TX Hash:`, result.txHash);
         toast.success(`Badge ${badgeName} successfully removed`);
 
         if (communityAddress) {
           const communityAddressStr = communityAddress.toString();
 
+          // Immediately invalidate all relevant queries
           queryClient.invalidateQueries({
             queryKey: ['community-badges', communityAddressStr, userAddress]
           });
@@ -177,15 +188,19 @@ export const CustomTable = <T extends Record<string, any>>({
             queryKey: ['community-details', communityAddressStr, userAddress]
           });
 
+          queryClient.invalidateQueries({ queryKey: ['communities'] });
+          queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+
+          if (getCommunitiesBadgesList) {
+            await getCommunitiesBadgesList(communityAddressStr);
+          }
+
           setTimeout(async () => {
             if (getCommunitiesBadgesList) {
               await getCommunitiesBadgesList(communityAddressStr);
             }
           }, 1000);
         }
-
-        queryClient.invalidateQueries({ queryKey: ['communities'] });
-        queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
       } else {
         console.error('Transaction failed:', result.error);
         alert(`Failed to remove badge: ${result.error}`);
