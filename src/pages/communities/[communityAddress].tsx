@@ -66,6 +66,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     useCommunityMembers(communityAddress as string);
 
   const { mutate: updateHideCommunities } = useUpdateCommunityVisibility();
+  const { updateShowCommunities } = useCommunityContext();
 
   const { setCommunitiesDetail } = useCommunityContext();
 
@@ -248,6 +249,40 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
   };
 
+  const handleShowCommunity = async (communityAddress: string) => {
+    setIsHiding(true);
+    try {
+      await updateShowCommunities(communityAddress);
+      toast.success('Community shown successfully');
+
+      setCommunitiesDetail((prev: any) => ({
+        ...prev,
+        is_hidden: false,
+      }));
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'joined', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'created', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'hidden', userAddress],
+      });
+
+      setTimeout(() => {
+        router.push('/communities?status=all');
+      }, 1000);
+    } catch (error) {
+      toast.error('Failed to show community');
+      console.error('Error showing community:', error);
+    } finally {
+      setIsHiding(false);
+    }
+  };
+
   const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
     badgeName: (
       <div className="flex flex-row items-center h-7">
@@ -389,40 +424,19 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               )}
               {status === hidden && (
                 <div className="flex justify-items-center">
-                  {typeof isJoined === 'undefined' || !isJoined ? (
-                    <PrimaryButton
-                      className={cc([
-                        'rounded-lg w-max',
-                        {
-                          'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
-                            !userAddress,
-                        },
-                      ])}
-                      label="Join"
-                      icon={<PlusIcon color="black" width={16} height={16} />}
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleJoinedCommunities(communityAddress as string)
-                      }
-                      disabled={!userAddress}
-                    />
-                  ) : (
-                    <PrimaryButton
-                      className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                      label="Joined"
-                      icon={
-                        <Check
-                          color={tailwindConfig.theme.extend.colors.brandGreen}
-                          width={24}
-                          height={24}
-                        />
-                      }
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleExitCommunities(communityAddress as string)
-                      }
-                    />
-                  )}
+                  <PrimaryButton
+                    className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                    label="Show"
+                    icon={
+                      <EyeOff
+                        color={tailwindConfig.theme.extend.colors.brandGreen}
+                        width={16}
+                        height={16}
+                      />
+                    }
+                    iconPosition={IconPosition.LEFT}
+                    onClick={() => handleShowCommunity(communityAddress as string)}
+                  />
                 </div>
               )}
             </div>
