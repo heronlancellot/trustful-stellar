@@ -235,7 +235,8 @@ export const StepModal: React.FC<ModalProps> = ({
       const fetchAndSetBadges = async () => {
         setLoadingBadgeListType(true);
         try {
-          const details = await getBadgesByTypes(selectedBadge);
+          const badgeTypesToFetch = selectedBadge.filter(type => type !== 'custom');
+          const details = await getBadgesByTypes(badgeTypesToFetch);
           if (details) {
             setBadges(details);
           }
@@ -271,8 +272,13 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const updateBadgesFromSelection = async (selectedTypes: string[]) => {
     if (selectedTypes.length > 0) {
-      const newBadges = await getBadgesByTypes(selectedTypes);
-      setBadges(newBadges);
+      const badgeTypesToFetch = selectedTypes.filter(type => type !== 'custom');
+      if (badgeTypesToFetch.length > 0) {
+        const newBadges = await getBadgesByTypes(badgeTypesToFetch);
+        setBadges(newBadges);
+      } else {
+        setBadges([]);
+      }
     } else {
       setBadges([]);
     }
