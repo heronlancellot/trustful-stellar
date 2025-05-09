@@ -12,17 +12,3 @@ export interface Communities {
     is_joined: boolean;
     icon: string;
 }
-
-// export interface Communities {
-//     communityAddress: string;
-//     factoryAddress?: string;
-//     name: string;
-//     description: string;
-//     creatorAddress?: string;
-//     isHidden?: boolean;
-//     blocktimestamp?: string;
-//     totalBadges?: number;
-//     totalMembers?: number;
-//     managers?: string[];
-//     id: string;
-// }

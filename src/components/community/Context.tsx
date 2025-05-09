@@ -170,6 +170,30 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     }
   };
 
+  const updateShowCommunities = async (communityAddress: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/visibility`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            is_hidden: false,
+          }),
+        }
+      );
+      const data = await response.json();
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+
+      getCommunities();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <communityCtx.Provider
       value={{
@@ -194,6 +218,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         verifyReputationcommunities,
         setVerifyReputationcommunities,
         updateHideCommunities,
+        updateShowCommunities
       }}
     >
       {props.children}

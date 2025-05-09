@@ -18,7 +18,7 @@ import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
 import { useModal } from '@/hooks/useModal';
 import { CustomModal } from './components/molecules/custom-modal';
 import LeaderboardTable from '../../components/molecules/leaderboard-table';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { CommunityTableCell } from '../../components/molecules/CommunityTableCell';
 import { useCommunityContext } from '@/components/community/Context';
 ('./components/molecules/leaderboard-table');
@@ -57,6 +57,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const [removeManager, setRemoveManager] = useState('');
   const queryClient = useQueryClient();
   const [isHiding, setIsHiding] = useState(false);
+  const [hasOfferedRedirect, setHasOfferedRedirect] = useState(false);
 
   const { data: communitiesDetail, isLoading: isLoadingDetails } =
     useCommunityDetails(communityAddress as string, userAddress);
@@ -66,11 +67,14 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     useCommunityMembers(communityAddress as string);
 
   const { mutate: updateHideCommunities } = useUpdateCommunityVisibility();
+  const { updateShowCommunities } = useCommunityContext();
 
   const { setCommunitiesDetail } = useCommunityContext();
 
   const isJoined = communitiesDetail?.is_joined;
   const totalBadgesMemberList = communitiesDetail?.total_badges;
+  const isCreator = userAddress && communitiesDetail?.creator_address &&
+    userAddress.toLowerCase() === communitiesDetail.creator_address.toLowerCase();
 
   const statusList = {
     all: 'all',
@@ -80,6 +84,17 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const { all, joined, created, hidden } = statusList;
+
+  useEffect(() => {
+    if (isCreator && status !== created && !hasOfferedRedirect && typeof window !== 'undefined') {
+      if (status === hidden) {
+        return;
+      }
+
+      setHasOfferedRedirect(true);
+      router.push(`/communities/${communityAddress}?status=created`);
+    }
+  }, [isCreator, status, created, communityAddress, router, hasOfferedRedirect]);
 
   if (!communityAddress || !status) {
     return <h1>Loading...</h1>;
@@ -139,23 +154,25 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
   const handleInviteManager = async (newManager: string) => {
     const sender = userAddress as string;
+    const newManagerFormatted = newManager.toUpperCase();
 
-    const result = await stellarContractManagers.addManager(sender, newManager);
+    const result = await stellarContractManagers.addManager(sender, newManagerFormatted);
 
     if (result.success) {
       toast.success('Successful Inserting Manager');
 
       setCommunitiesDetail((prev: any) => {
-        const currentManagers = prev.managers || [];
+        const prevData = prev || {};
+        const currentManagers = prevData.managers || [];
 
-        if (!currentManagers.includes(newManager.toUpperCase())) {
+        if (!currentManagers.includes(newManagerFormatted)) {
           return {
-            ...prev,
-            managers: [...currentManagers, newManager.toUpperCase()],
+            ...prevData,
+            managers: [...currentManagers, newManagerFormatted],
           };
         }
 
-        return prev;
+        return prevData;
       });
 
       queryClient.invalidateQueries({
@@ -184,10 +201,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       toast.success('Successful Removing Manager');
 
       setCommunitiesDetail((prev: any) => {
-        const currentManagers = prev.managers || [];
+        const prevData = prev || {};
+        const currentManagers = prevData.managers || [];
 
         return {
-          ...prev,
+          ...prevData,
           managers: currentManagers.filter(
             (manager: string) => manager !== removedManagerFormatted
           ),
@@ -248,6 +266,40 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
   };
 
+  const handleShowCommunity = async (communityAddress: string) => {
+    setIsHiding(true);
+    try {
+      await updateShowCommunities(communityAddress);
+      toast.success('Community shown successfully');
+
+      setCommunitiesDetail((prev: any) => ({
+        ...prev,
+        is_hidden: false,
+      }));
+
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'joined', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'created', userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['communities', 'hidden', userAddress],
+      });
+
+      setTimeout(() => {
+        router.push('/communities?status=all');
+      }, 1000);
+    } catch (error) {
+      toast.error('Failed to show community');
+      console.error('Error showing community:', error);
+    } finally {
+      setIsHiding(false);
+    }
+  };
+
   const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
     badgeName: (
       <div className="flex flex-row items-center h-7">
@@ -276,7 +328,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.back()}
+                onClick={() => router.push('/communities')}
                 className="flex items-center justify-center w-8 h-8 rounded-full transition-colors"
               >
                 <div className="w-4 h-4">
@@ -289,39 +341,66 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div>
               {status === all && (
                 <div className="flex justify-items-center">
-                  {typeof isJoined !== 'undefined' && isJoined ? (
-                    <PrimaryButton
-                      className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                      label="Joined"
-                      icon={
-                        <Check
-                          color={tailwindConfig.theme.extend.colors.brandGreen}
-                          width={24}
-                          height={24}
-                        />
-                      }
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleExitCommunities(communityAddress as string)
-                      }
-                    />
+                  {isCreator ? (
+                    <div className="flex justify-items-center gap-2">
+                      <PrimaryButton
+                        className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                        label="Hide"
+                        icon={
+                          <EyeOff
+                            color={tailwindConfig.theme.extend.colors.brandGreen}
+                            width={16}
+                            height={16}
+                          />
+                        }
+                        iconPosition={IconPosition.LEFT}
+                        onClick={() => openModal('hideCommunity')}
+                      />
+                      <PrimaryButton
+                        className="rounded-lg w-max"
+                        label="Managers"
+                        icon={<LockIcon color="black" width={16} height={16} />}
+                        iconPosition={IconPosition.LEFT}
+                        onClick={() => openModal('managers')}
+                      />
+                    </div>
                   ) : (
-                    <PrimaryButton
-                      className={cc([
-                        'rounded-lg w-max',
-                        {
-                          'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
-                            !userAddress,
-                        },
-                      ])}
-                      label="Join"
-                      icon={<PlusIcon color="black" width={16} height={16} />}
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleJoinedCommunities(communityAddress as string)
-                      }
-                      disabled={!userAddress}
-                    />
+                    <div>
+                      {typeof isJoined !== 'undefined' && isJoined ? (
+                        <PrimaryButton
+                          className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                          label="Joined"
+                          icon={
+                            <Check
+                              color={tailwindConfig.theme.extend.colors.brandGreen}
+                              width={24}
+                              height={24}
+                            />
+                          }
+                          iconPosition={IconPosition.LEFT}
+                          onClick={() =>
+                            handleExitCommunities(communityAddress as string)
+                          }
+                        />
+                      ) : (
+                        <PrimaryButton
+                          className={cc([
+                            'rounded-lg w-max',
+                            {
+                              'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                                !userAddress,
+                            },
+                          ])}
+                          label="Join"
+                          icon={<PlusIcon color="black" width={16} height={16} />}
+                          iconPosition={IconPosition.LEFT}
+                          onClick={() =>
+                            handleJoinedCommunities(communityAddress as string)
+                          }
+                          disabled={!userAddress}
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               )}
@@ -351,78 +430,84 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               )}
               {status === joined && (
                 <div className="flex justify-items-center">
-                  {typeof isJoined === 'undefined' || !isJoined ? (
-                    <PrimaryButton
-                      className={cc([
-                        'rounded-lg w-max',
-                        {
-                          'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
-                            !userAddress,
-                        },
-                      ])}
-                      label="Join"
-                      icon={<PlusIcon color="black" width={16} height={16} />}
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleJoinedCommunities(communityAddress as string)
-                      }
-                      disabled={!userAddress}
-                    />
+                  {isCreator ? (
+                    <div className="flex justify-items-center gap-2">
+                      <PrimaryButton
+                        className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                        label="Hide"
+                        icon={
+                          <EyeOff
+                            color={tailwindConfig.theme.extend.colors.brandGreen}
+                            width={16}
+                            height={16}
+                          />
+                        }
+                        iconPosition={IconPosition.LEFT}
+                        onClick={() => openModal('hideCommunity')}
+                      />
+                      <PrimaryButton
+                        className="rounded-lg w-max"
+                        label="Managers"
+                        icon={<LockIcon color="black" width={16} height={16} />}
+                        iconPosition={IconPosition.LEFT}
+                        onClick={() => openModal('managers')}
+                      />
+                    </div>
                   ) : (
-                    <PrimaryButton
-                      className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                      label="Joined"
-                      icon={
-                        <Check
-                          color={tailwindConfig.theme.extend.colors.brandGreen}
-                          width={24}
-                          height={24}
+                    <div>
+                      {typeof isJoined === 'undefined' || !isJoined ? (
+                        <PrimaryButton
+                          className={cc([
+                            'rounded-lg w-max',
+                            {
+                              'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                                !userAddress,
+                            },
+                          ])}
+                          label="Join"
+                          icon={<PlusIcon color="black" width={16} height={16} />}
+                          iconPosition={IconPosition.LEFT}
+                          onClick={() =>
+                            handleJoinedCommunities(communityAddress as string)
+                          }
+                          disabled={!userAddress}
                         />
-                      }
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleExitCommunities(communityAddress as string)
-                      }
-                    />
+                      ) : (
+                        <PrimaryButton
+                          className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                          label="Joined"
+                          icon={
+                            <Check
+                              color={tailwindConfig.theme.extend.colors.brandGreen}
+                              width={24}
+                              height={24}
+                            />
+                          }
+                          iconPosition={IconPosition.LEFT}
+                          onClick={() =>
+                            handleExitCommunities(communityAddress as string)
+                          }
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               )}
               {status === hidden && (
                 <div className="flex justify-items-center">
-                  {typeof isJoined === 'undefined' || !isJoined ? (
-                    <PrimaryButton
-                      className={cc([
-                        'rounded-lg w-max',
-                        {
-                          'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
-                            !userAddress,
-                        },
-                      ])}
-                      label="Join"
-                      icon={<PlusIcon color="black" width={16} height={16} />}
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleJoinedCommunities(communityAddress as string)
-                      }
-                      disabled={!userAddress}
-                    />
-                  ) : (
-                    <PrimaryButton
-                      className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                      label="Joined"
-                      icon={
-                        <Check
-                          color={tailwindConfig.theme.extend.colors.brandGreen}
-                          width={24}
-                          height={24}
-                        />
-                      }
-                      iconPosition={IconPosition.LEFT}
-                      onClick={() =>
-                        handleExitCommunities(communityAddress as string)
-                      }
-                    />
-                  )}
+                  <PrimaryButton
+                    className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                    label="Show"
+                    icon={
+                      <EyeOff
+                        color={tailwindConfig.theme.extend.colors.brandGreen}
+                        width={16}
+                        height={16}
+                      />
+                    }
+                    iconPosition={IconPosition.LEFT}
+                    onClick={() => handleShowCommunity(communityAddress as string)}
+                  />
                 </div>
               )}
             </div>
