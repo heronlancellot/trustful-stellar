@@ -46,7 +46,7 @@ function VerifyReputationPage() {
   const [reputationDetail, setReputationDetail] = useState<
     VerifyReputationProps | undefined
   >();
-  const { badgeDetails, getBagdeDetails } = useVerifyReputationController();
+  const { badgeDetails, getBagdeDetails, setBadgeDetails } = useVerifyReputationController();
   const { userAddress } = useAuthContext();
 
   const {
@@ -97,6 +97,7 @@ function VerifyReputationPage() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setBadgeDetails(null);
   };
 
   return (
@@ -198,25 +199,25 @@ function VerifyReputationPage() {
                 <span className="text-sm w-24 text-center">Status</span>
               </div>
 
-              {badgeDetails?.community_badges.map((item: Badge) => (
-                <div
-                  key={item?.community_address}
-                  className="flex justify-between items-center px-6 py-4"
-                >
-                  <span className="text-sm text-whiteOpacity05 text-left">
-                    {item?.name}
-                  </span>
-                  <span className="text-sm text-brandWhite w-24 text-left">
-                    {item?.score}
-                  </span>
-                  <span
-                    className={`text-xs w-24 text-center p-1 rounded-3xl bg-darkGreenOpacity01 ${reputation[0]?.statusColor}`}
+              {badgeDetails && Array.isArray(badgeDetails.community_badges) &&
+                badgeDetails.community_badges.map((item: Badge) => (
+                  <div
+                    key={`${item.community_address}-${item.name}`}
+                    className="flex justify-between items-center px-6 py-4"
                   >
-                    {/* {item?.user_has} */}
-                    {`${item.user_has ? 'Completed' : 'Pending'}`}
-                  </span>
-                </div>
-              ))}
+                    <span className="text-sm text-whiteOpacity05 text-left">
+                      {item?.name}
+                    </span>
+                    <span className="text-sm text-brandWhite w-24 text-left">
+                      {item?.score}
+                    </span>
+                    <span
+                      className={`text-xs w-24 text-center p-1 rounded-3xl bg-darkGreenOpacity01 ${reputation[0]?.statusColor}`}
+                    >
+                      {`${item.user_has ? 'Completed' : 'Pending'}`}
+                    </span>
+                  </div>
+                ))}
 
               {/* {reputationDetail.map(({ item, index }: any) => (
                 <div key={index} className="flex justify-between items-center px-6 py-4">
