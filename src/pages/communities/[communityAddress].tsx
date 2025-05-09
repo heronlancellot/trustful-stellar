@@ -152,23 +152,25 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
   const handleInviteManager = async (newManager: string) => {
     const sender = userAddress as string;
+    const newManagerFormatted = newManager.toUpperCase();
 
-    const result = await stellarContractManagers.addManager(sender, newManager);
+    const result = await stellarContractManagers.addManager(sender, newManagerFormatted);
 
     if (result.success) {
       toast.success('Successful Inserting Manager');
 
       setCommunitiesDetail((prev: any) => {
-        const currentManagers = prev.managers || [];
+        const prevData = prev || {};
+        const currentManagers = prevData.managers || [];
 
-        if (!currentManagers.includes(newManager.toUpperCase())) {
+        if (!currentManagers.includes(newManagerFormatted)) {
           return {
-            ...prev,
-            managers: [...currentManagers, newManager.toUpperCase()],
+            ...prevData,
+            managers: [...currentManagers, newManagerFormatted],
           };
         }
 
-        return prev;
+        return prevData;
       });
 
       queryClient.invalidateQueries({
@@ -197,10 +199,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       toast.success('Successful Removing Manager');
 
       setCommunitiesDetail((prev: any) => {
-        const currentManagers = prev.managers || [];
+        const prevData = prev || {};
+        const currentManagers = prevData.managers || [];
 
         return {
-          ...prev,
+          ...prevData,
           managers: currentManagers.filter(
             (manager: string) => manager !== removedManagerFormatted
           ),
