@@ -27,6 +27,7 @@ export default function useVerifyReputationController() {
 
   const getBagdeDetails = async (communityAddress: string) => {
     try {
+      setBadgeDetails(null);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/badges?user_address=${userAddress}`
       );

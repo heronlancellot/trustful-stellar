@@ -23,6 +23,7 @@ export type CommunityContext = {
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;
   getCommunitiesMembersList: (communityAddress: string) => Promise<void>;
   updateHideCommunities: (communityAddress: string) => Promise<void>;
+  updateShowCommunities: (communityAddress: string) => Promise<void>;
 };
 
 export type CommunityContextProviderProps = {

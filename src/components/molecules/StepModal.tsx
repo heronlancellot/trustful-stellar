@@ -495,9 +495,8 @@ export const StepModal: React.FC<ModalProps> = ({
                       key={id}
                       type="button"
                       onClick={e => handleAvatarSelect(e, id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
-                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
-                      }`}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                        }`}
                     >
                       {icon}
                     </button>
@@ -523,11 +522,10 @@ export const StepModal: React.FC<ModalProps> = ({
                           className="hidden"
                         />
                         <span
-                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${
-                            selectedBadge.includes(id)
+                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${selectedBadge.includes(id)
                               ? 'border-brandGreen bg-darkGreenOpacity01'
                               : 'border-whiteOpacity008'
-                          }`}
+                            }`}
                         >
                           {selectedBadge.includes(id) && (
                             <span className="w-2.5 h-2.5 bg-brandGreen"></span>
@@ -839,7 +837,7 @@ export const StepModal: React.FC<ModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
+              className="px-4 py-2 bg-brandGreen rounded-lg text-black"
             >
               {isSubmitting ? 'Processing...' : 'Confirm'}
             </button>
