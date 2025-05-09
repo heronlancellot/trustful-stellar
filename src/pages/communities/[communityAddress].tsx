@@ -87,9 +87,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
   useEffect(() => {
     if (isCreator && status !== created && !hasOfferedRedirect && typeof window !== 'undefined') {
+      if (status === hidden) {
+        return;
+      }
+
       setHasOfferedRedirect(true);
-
-
       router.push(`/communities/${communityAddress}?status=created`);
     }
   }, [isCreator, status, created, communityAddress, router, hasOfferedRedirect]);
@@ -504,39 +506,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       />
                     }
                     iconPosition={IconPosition.LEFT}
-                    onClick={async () => {
-                      setIsHiding(true);
-                      try {
-                        await useCommunityContext().updateShowCommunities(communityAddress as string);
-                        toast.success('Community shown successfully');
-
-                        setCommunitiesDetail((prev: any) => ({
-                          ...prev,
-                          is_hidden: false,
-                        }));
-
-                        queryClient.invalidateQueries({ queryKey: ['communities'] });
-                        queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
-                        queryClient.invalidateQueries({
-                          queryKey: ['communities', 'joined', userAddress],
-                        });
-                        queryClient.invalidateQueries({
-                          queryKey: ['communities', 'created', userAddress],
-                        });
-                        queryClient.invalidateQueries({
-                          queryKey: ['communities', 'hidden', userAddress],
-                        });
-
-                        setTimeout(() => {
-                          router.push('/communities?status=all');
-                        }, 1000);
-                      } catch (error) {
-                        toast.error('Failed to show community');
-                        console.error('Error showing community:', error);
-                      } finally {
-                        setIsHiding(false);
-                      }
-                    }}
+                    onClick={() => handleShowCommunity(communityAddress as string)}
                   />
                 </div>
               )}
