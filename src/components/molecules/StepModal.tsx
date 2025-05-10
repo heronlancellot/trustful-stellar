@@ -235,12 +235,19 @@ export const StepModal: React.FC<ModalProps> = ({
       const fetchAndSetBadges = async () => {
         setLoadingBadgeListType(true);
         try {
-          const details = await getBadgesByTypes(selectedBadge);
+          const badgeTypesToFetch = selectedBadge.filter(type => type !== 'custom');
+          const details = await getBadgesByTypes(badgeTypesToFetch);
           if (details) {
             setBadges(details);
+          }    
+          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && (!details || details.length === 0)) {
+            addEmptyBadge();
           }
         } catch (error) {
           console.error('Error fetching badge details:', error);
+          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && badges.length === 0) {
+            addEmptyBadge();
+          }
         } finally {
           setLoadingBadgeListType(false);
         }
@@ -251,16 +258,23 @@ export const StepModal: React.FC<ModalProps> = ({
         setLoadingBadgeListType(false);
       }
     }
-  }, [badges?.length, currentStep, getBadgesByTypes, selectedBadge, setBadges]);
+  }, [badges?.length, currentStep, getBadgesByTypes, selectedBadge, setBadges, badges]);
 
-  const addNewBadge = () => {
+  // Helper function to add an empty badge
+  const addEmptyBadge = () => {
     const newBadge = {
       name: '',
       issuer: '',
       score: 0,
     } as Badge;
+    
     useBadgeStore.getState().addBadge(newBadge);
-    setBadgeCount(prev => prev + 1);
+    setBadgeCount(prev => Math.max(prev, 1));
+    return newBadge;
+  };
+
+  const addNewBadge = () => {
+    addEmptyBadge();
   };
 
   const handleAvatarSelect = (e: React.MouseEvent, id: string) => {
@@ -271,8 +285,18 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const updateBadgesFromSelection = async (selectedTypes: string[]) => {
     if (selectedTypes.length > 0) {
-      const newBadges = await getBadgesByTypes(selectedTypes);
-      setBadges(newBadges);
+      const badgeTypesToFetch = selectedTypes.filter(type => type !== 'custom');
+      if (badgeTypesToFetch.length > 0) {
+        const newBadges = await getBadgesByTypes(badgeTypesToFetch);
+        setBadges(newBadges);
+      } else {
+        if (selectedTypes.includes('custom') && badges.length === 0) {
+          useBadgeStore.getState().clearBadges();
+          addEmptyBadge();
+        } else {
+          setBadges([]);
+        }
+      }
     } else {
       setBadges([]);
     }
@@ -778,6 +802,16 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const handleNextClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+
+    // Ensure at least one empty badge exists when only 'custom' is selected
+    if (currentStep === 1 && selectedBadge.includes('custom') && selectedBadge.length === 1) {
+      if (badges.length === 0) {
+        const newBadge = addEmptyBadge();
+        setBadges([newBadge]);
+      }
+      onNext();
+      return;
+    }
 
     const isValid = await trigger();
     if (!isValid) {
