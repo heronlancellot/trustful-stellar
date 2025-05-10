@@ -204,7 +204,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             <div>
               <button
                 className={cc([
-                  'overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
+                  'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
                   { 'opacity-50 cursor-not-allowed': !userAddress },
                 ])}
                 disabled={!userAddress}
@@ -223,7 +223,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
                   <div className="flex justify-center items-center">
                     <Minus className="transition-all duration-500 ease-in-out" />
                     <span
-                      className="hidden font-inter text-sm group-hover:inline-block group-hover:opacity-100 transition-all duration-500 ease-in-out "
+                      className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
                       onClick={handleExit}
                     >
                       Exit
