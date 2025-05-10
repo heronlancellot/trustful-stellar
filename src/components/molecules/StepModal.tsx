@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import * as z from 'zod';
-import { PlusIcon, StarIcon, TagIcon } from '../atoms/icons';
+import { PlusIcon, StarIcon, TagIcon, UserIcon } from '../atoms/icons';
 import { AlertIcon } from '../atoms/icons/AlertIcon';
 import { AwardIcon } from '../atoms/icons/AwardIcon';
 import { BankIcon } from '../atoms/icons/BankIcon';
@@ -51,6 +51,20 @@ const BADGE_OPTIONS: BadgeOption[] = [
   { id: 'blockful', label: 'Blockful' },
   { id: 'custom', label: 'Custom' },
 ];
+
+const BadgeInfoMessage = () => {
+  return (
+    <div className="flex items-start flex-row gap-2 p-4 bg-darkRedOpacity text-white rounded-lg shadow-lg max-w-md">
+      <AlertIcon width={24}
+        height={24} />
+      <div>
+        <p className="text-sm font-light">
+          Please make sure all your information is correct before proceeding, as it cannot be changed later.
+        </p>
+      </div>
+    </div>
+  );
+};
 
 const CustomBadge = () => {
   return (
@@ -570,7 +584,11 @@ export const StepModal: React.FC<ModalProps> = ({
               </div>
             </div>
 
-            {/* <CustomBadge /> */}
+            {selectedBadge.includes('custom') && (
+              <div className="pt-2 pb-4">
+                <CustomBadge />
+              </div>
+            )}
 
             <CustomHR />
           </>
@@ -730,13 +748,7 @@ export const StepModal: React.FC<ModalProps> = ({
             </p>
             <div className="flex flex-row items-center gap-2">
               <div className="w-5 h-5 overflow-hidden rounded-full">
-                <Image
-                  src="https://fontawesome.com/icons/user?f=classic&s=solid"
-                  width={20}
-                  height={20}
-                  alt="User Avatar"
-                  className="rounded-full"
-                />
+                <UserIcon />
               </div>
               <div>
                 <p className="font-light text-sm text-whiteOpacity05">
@@ -750,7 +762,7 @@ export const StepModal: React.FC<ModalProps> = ({
                 {badges?.length} badges
               </p>
             </div>
-            <CustomBadge />
+            <BadgeInfoMessage />
           </div>
         );
       }

@@ -277,7 +277,7 @@ export const CustomTable = <T extends Record<string, any>>({
             >
               {isNewBadge ? (
                 <form onSubmit={handleSubmit}>
-                  <div className="flex gap-2 items-center w-full ml-4">
+                  <div className="flex p-2 gap-2 items-center w-full ml-3">
                     <input
                       type="text"
                       placeholder="Badge name"
@@ -332,8 +332,8 @@ export const CustomTable = <T extends Record<string, any>>({
                 </form>
               ) : (
                 <div className="flex gap-2 py-2 items-center ml-10 ">
-                  <PlusIcon className="text-whiteOpacity05" />
-                  <button onClick={() => setIsNewBadge(true)}>New Badge</button>
+                  <PlusIcon color="gray" />
+                  <button className="text-whiteOpacity05" onClick={() => setIsNewBadge(true)}>New Badge</button>
                 </div>
               )}
             </td>
