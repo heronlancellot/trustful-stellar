@@ -29,7 +29,7 @@ import { addUser, mainTestnet } from '@/testCall';
 import { kit } from '@/components/auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
 import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
-import { ArrowLeft, Check, EyeOff, LockIcon } from 'lucide-react';
+import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon } from 'lucide-react';
 import cc from 'classcat';
 import {
   useCommunityBadges,
@@ -499,7 +499,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
                     label="Show"
                     icon={
-                      <EyeOff
+                      <EyeIcon
                         color={tailwindConfig.theme.extend.colors.brandGreen}
                         width={16}
                         height={16}
