@@ -1,6 +1,9 @@
+'use client';
+
 import {
   CheckIcon,
   ContentTabs,
+  DappHeader,
   PlusIcon,
   PrimaryButton,
   StarIcon,
@@ -12,16 +15,15 @@ import { ArrowIcon } from '@/components/atoms/icons/ArrowIcon';
 import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { IconPosition } from '@/types/iconPosition';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import tailwindConfig from 'tailwind.config';
 import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
 import { useModal } from '@/hooks/useModal';
-import { CustomModal } from './components/molecules/custom-modal';
-import LeaderboardTable from '../../components/molecules/leaderboard-table';
+import { CustomModal } from '@/components/molecules';
+import LeaderboardTable from '@/components/molecules/leaderboard-table';
 import { useContext, useState, useEffect } from 'react';
-import { CommunityTableCell } from '../../components/molecules/CommunityTableCell';
+import { CommunityTableCell } from '@/components/molecules/CommunityTableCell';
 import { useCommunityContext } from '@/components/community/Context';
-('./components/molecules/leaderboard-table');
 import { useAuthContext } from '@/components/auth/Context';
 import useCommunitiesController from '@/components/community/hooks/controller';
 import toast from 'react-hot-toast';
@@ -42,17 +44,21 @@ import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModa
 
 interface DetailsProps {
   params: {
-    data: string[];
+    communityAddress: string;
   };
 }
 
 export default function DetailsCommunity({ params }: DetailsProps) {
   const { openModal, closeModal, isOpen } = useModal();
   const { userAddress, setUserAddress } = useAuthContext();
-  const { stellarContractJoinCommunities, stellarContractManagers } =
-    useCommunitiesController();
   const router = useRouter();
-  const { status, communityAddress } = router.query;
+  const searchParams = useSearchParams();
+  const status = searchParams.get('status');
+  const communityAddress = params.communityAddress;
+
+  const { stellarContractJoinCommunities, stellarContractManagers } =
+    useCommunitiesController({ communityAddress });
+
   const [newManager, setNewManager] = useState('');
   const [removeManager, setRemoveManager] = useState('');
   const queryClient = useQueryClient();
@@ -73,8 +79,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
   const isJoined = communitiesDetail?.is_joined;
   const totalBadgesMemberList = communitiesDetail?.total_badges;
-  const isCreator = userAddress && communitiesDetail?.creator_address &&
-    userAddress.toLowerCase() === communitiesDetail.creator_address.toLowerCase();
+  const isCreator =
+    userAddress &&
+    communitiesDetail?.creator_address &&
+    userAddress.toLowerCase() ===
+      communitiesDetail.creator_address.toLowerCase();
 
   const statusList = {
     all: 'all',
@@ -86,7 +95,12 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { all, joined, created, hidden } = statusList;
 
   useEffect(() => {
-    if (isCreator && status !== created && !hasOfferedRedirect && typeof window !== 'undefined') {
+    if (
+      isCreator &&
+      status !== created &&
+      !hasOfferedRedirect &&
+      typeof window !== 'undefined'
+    ) {
       if (status === hidden) {
         return;
       }
@@ -94,8 +108,17 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       setHasOfferedRedirect(true);
       router.push(`/communities/${communityAddress}?status=created`);
     }
-  }, [isCreator, status, created, communityAddress, router, hasOfferedRedirect]);
+  }, [
+    isCreator,
+    status,
+    created,
+    communityAddress,
+    router,
+    hasOfferedRedirect,
+  ]);
 
+  console.log('communityAddress', communityAddress);
+  console.log('status', status);
   if (!communityAddress || !status) {
     return <h1>Loading...</h1>;
   }
@@ -156,7 +179,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const sender = userAddress as string;
     const newManagerFormatted = newManager.toUpperCase();
 
-    const result = await stellarContractManagers.addManager(sender, newManagerFormatted);
+    const result = await stellarContractManagers.addManager(
+      sender,
+      newManagerFormatted
+    );
 
     if (result.success) {
       toast.success('Successful Inserting Manager');
@@ -322,7 +348,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   }));
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack">
+    <div className="flex flex-col w-full h-full bg-brandBlack">
+      <div className="w-full h-fit z-10">
+        <DappHeader />
+      </div>
       <div className="flex flex-col gap-6 px-8 pt-8">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -348,7 +377,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         label="Hide"
                         icon={
                           <EyeOff
-                            color={tailwindConfig.theme.extend.colors.brandGreen}
+                            color={
+                              tailwindConfig.theme.extend.colors.brandGreen
+                            }
                             width={16}
                             height={16}
                           />
@@ -372,7 +403,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                           label="Joined"
                           icon={
                             <Check
-                              color={tailwindConfig.theme.extend.colors.brandGreen}
+                              color={
+                                tailwindConfig.theme.extend.colors.brandGreen
+                              }
                               width={24}
                               height={24}
                             />
@@ -392,7 +425,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                             },
                           ])}
                           label="Join"
-                          icon={<PlusIcon color="black" width={16} height={16} />}
+                          icon={
+                            <PlusIcon color="black" width={16} height={16} />
+                          }
                           iconPosition={IconPosition.LEFT}
                           onClick={() =>
                             handleJoinedCommunities(communityAddress as string)
@@ -437,7 +472,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         label="Hide"
                         icon={
                           <EyeOff
-                            color={tailwindConfig.theme.extend.colors.brandGreen}
+                            color={
+                              tailwindConfig.theme.extend.colors.brandGreen
+                            }
                             width={16}
                             height={16}
                           />
@@ -465,7 +502,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                             },
                           ])}
                           label="Join"
-                          icon={<PlusIcon color="black" width={16} height={16} />}
+                          icon={
+                            <PlusIcon color="black" width={16} height={16} />
+                          }
                           iconPosition={IconPosition.LEFT}
                           onClick={() =>
                             handleJoinedCommunities(communityAddress as string)
@@ -478,7 +517,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                           label="Joined"
                           icon={
                             <Check
-                              color={tailwindConfig.theme.extend.colors.brandGreen}
+                              color={
+                                tailwindConfig.theme.extend.colors.brandGreen
+                              }
                               width={24}
                               height={24}
                             />
@@ -506,7 +547,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       />
                     }
                     iconPosition={IconPosition.LEFT}
-                    onClick={() => handleShowCommunity(communityAddress as string)}
+                    onClick={() =>
+                      handleShowCommunity(communityAddress as string)
+                    }
                   />
                 </div>
               )}
@@ -550,6 +593,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 content: (
                   <div className="px-12">
                     <CustomTable
+                      communityAddress={communityAddress}
                       childrenForEmptyTable={
                         <TableEmptyScreen
                           icon={
@@ -591,6 +635,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 content: (
                   <div className="px-12">
                     <CustomTable
+                      communityAddress={communityAddress}
                       childrenForEmptyTable={
                         <TableEmptyScreen
                           icon={
@@ -634,6 +679,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 content: (
                   <div className="px-12">
                     <CustomTable
+                      communityAddress={communityAddress}
                       childrenForEmptyTable={
                         <TableEmptyScreen
                           icon={
@@ -675,6 +721,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 content: (
                   <div className="px-12">
                     <CustomTable
+                      communityAddress={communityAddress}
                       childrenForEmptyTable={
                         <TableEmptyScreen
                           icon={

@@ -1,7 +1,7 @@
-import cc from "classcat";
-import { ReactNode } from "react";
+import cc from 'classcat';
+import { ReactNode } from 'react';
 
-interface CardLinkProps extends React.ComponentPropsWithoutRef<"div"> {
+interface CardLinkProps extends React.ComponentPropsWithoutRef<'div'> {
   mainIcon: ReactNode;
   actionIcon: ReactNode;
   title: string;
@@ -17,7 +17,10 @@ export const CardLink: React.FC<CardLinkProps> = ({
 }) => {
   return (
     <div
-      className={cc(["flex min-w-[572px] min-h-[232px] card-link cursor-pointer", className])}
+      className={cc([
+        'flex min-w-[572px] min-h-[232px] card-link cursor-pointer',
+        className,
+      ])}
       {...props}
     >
       <div className="flex-1 card-link-main-card">

@@ -1,17 +1,19 @@
-import Image from "next/image";
-import Link from "next/link";
-import { ConnectStellarWallet } from "../auth/ConnectStellarWallet";
-import { useUsersContext } from "../user/Context";
-import { useRouter } from "next/router";
-import cc from "classcat";
-import React from "react";
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { ConnectStellarWallet } from '../auth/ConnectStellarWallet';
+import { useUsersContext } from '../user/Context';
+import { useRouter, usePathname } from 'next/navigation';
+import cc from 'classcat';
+import React from 'react';
 
 export const DappHeader = () => {
   const { userScore } = useUsersContext();
   const router = useRouter();
-  const path = router.pathname;
+  const path = usePathname();
   return (
-    <div className="w-screen flex items-center mx-auto px-6 pb-0 max-w-[100vw] h-[72px] justify-between border-t-none border border-r-none border-l-none border-whiteOpacity008 bg-brandBlack">
+    <div className="w-full  flex items-center mx-auto px-6 pb-0 max-w-[100vw] h-[72px] justify-between border-t-none border border-r-none border-l-none border-whiteOpacity008 bg-brandBlack z-10">
       <div className="flex h-full items-center gap-6">
         <Link href="/">
           <Image
@@ -21,37 +23,36 @@ export const DappHeader = () => {
             width={103}
           />
         </Link>
-        {path !== "/" && (
+        {path !== '/' && (
           <div className="flex h-full">
             <div
               className={cc([
-                { "tab-active": path.includes("communities") },
-                "tab p-2 px-4 items-center flex",
+                { 'tab-active': path.includes('communities') },
+                'tab p-2 px-4 items-center flex',
               ])}
-              onClick={() => router.push("/communities?status=all")}
+              onClick={() => router.push('/communities?status=all')}
             >
               <span className="cursor-pointer">Communities</span>
             </div>
             <div
               className={cc([
-                { "tab-active": path.includes("verify-reputation") },
-                "tab p-2 px-4 items-center flex",
+                { 'tab-active': path.includes('verify-reputation') },
+                'tab p-2 px-4 items-center flex',
               ])}
-              onClick={() => router.push("/verify-reputation")}
+              onClick={() => router.push('/verify-reputation')}
             >
               <span className="cursor-pointer">Verify Reputation</span>
             </div>
             <div
               className={cc([
-                { "tab-active": path.includes("faq") },
-                "tab p-2 px-4 items-center flex",
+                { 'tab-active': path.includes('faq') },
+                'tab p-2 px-4 items-center flex',
               ])}
-              onClick={() => router.push("/faq")}
+              onClick={() => router.push('/faq')}
             >
               <span className="cursor-pointer">FAQ</span>
             </div>
           </div>
-
         )}
       </div>
       <div className="flex flex-row">
