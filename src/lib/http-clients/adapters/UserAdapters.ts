@@ -1,5 +1,19 @@
-import { UserBadge } from "@/components/user/types";
-import { UserBadgeFromApi } from "../types";
+import { UserBadge } from '@/components/user/types';
+
+export type UserBadgeFromApi = {
+  balance: string;
+  limit?: string;
+  buying_liabilities: string;
+  selling_liabilities: string;
+  sponsor?: string;
+  last_modified_ledger?: number;
+  is_authorized?: boolean;
+  is_authorized_to_maintain_liabilities?: boolean;
+  is_clawback_enabled?: boolean;
+  asset_type: string;
+  asset_code?: string;
+  asset_issuer?: string[];
+};
 
 export const userBadgeAdapter = (() => {
   const fromApi = (userBadgeFromApi: UserBadgeFromApi): UserBadge => {

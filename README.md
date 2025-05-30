@@ -17,11 +17,12 @@ In practice, Trustful Stellar allows users to prove their achievements on the St
 
 ## Tech Stack
 
-- **Next.js (React & TypeScript):** The frontend is built with Next.js and fully typed with TypeScript.
+- **Next.js 15 App Router (React & TypeScript):** The frontend is built with Next.js App Router and fully typed with TypeScript, using modern Server Actions and Route Handlers.
 - **Tailwind CSS:** Used for styling with utility-first classes and custom configurations via `tailwind.config.ts`.
 - **Stellar SDK & Wallet Integration:** Integrates with Stellar using `@stellar/stellar-sdk`, **Albedo** (`@albedo-link/intent`), and `@creit.tech/stellar-wallets-kit`.
 - **WalletConnect & Alchemy (EVM):** Integrates with WalletConnect v2 for Ethereum wallet support, using **Alchemy** APIs to read/write on EVM blockchains.
-- **Axios:** For HTTP requests to backend APIs or external services.
+- **Native Fetch API:** All HTTP requests use the native fetch API with optimized caching and Next.js 15 features.
+- **React Query:** For client-side data fetching, caching, and state management with `@tanstack/react-query`.
 - **Support Libraries:** `react-hook-form`, `zod`, `react-hot-toast`, `react-tooltip`, `react-spinners`, `lucide-react`, `boring-avatars`, etc.
 - **Storybook:** For developing and previewing UI components in isolation.
 

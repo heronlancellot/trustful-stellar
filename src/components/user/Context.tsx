@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { UserBadge, UserContext, UserContextProviderProps } from './types';
 import { CommunityBadge } from '../community/types';
-import usersClient from '@/lib/http-clients/UsersClient';
 import { useAuthContext } from '../auth/Context';
 import toast from 'react-hot-toast';
 import { BLOCKFUL_QUEST_NAME } from '@/lib/constants';

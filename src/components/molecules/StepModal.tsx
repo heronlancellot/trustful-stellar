@@ -55,11 +55,11 @@ const BADGE_OPTIONS: BadgeOption[] = [
 const BadgeInfoMessage = () => {
   return (
     <div className="flex items-start flex-row gap-2 p-4 bg-darkRedOpacity text-white rounded-lg shadow-lg max-w-md">
-      <AlertIcon width={24}
-        height={24} />
+      <AlertIcon width={24} height={24} />
       <div>
         <p className="text-sm font-light">
-          Please make sure all your information is correct before proceeding, as it cannot be changed later.
+          Please make sure all your information is correct before proceeding, as
+          it cannot be changed later.
         </p>
       </div>
     </div>
@@ -249,17 +249,27 @@ export const StepModal: React.FC<ModalProps> = ({
       const fetchAndSetBadges = async () => {
         setLoadingBadgeListType(true);
         try {
-          const badgeTypesToFetch = selectedBadge.filter(type => type !== 'custom');
+          const badgeTypesToFetch = selectedBadge.filter(
+            type => type !== 'custom'
+          );
           const details = await getBadgesByTypes(badgeTypesToFetch);
           if (details) {
             setBadges(details);
           }
-          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && (!details || details.length === 0)) {
+          if (
+            selectedBadge.includes('custom') &&
+            selectedBadge.length === 1 &&
+            (!details || details.length === 0)
+          ) {
             addEmptyBadge();
           }
         } catch (error) {
           console.error('Error fetching badge details:', error);
-          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && badges.length === 0) {
+          if (
+            selectedBadge.includes('custom') &&
+            selectedBadge.length === 1 &&
+            badges.length === 0
+          ) {
             addEmptyBadge();
           }
         } finally {
@@ -272,7 +282,14 @@ export const StepModal: React.FC<ModalProps> = ({
         setLoadingBadgeListType(false);
       }
     }
-  }, [badges?.length, currentStep, getBadgesByTypes, selectedBadge, setBadges, badges]);
+  }, [
+    badges?.length,
+    currentStep,
+    getBadgesByTypes,
+    selectedBadge,
+    setBadges,
+    badges,
+  ]);
 
   // Helper function to add an empty badge
   const addEmptyBadge = () => {
@@ -359,7 +376,9 @@ export const StepModal: React.FC<ModalProps> = ({
         return;
       }
 
-      const sortedBadges = filteredBadges.sort((a, b) => a.name.localeCompare(b.name));
+      const sortedBadges = filteredBadges.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
 
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
@@ -382,18 +401,16 @@ export const StepModal: React.FC<ModalProps> = ({
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
 
-      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(
-        badgeType => {
-          const badgeIdVector = xdr.ScVal.scvVec([
-            xdr.ScVal.scvString(badgeType.name),
-            new Address(badgeType.issuer.toUpperCase()).toScVal(),
-          ]);
-          return new xdr.ScMapEntry({
-            key: badgeIdVector,
-            val: xdr.ScVal.scvU32(badgeType.score),
-          });
-        }
-      );
+      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(badgeType => {
+        const badgeIdVector = xdr.ScVal.scvVec([
+          xdr.ScVal.scvString(badgeType.name),
+          new Address(badgeType.issuer.toUpperCase()).toScVal(),
+        ]);
+        return new xdr.ScMapEntry({
+          key: badgeIdVector,
+          val: xdr.ScVal.scvU32(badgeType.score),
+        });
+      });
 
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
 
@@ -469,7 +486,7 @@ export const StepModal: React.FC<ModalProps> = ({
       }
     } catch (error: any) {
       setIsSubmitting(false);
-      toast.error('Invalid badge name. Please use a valid one.');
+      toast.error('Invalid badge name. Please use a valid one.'); // testnet hardcodado
     }
   };
 
@@ -535,8 +552,9 @@ export const StepModal: React.FC<ModalProps> = ({
                       key={id}
                       type="button"
                       onClick={e => handleAvatarSelect(e, id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
-                        }`}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
+                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                      }`}
                     >
                       {icon}
                     </button>
@@ -562,10 +580,11 @@ export const StepModal: React.FC<ModalProps> = ({
                           className="hidden"
                         />
                         <span
-                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${selectedBadge.includes(id)
-                            ? 'border-brandGreen bg-darkGreenOpacity01'
-                            : 'border-whiteOpacity008'
-                            }`}
+                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${
+                            selectedBadge.includes(id)
+                              ? 'border-brandGreen bg-darkGreenOpacity01'
+                              : 'border-whiteOpacity008'
+                          }`}
                         >
                           {selectedBadge.includes(id) && (
                             <span className="w-2.5 h-2.5 bg-brandGreen"></span>
@@ -818,7 +837,11 @@ export const StepModal: React.FC<ModalProps> = ({
     e.preventDefault();
 
     // Ensure at least one empty badge exists when only 'custom' is selected
-    if (currentStep === 1 && selectedBadge.includes('custom') && selectedBadge.length === 1) {
+    if (
+      currentStep === 1 &&
+      selectedBadge.includes('custom') &&
+      selectedBadge.length === 1
+    ) {
       if (badges.length === 0) {
         const newBadge = addEmptyBadge();
         setBadges([newBadge]);

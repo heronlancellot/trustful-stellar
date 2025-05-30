@@ -6,9 +6,7 @@ import { useCommunityContext } from '@/components/community/Context';
 import { CardWrapper } from '@/components/templates/CardWrapper';
 import { PageTemplate } from '@/components/templates/PageTemplate';
 import { useUsersContext } from '@/components/user/Context';
-import communityClient from '@/lib/http-clients/CommunityClient';
-import usersClient from '@/lib/http-clients/UsersClient';
-import { useCallback, useEffect, useState, useRef, Suspense } from 'react';
+import { useCallback, useEffect, useState, Suspense } from 'react';
 import _ from 'lodash';
 import { CommunityQuests } from '@/components/community/types';
 import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
@@ -17,7 +15,6 @@ import { WalletIcon } from '@/components/atoms/icons/WalletIcon';
 import tailwindConfig from 'tailwind.config';
 import { kit } from '@/components/auth/ConnectStellarWallet';
 import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
-import assetClient from '@/lib/http-clients/AssetClient';
 import toast from 'react-hot-toast';
 import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
 import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
@@ -27,6 +24,7 @@ import {
   useCommunities,
   useCommunitiesByStatus,
 } from '@/lib/hooks/api/useCommunities';
+import { useUserMutations } from '@/lib/hooks/api/useUsers';
 
 // Loading component for Suspense fallback
 function CommunitiesPageLoading() {
@@ -60,6 +58,7 @@ function CommunitiesContent() {
   } = useUsersContext();
 
   const { inputText, setInputText } = useCommunitiesController();
+  const { postAsset } = useUserMutations();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -157,10 +156,14 @@ function CommunitiesContent() {
         },
         [] as string[]
       );
-      const transaction = await assetClient.postAsset(
-        userAddress,
-        assetCodesToImport
-      );
+
+      // Use the modern mutation hook
+      const { transaction } = await postAsset.mutateAsync({
+        receivingPublicKey: userAddress,
+        assetName: assetCodesToImport,
+        community: 'stellar',
+      });
+
       await sendSignedTransaction(transaction, userAddress);
       toast.success('The badges were imported with success');
     } catch (error: unknown) {

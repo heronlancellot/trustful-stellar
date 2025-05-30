@@ -1,5 +1,11 @@
-import { CommunityBadge } from "@/components/community/types";
-import { CommunityBadgeFromApi } from "../types";
+import { CommunityBadge } from '@/components/community/types';
+
+export type CommunityBadgeFromApi = {
+  score: number;
+  issuer: string[];
+  description: string;
+  title: string;
+};
 
 export const communityBadgeAdapter = (() => {
   const fromApi = (
@@ -16,7 +22,7 @@ export const communityBadgeAdapter = (() => {
       score,
       issuer,
       description,
-      title
+      title,
     };
   };
   return { fromApi };

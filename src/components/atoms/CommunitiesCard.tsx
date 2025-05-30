@@ -43,7 +43,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
     (currentTab === 'joined' || currentTab === 'all') &&
     userAddress &&
     community.creator_address.toLocaleLowerCase() ===
-    userAddress.toLocaleLowerCase();
+      userAddress.toLocaleLowerCase();
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
@@ -57,6 +57,15 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
       toast.error('Please connect your wallet first');
       return;
     }
+
+    console.log('Attempting to join community:', {
+      communityAddress: formattedContractAddress,
+      userAddress,
+      rpcUrl:
+        process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
+      networkType: process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET',
+    });
+
     try {
       const result = await stellarContractJoinCommunities.addUser();
       if (result.success) {
@@ -94,13 +103,49 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
           queryClient.setQueryData(['communities', userAddress], updatedData);
         }
       } else {
-        toast.error('Failed to join community');
         console.error('Transaction failed:', result.error);
+        console.error('Transaction details:', result.details);
+
+        // Provide more specific error messages
+        if (
+          result.error?.includes('network') ||
+          result.details?.ext?.includes('Failed to submit transaction')
+        ) {
+          toast.error(
+            'Network configuration error. Please check if your wallet is connected to the correct network.'
+          );
+        } else if (
+          result.error?.includes('wallet registry') ||
+          result.error?.includes('initialized')
+        ) {
+          toast.error(
+            "Can't find your wallet registry. Make sure you're using an initialized (funded) wallet."
+          );
+        } else {
+          toast.error(`Failed to join community: ${result.error}`);
+        }
       }
-    } catch (error) {
-      toast.error(
-        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
-      );
+    } catch (error: any) {
+      console.error('Unexpected error during join:', error);
+
+      // Handle different types of errors
+      if (
+        error.message?.includes('User cancelled') ||
+        error.message?.includes('cancelled')
+      ) {
+        toast.error('Transaction was cancelled by user');
+      } else if (
+        error.message?.includes('network') ||
+        error.message?.includes('Network')
+      ) {
+        toast.error(
+          'Network configuration error. Please check your wallet network settings.'
+        );
+      } else {
+        toast.error(
+          "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+        );
+      }
       setUserAddress('');
     }
   };
@@ -200,49 +245,51 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             </button>
           </div>
 
-          {currentTab !== 'created' && currentTab !== 'hidden' && !hideExitButton && (
-            <div>
-              <button
-                className={cc([
-                  'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
-                  { 'opacity-50 cursor-not-allowed': !userAddress },
-                ])}
-                disabled={!userAddress}
-              >
-                {!('is_joined' in community) ? (
-                  <div className="flex justify-center items-center">
-                    <Minus className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleExit}
-                    >
-                      Exit
-                    </span>
-                  </div>
-                ) : community.is_joined ? (
-                  <div className="flex justify-center items-center">
-                    <Minus className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleExit}
-                    >
-                      Exit
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex justify-center items-center">
-                    <PlusIcon className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleJoin}
-                    >
-                      Join
-                    </span>
-                  </div>
-                )}
-              </button>
-            </div>
-          )}
+          {currentTab !== 'created' &&
+            currentTab !== 'hidden' &&
+            !hideExitButton && (
+              <div>
+                <button
+                  className={cc([
+                    'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
+                    { 'opacity-50 cursor-not-allowed': !userAddress },
+                  ])}
+                  disabled={!userAddress}
+                >
+                  {!('is_joined' in community) ? (
+                    <div className="flex justify-center items-center">
+                      <Minus className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleExit}
+                      >
+                        Exit
+                      </span>
+                    </div>
+                  ) : community.is_joined ? (
+                    <div className="flex justify-center items-center">
+                      <Minus className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleExit}
+                      >
+                        Exit
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-center items-center">
+                      <PlusIcon className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleJoin}
+                      >
+                        Join
+                      </span>
+                    </div>
+                  )}
+                </button>
+              </div>
+            )}
         </div>
       </div>
       <div className="flex flex-col p-3 gap-1 justify-center">
