@@ -88,10 +88,24 @@ function CommunitiesContent() {
       userAddress
     );
 
+  console.log('🏘️ Communities Debug:', {
+    userAddress,
+    currentStatus,
+    allCommunities,
+    statusCommunities,
+    isLoadingAllCommunities,
+    isLoadingStatusCommunities,
+  });
+
   const communities =
     currentStatus !== statusList.all && userAddress
       ? statusCommunities
       : allCommunities;
+
+  console.log('🏘️ Final communities:', communities);
+  console.log('🏘️ Communities length:', communities?.length);
+  console.log('🏘️ API URL Internal:', process.env.NEXT_PUBLIC_API_URL_INTERNAL);
+  console.log('🏘️ API URL:', process.env.NEXT_PUBLIC_API_URL);
 
   const handleTabChange = useCallback(
     (tabName: string) => {

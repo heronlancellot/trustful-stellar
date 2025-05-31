@@ -351,9 +351,14 @@ export const StepModal: React.FC<ModalProps> = ({
     e: React.MouseEvent | React.ChangeEvent,
     id: string
   ) => {
+    console.log('🎯 handleBadgeSelect called with id:', id);
+    console.log('🎯 Current selectedBadge before:', selectedBadge);
+
     const newSelectedBadges = selectedBadge.includes(id)
       ? selectedBadge.filter(badge => badge !== id)
       : [...selectedBadge, id];
+
+    console.log('🎯 New selectedBadges:', newSelectedBadges);
 
     setSelectedBadge(newSelectedBadges);
     updateBadgesFromSelection(newSelectedBadges);
