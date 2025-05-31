@@ -25,6 +25,9 @@ export async function postAsset(
     return { success: false, error: 'Asset name is required' };
   }
 
+  // erros dos parametros da transação
+  // revisaria o flow e os parametros da transaçaõ 
+  // erro da
   try {
     const response = await fetch(`${API_BASE_URL}/asset`, {
       method: 'POST',
