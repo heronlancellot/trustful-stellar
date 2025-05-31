@@ -868,6 +868,23 @@ export const StepModal: React.FC<ModalProps> = ({
     }
 
     console.log('🔍 Triggering form validation...');
+
+    // Try validating individual fields first
+    console.log('🔍 Validating individual fields...');
+    const nameValid = await trigger('name');
+    const descriptionValid = await trigger('description');
+    const avatarValid = await trigger('avatar');
+    const badgeTypeValid = await trigger('badgeType');
+    const badgesValid = await trigger('badges');
+
+    console.log('🔍 Individual field validation results:', {
+      nameValid,
+      descriptionValid,
+      avatarValid,
+      badgeTypeValid,
+      badgesValid,
+    });
+
     const isValid = await trigger();
     console.log('✅ Form validation result:', isValid);
     console.log('🚨 Form errors after validation:', errors);
@@ -881,6 +898,12 @@ export const StepModal: React.FC<ModalProps> = ({
         badgeTypeError: errors.badgeType,
         badgesError: errors.badges,
       });
+
+      // Check if badges array is the issue
+      const currentBadges = watch('badges');
+      console.log('🏷️ Current badges array:', currentBadges);
+      console.log('🏷️ Badges array length:', currentBadges?.length);
+
       console.log('🔍 Checking badges for error messages...');
       badges.map(item => {
         console.log('🏷️ Badge item:', item);
