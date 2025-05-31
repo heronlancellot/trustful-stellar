@@ -834,6 +834,14 @@ export const StepModal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   const handleNextClick = async (e: React.MouseEvent) => {
+    console.log('🔍 handleNextClick called');
+    console.log('📊 Current state:', {
+      currentStep,
+      selectedBadge,
+      badgesLength: badges.length,
+      isSubmitting,
+    });
+
     e.preventDefault();
 
     // Ensure at least one empty badge exists when only 'custom' is selected
@@ -842,23 +850,37 @@ export const StepModal: React.FC<ModalProps> = ({
       selectedBadge.includes('custom') &&
       selectedBadge.length === 1
     ) {
+      console.log('🎯 Custom badge logic triggered');
       if (badges.length === 0) {
+        console.log('➕ Adding empty badge');
         const newBadge = addEmptyBadge();
         setBadges([newBadge]);
+        console.log('✅ Empty badge added:', newBadge);
       }
+      console.log('⏭️ Calling onNext() for custom badge');
       onNext();
       return;
     }
 
+    console.log('🔍 Triggering form validation...');
     const isValid = await trigger();
+    console.log('✅ Form validation result:', isValid);
+
     if (!isValid) {
+      console.log('❌ Form validation failed');
+      console.log('🔍 Checking badges for error messages...');
       badges.map(item => {
-        if (item.message) return toast.error(item.message);
+        console.log('🏷️ Badge item:', item);
+        if (item.message) {
+          console.log('🚨 Badge error message:', item.message);
+          return toast.error(item.message);
+        }
       });
 
       return;
     }
 
+    console.log('✅ Form is valid, calling onNext()');
     onNext();
   };
 
