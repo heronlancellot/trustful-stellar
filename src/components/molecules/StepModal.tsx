@@ -315,20 +315,34 @@ export const StepModal: React.FC<ModalProps> = ({
   };
 
   const updateBadgesFromSelection = async (selectedTypes: string[]) => {
+    console.log('🔄 updateBadgesFromSelection called with:', selectedTypes);
+
     if (selectedTypes.length > 0) {
       const badgeTypesToFetch = selectedTypes.filter(type => type !== 'custom');
+      console.log('🎯 Badge types to fetch:', badgeTypesToFetch);
+
       if (badgeTypesToFetch.length > 0) {
-        const newBadges = await getBadgesByTypes(badgeTypesToFetch);
-        setBadges(newBadges);
+        console.log('📡 Fetching badges for types:', badgeTypesToFetch);
+        try {
+          const newBadges = await getBadgesByTypes(badgeTypesToFetch);
+          console.log('✅ Fetched badges:', newBadges);
+          setBadges(newBadges);
+        } catch (error) {
+          console.error('❌ Error fetching badges:', error);
+        }
       } else {
+        console.log('🔄 No badge types to fetch, checking custom logic...');
         if (selectedTypes.includes('custom') && badges.length === 0) {
+          console.log('➕ Adding empty badge for custom type');
           useBadgeStore.getState().clearBadges();
           addEmptyBadge();
         } else {
+          console.log('🧹 Clearing badges');
           setBadges([]);
         }
       }
     } else {
+      console.log('🧹 No selected types, clearing badges');
       setBadges([]);
     }
   };
@@ -904,14 +918,21 @@ export const StepModal: React.FC<ModalProps> = ({
       console.log('🏷️ Current badges array:', currentBadges);
       console.log('🏷️ Badges array length:', currentBadges?.length);
 
+      // Log detailed badge errors
+      if (errors.badges && Array.isArray(errors.badges)) {
+        console.log('🚨 Detailed badge errors:', errors.badges);
+        errors.badges.forEach((badgeError, index) => {
+          if (badgeError) {
+            console.log(`🚨 Badge ${index} errors:`, {
+              name: badgeError?.name?.message,
+              issuer: badgeError?.name?.message,
+              score: badgeError.score?.message,
+            });
+          }
+        });
+      }
+
       console.log('🔍 Checking badges for error messages...');
-      badges.map(item => {
-        console.log('🏷️ Badge item:', item);
-        if (item.message) {
-          console.log('🚨 Badge error message:', item.message);
-          return toast.error(item.message);
-        }
-      });
 
       return;
     }
