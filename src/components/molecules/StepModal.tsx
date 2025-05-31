@@ -844,6 +844,11 @@ export const StepModal: React.FC<ModalProps> = ({
 
     e.preventDefault();
 
+    // Log current form values
+    const formValues = watch();
+    console.log('📝 Current form values:', formValues);
+    console.log('🔍 Form errors before validation:', errors);
+
     // Ensure at least one empty badge exists when only 'custom' is selected
     if (
       currentStep === 1 &&
@@ -865,9 +870,17 @@ export const StepModal: React.FC<ModalProps> = ({
     console.log('🔍 Triggering form validation...');
     const isValid = await trigger();
     console.log('✅ Form validation result:', isValid);
+    console.log('🚨 Form errors after validation:', errors);
 
     if (!isValid) {
       console.log('❌ Form validation failed');
+      console.log('🔍 Detailed errors:', {
+        nameError: errors.name,
+        descriptionError: errors.description,
+        avatarError: errors.avatar,
+        badgeTypeError: errors.badgeType,
+        badgesError: errors.badges,
+      });
       console.log('🔍 Checking badges for error messages...');
       badges.map(item => {
         console.log('🏷️ Badge item:', item);
