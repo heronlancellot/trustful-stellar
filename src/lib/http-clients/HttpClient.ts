@@ -1,7 +1,7 @@
-import { parseQueryParams } from "@/lib/utils/parseQueryParams";
-import axios from "axios";
-import dotenv from "dotenv";
-import { IGenericHttpClient } from "./types";
+import { parseQueryParams } from '@/lib/utils/parseQueryParams';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { IGenericHttpClient } from './types';
 dotenv.config();
 
 class HttpClient implements IGenericHttpClient {
@@ -9,7 +9,7 @@ class HttpClient implements IGenericHttpClient {
 
   constructor(baseUrl: string) {
     if (!baseUrl)
-      throw new Error("HttpClient constructor: baseUrl empty or invalid");
+      throw new Error('HttpClient constructor: baseUrl empty or invalid');
     this._baseUrl = baseUrl;
   }
 
@@ -18,21 +18,28 @@ class HttpClient implements IGenericHttpClient {
     query: P,
     body: B
   ): Promise<T> {
-    const fullPath = [this._baseUrl, path, "?", parseQueryParams(query)].join(
-      ""
+    const fullPath = [this._baseUrl, path, '?', parseQueryParams(query)].join(
+      ''
     );
+    console.log('fullPath', fullPath);
     const response = await axios.post<T>(fullPath, body);
+    console.log('response', response);
     return response.data;
   }
 
   async get<T, P extends Object>(path: string, query: P): Promise<T> {
-    const fullPath = [this._baseUrl, path, "?", parseQueryParams(query)].join(
-      ""
+    const fullPath = [this._baseUrl, path, '?', parseQueryParams(query)].join(
+      ''
     );
+    console.log('fullPath get', fullPath);
     const response = await axios.get<T>(fullPath);
+    console.log('response get', response);
     return response.data;
   }
 }
 
-const httpClient = new HttpClient(process.env.NEXT_PUBLIC_API_URL || "");
+const httpClient = new HttpClient(
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+);
+console.log('httpClient', httpClient);
 export default httpClient;
