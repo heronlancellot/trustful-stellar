@@ -813,7 +813,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   </button>
                 </div>
                 <div className="w-full flex flex-col">
-                  {communitiesDetail?.managers?.map(item => (
+                  {communitiesDetail?.managers?.map((item: string) => (
                     <div
                       key={item}
                       className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3"
