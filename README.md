@@ -37,7 +37,7 @@ In decentralized communities, proving your contributions and expertise is challe
 
 <table>
 <tr>
-<td width="50%">
+<td width="25%">
 
 ### 🔗 **Wallet Integration**
 
@@ -48,7 +48,7 @@ In decentralized communities, proving your contributions and expertise is challe
 - On-chain attestation and verification
 
 </td>
-<td width="50%">
+<td width="25%">
 
 ### 🏘️ **Community-Driven**
 
