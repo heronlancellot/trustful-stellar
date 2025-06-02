@@ -1,8 +1,7 @@
 import { parseQueryParams } from '@/lib/utils/parseQueryParams';
 import axios from 'axios';
-import dotenv from 'dotenv';
+import { envVars } from '@/lib/environmentVars';
 import { IGenericHttpClient } from './types';
-dotenv.config();
 
 class HttpClient implements IGenericHttpClient {
   private readonly _baseUrl: string;
@@ -38,8 +37,5 @@ class HttpClient implements IGenericHttpClient {
   }
 }
 
-const httpClient = new HttpClient(
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-);
-console.log('httpClient', httpClient);
+const httpClient = new HttpClient(envVars.NEXT_PUBLIC_API_URL);
 export default httpClient;

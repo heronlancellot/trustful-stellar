@@ -1,5 +1,6 @@
 'use client';
 
+import { STELLAR } from '@/lib/environmentVars';
 import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
 import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
 import { useStellarContractManager } from '@/lib/stellar/transactions/hooks/useStellarContractManager';
@@ -20,30 +21,25 @@ export default function useCommunitiesController({
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: communityAddressFormatted,
-    rpcUrl:
-      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
-    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
+    rpcUrl: STELLAR.RPC_URL,
   });
 
   const stellarContractManagers = useStellarContractManager({
     contractId: communityAddressFormatted,
-    rpcUrl:
-      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
-    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
+    rpcUrl: STELLAR.RPC_URL,
+    networkType: STELLAR.NETWORK_TYPE,
   });
 
   const stellarContractBadges = useStellarContractBadge({
     contractId: communityAddressFormatted,
-    rpcUrl:
-      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
-    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
+    rpcUrl: STELLAR.RPC_URL,
+    networkType: STELLAR.NETWORK_TYPE,
   });
 
   const stellarContractRemoveBadges = useStellarContractRemoveBadge({
     contractId: communityAddressFormatted,
-    rpcUrl:
-      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
-    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
+    rpcUrl: STELLAR.RPC_URL,
+    networkType: STELLAR.NETWORK_TYPE,
   });
 
   return {

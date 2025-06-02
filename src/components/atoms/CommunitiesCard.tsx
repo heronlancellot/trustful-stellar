@@ -18,6 +18,7 @@ import { Minus } from 'lucide-react';
 import { CakeIcon } from './icons/CakeIcon';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCommunityContext } from '../community/Context';
+import { STELLAR } from '@/lib/environmentVars';
 
 interface CommunitiesCardProps
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
@@ -43,13 +44,11 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
     (currentTab === 'joined' || currentTab === 'all') &&
     userAddress &&
     community.creator_address.toLocaleLowerCase() ===
-    userAddress.toLocaleLowerCase();
+      userAddress.toLocaleLowerCase();
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
-    rpcUrl:
-      process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org',
-    networkType: (process.env.NEXT_PUBLIC_NETWORK_TYPE || 'TESTNET') as any,
+    rpcUrl: STELLAR.RPC_URL,
   });
 
   const handleJoin = async () => {
@@ -59,7 +58,9 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
     }
     try {
       const result = await stellarContractJoinCommunities.addUser();
+      console.log('result', result);
       if (result.success) {
+        console.log('result when success', result);
         toast.success('Successfully joined community');
         console.log('Transaction successful:', result.txHash);
 
@@ -76,6 +77,7 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
         });
 
         await getCommunities();
+        console.log('communities', await getCommunities());
 
         setTimeout(() => {
           queryClient.resetQueries();
@@ -85,12 +87,14 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
           'communities',
           userAddress,
         ]) as Communities[] | undefined;
+        console.log('currentData', currentData);
         if (currentData) {
           const updatedData = currentData.map(c =>
             c.community_address === community.community_address
               ? { ...c, is_joined: true }
               : c
           );
+          console.log('updatedData', updatedData);
           queryClient.setQueryData(['communities', userAddress], updatedData);
         }
       } else {
@@ -200,49 +204,51 @@ export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
             </button>
           </div>
 
-          {currentTab !== 'created' && currentTab !== 'hidden' && !hideExitButton && (
-            <div>
-              <button
-                className={cc([
-                  'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
-                  { 'opacity-50 cursor-not-allowed': !userAddress },
-                ])}
-                disabled={!userAddress}
-              >
-                {!('is_joined' in community) ? (
-                  <div className="flex justify-center items-center">
-                    <Minus className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleExit}
-                    >
-                      Exit
-                    </span>
-                  </div>
-                ) : community.is_joined ? (
-                  <div className="flex justify-center items-center">
-                    <Minus className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleExit}
-                    >
-                      Exit
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex justify-center items-center">
-                    <PlusIcon className="transition-all duration-500 ease-in-out" />
-                    <span
-                      className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
-                      onClick={handleJoin}
-                    >
-                      Join
-                    </span>
-                  </div>
-                )}
-              </button>
-            </div>
-          )}
+          {currentTab !== 'created' &&
+            currentTab !== 'hidden' &&
+            !hideExitButton && (
+              <div>
+                <button
+                  className={cc([
+                    'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
+                    { 'opacity-50 cursor-not-allowed': !userAddress },
+                  ])}
+                  disabled={!userAddress}
+                >
+                  {!('is_joined' in community) ? (
+                    <div className="flex justify-center items-center">
+                      <Minus className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleExit}
+                      >
+                        Exit
+                      </span>
+                    </div>
+                  ) : community.is_joined ? (
+                    <div className="flex justify-center items-center">
+                      <Minus className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleExit}
+                      >
+                        Exit
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-center items-center">
+                      <PlusIcon className="transition-all duration-500 ease-in-out" />
+                      <span
+                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        onClick={handleJoin}
+                      >
+                        Join
+                      </span>
+                    </div>
+                  )}
+                </button>
+              </div>
+            )}
         </div>
       </div>
       <div className="flex flex-col p-3 gap-1 justify-center">
