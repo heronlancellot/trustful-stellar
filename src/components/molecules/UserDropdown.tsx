@@ -1,16 +1,19 @@
+'use client'
+
 import { useState, useRef, useEffect } from 'react';
 import { DisconnectIcon, UserIcon } from '@/components/atoms';
 import { useAuthContext } from '@/components/auth/Context';
 import tailwindConfig from 'tailwind.config';
 import cc from 'classcat';
 import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { setUserAddress, userAddress } = useAuthContext();
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownRef.current &&
@@ -20,8 +23,17 @@ export const UserDropdown = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    if (!userAddress) return;
+    const searchParams = new URLSearchParams();
+    searchParams.set('searchAddress', userAddress);
+    router.push(`/verify-reputation?${searchParams.toString()}`);
+    setIsOpen(false);
+  };
+
   const disconnect = () => {
     setUserAddress('');
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -34,9 +46,10 @@ export const UserDropdown = () => {
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
+        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-controls="user-menu"
       >
         <div
           className={cc([
@@ -62,19 +75,16 @@ export const UserDropdown = () => {
       </button>
 
       {isOpen && (
-        <div className="z-50 origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-[15vw] rounded-md shadow-lg bg-brandBlack">
-          <div
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="options-menu"
-          >
+        <div 
+          id="user-menu"
+          className="z-50 origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-[15vw] rounded-md shadow-lg bg-brandBlack"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="user-menu-button"
+        >
+          <div>
             <button
-              onClick={() => {
-                router.push({
-                  pathname: '/verify-reputation',
-                  query: { searchAddress: userAddress },
-                });
-              }}
+              onClick={handleProfileClick}
               className="flex justify-between rounded-md items-center gap-2 cursor-pointer p-3 text-base hover:bg-whiteOpacity05 w-full text-left transition-colors duration-300"
               role="menuitem"
             >

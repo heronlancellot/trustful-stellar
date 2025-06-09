@@ -1,8 +1,8 @@
-import httpClient from "./HttpClient";
+import httpClient from './HttpClient';
 
 export class AssetClient {
-  static assetPath = "asset";
-  static defaultCommunity = "stellar";
+  static assetPath = 'asset';
+  static defaultCommunity = 'stellar';
 
   async postAsset(
     receivingPublicKey: string,

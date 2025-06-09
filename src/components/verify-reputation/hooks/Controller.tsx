@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuthContext } from '@/components/auth/Context';
+import { getApiUrl } from '@/lib/environmentVars';
 import { useState } from 'react';
 
 export type Badge = {
@@ -29,7 +30,9 @@ export default function useVerifyReputationController() {
     try {
       setBadgeDetails(null);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/badges?user_address=${userAddress}`
+        getApiUrl(
+          `/communities/${communityAddress}/badges?user_address=${userAddress}`
+        )
       );
       const data: BadgeDTO = await response.json();
 
