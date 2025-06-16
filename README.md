@@ -1,97 +1,242 @@
-# Trustful Stellar
+<div align="center">
+  <img src="public/trustful-logo.svg" alt="Trustful Stellar Logo" width="200" height="200">
 
-## Introduction
+# 🌟 Trustful Stellar
 
-**Trustful Stellar** is a web application (dApp) focused on on-chain reputation built for the **Stellar** ecosystem. Its purpose is to turn user achievements (such as **Stellar Quest badges** and other ecosystem assets) into verifiable and transparent blockchain-based reputations. In short, the project assigns scores to user achievements and creates a verifiable on-chain profile that can be used in governance processes, resource allocation, and role assignments within communities. This makes reputation a data-driven tool to aid in decision-making within these communities.
+**Transform Your Stellar Achievements Into Verifiable On-Chain Reputation**
 
-In practice, Trustful Stellar allows users to prove their achievements on the Stellar network in a trustworthy way. For instance, someone who completed Stellar Quest challenges can connect their wallet, receive a score based on earned badges, and record that reputation on-chain. Other members or organizations can then verify that credential during votes, grant processes, or project applications.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2.4-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.1-38B2AC)](https://tailwindcss.com/)
+[![Stellar](https://img.shields.io/badge/Stellar-Network-7B2CBF)](https://stellar.org/)
 
-## Main Features
+[🚀 Live Demo](#) • [📖 Documentation](#) • [🐛 Report Bug](https://github.com/blockful-io/trustful-stellar/issues) • [✨ Request Feature](https://github.com/blockful-io/trustful-stellar/issues)
 
-- **Wallet Connection:** Connect a **Stellar wallet** (Albedo) to retrieve the user's achievements on the Stellar network, and connect an **Ethereum wallet** (via WalletConnect) to link an EVM address to the user's profile.
-- **Reputation Verification:** Once wallets are connected, the user can verify and generate their reputation. The system collects badges from Stellar Quest and other user indicators, calculates a reputation score, and prepares a verifiable on-chain record.
-- **On-Chain Reputation:** Trustful Stellar registers user reputation on a public blockchain using smart contracts or attestation services, making the credential publicly accessible and auditable.
-- **Integrated Communities:** The platform supports multiple **communities** or reputation contexts. Users can view a list of available communities and how their reputation applies in each. Different communities may score various types of badges or achievements.
-- **User-Friendly Interface:** Features a responsive and intuitive web UI. Users can navigate sections such as **"Communities"** and **"Verify Reputation"**. Feedback via toast notifications and tooltips help guide users.
-- **UI Documentation via Storybook:** The project includes component documentation using **Storybook**, which helps contributors understand and test the UI without running the full application.
+</div>
 
-## Tech Stack
+---
 
-- **Next.js (React & TypeScript):** The frontend is built with Next.js and fully typed with TypeScript.
-- **Tailwind CSS:** Used for styling with utility-first classes and custom configurations via `tailwind.config.ts`.
-- **Stellar SDK & Wallet Integration:** Integrates with Stellar using `@stellar/stellar-sdk`, **Albedo** (`@albedo-link/intent`), and `@creit.tech/stellar-wallets-kit`.
-- **WalletConnect & Alchemy (EVM):** Integrates with WalletConnect v2 for Ethereum wallet support, using **Alchemy** APIs to read/write on EVM blockchains.
-- **Axios:** For HTTP requests to backend APIs or external services.
-- **Support Libraries:** `react-hook-form`, `zod`, `react-hot-toast`, `react-tooltip`, `react-spinners`, `lucide-react`, `boring-avatars`, etc.
-- **Storybook:** For developing and previewing UI components in isolation.
+## 🎯 What is Trustful Stellar?
 
-> The project depends on a separate backend (Trustful Stellar Backend) built with NestJS and PostgreSQL (via Prisma). Ensure the frontend points to this backend via `NEXT_PUBLIC_API_URL`.
+**Trustful Stellar** is a cutting-edge decentralized application (dApp) that revolutionizes on-chain reputation for the **Stellar ecosystem**. We transform your blockchain achievements—like **Stellar Quest badges** and ecosystem contributions—into verifiable, transparent, and actionable reputation scores.
 
-## Getting Started
+### 💡 The Problem We Solve
 
-### Prerequisites
+In decentralized communities, proving your contributions and expertise is challenging. Traditional reputation systems are centralized and opaque. Trustful Stellar bridges this gap by creating a **trustless, verifiable reputation system** that communities can use for:
 
-- Node.js (v18+)
-- npm or yarn
-- (Optional) The backend service running locally
+- 🗳️ **Governance voting** with weighted reputation
+- 💰 **Grant allocation** based on proven track record
+- 👥 **Role assignments** with verified credentials
+- 🤝 **Community participation** with transparent standing
 
-### Installation
+---
+
+## ✨ Key Features
+
+<table>
+<tr>
+<td width="25%">
+
+### 🔗 **Wallet Integration**
+
+- **Stellar Wallet** (Albedo) for achievement retrieval
+
+### 🛡️ **Verifiable Reputation**
+
+- On-chain attestation and verification
+
+</td>
+<td width="25%">
+
+### 🏘️ **Community-Driven**
+
+- Multiple community contexts supported
+
+### 🎨 **Modern UI/UX**
+
+- Intuitive navigation and feedback
+
+</td>
+</tr>
+</table>
+
+---
+
+### 🛠️ **Core Technologies**
+
+| Category             | Technologies                                   |
+| -------------------- | ---------------------------------------------- |
+| **Frontend**         | Next.js 14, React 18, TypeScript, Tailwind CSS |
+| **State Management** | Zustand, React Query, React Hook Form          |
+| **Blockchain**       | Stellar SDK, Albedo                            |
+| **UI/UX**            | Lucide React, React Hot Toast, React Tooltip   |
+| **Development**      | Storybook, ESLint, Prettier, PostCSS           |
+
+---
+
+## 🚀 Quick Start
+
+### 📋 Prerequisites
+
+- **Node.js** 18.x or higher
+- **npm** or **yarn**
+- **Git**
+
+### ⚡ Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/blockful-io/trustful-stellar.git
+
+# Navigate to project directory
 cd trustful-stellar
-cp .env.example .env.local
+
+# Install dependencies
+npm install
+
+# Copy environment file
+cp .env.example .env
 ```
 
-### Configure Environment Variables
+### 🔧 Environment Setup
 
-Edit `.env.local` and provide values for:
+Create your `.env` file with the following variables:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_walletconnect_project_id
-NEXT_PUBLIC_ALCHEMY_TESTNET_KEY=your_testnet_key
-NEXT_PUBLIC_ALCHEMY_KEY=your_mainnet_key
-NEXT_PUBLIC_USE_TESTNET=true
+
+NEXT_PUBLIC_ENV=
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_RPC_URL=
+NEXT_PUBLIC_NETWORK=
+NEXT_PUBLIC_FACTORY_CONTRACT_ID=
+
 ```
 
-You must set up WalletConnect and Alchemy accounts to obtain the appropriate keys.
-
-### Install Dependencies
+### 🎬 Running the Application
 
 ```bash
-npm install
-```
-
-### Run the App
-
-```bash
+# Start development server
 npm run dev
+
+# Open your browser
+# Navigate to http://localhost:3000
 ```
 
-Visit `http://localhost:3000` to view the app.
-
-### Run Storybook (optional)
+### 📚 Component Development
 
 ```bash
+# Start Storybook for UI development
 npm run storybook
+
+# Open component library
+# Navigate to http://localhost:6006
 ```
 
-Visit `http://localhost:6006` to view UI components.
+---
 
-## Environment Variables Reference
+## 📖 Usage Guide
 
-- **NEXT_PUBLIC_API_URL** – Base URL for the Trustful Stellar backend
-- **NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID** – WalletConnect v2 project ID
-- **NEXT_PUBLIC_ALCHEMY_TESTNET_KEY** – Alchemy key for testnet
-- **NEXT_PUBLIC_ALCHEMY_KEY** – Alchemy key for mainnet
-- **NEXT_PUBLIC_USE_TESTNET** – Set to `true` or `false` to toggle between testnet/mainnet
+### 1️⃣ **Connect Your Wallets**
 
-## Useful Development Commands
+- Link your Stellar wallet (Albedo) to access your achievements
 
-- `npm run dev` – Run Next.js dev server (http://localhost:3000)
-- `npm run build` – Build production assets
-- `npm run start` – Start production server (after build)
-- `npm run lint` – Run ESLint
-- `npm run storybook` – Run Storybook for UI components
-- `npm run build-storybook` – Build static Storybook
+### 2️⃣ **Verify Your Reputation**
+
+- Trustful Stellar registers user reputation
+
+### 3️⃣ **Join Communities**
+
+- Browse available reputation contexts
+- See how your score applies in different communities
+
+---
+
+## 🗂️ Project Structure
+
+```
+trustful-stellar/
+├── 📁 src/                    # Source code
+│   ├── 📁 components/         # Reusable UI components
+│   ├── 📁 hooks/             # Custom React hooks
+│   ├── 📁 lib/               # Utility libraries
+│   └── 📁 types/             # TypeScript definitions
+├── 📁 app/                   # Next.js App Router
+├── 📁 public/               # Static assets
+├── 📁 .storybook/           # Storybook configuration
+├── 📄 tailwind.config.ts    # Tailwind configuration
+└── 📄 next.config.mjs       # Next.js configuration
+```
+
+---
+
+## 🔄 Available Scripts
+
+| Command                   | Description                       |
+| ------------------------- | --------------------------------- |
+| `npm run dev`             | 🏃‍♂️ Start development server       |
+| `npm run build`           | 🏗️ Build production application   |
+| `npm run start`           | 🚀 Start production server        |
+| `npm run lint`            | 🧹 Run ESLint for code quality    |
+| `npm run storybook`       | 📚 Start Storybook development    |
+| `npm run build-storybook` | 📦 Build Storybook for deployment |
+
+---
+
+## 🤝 Contributing
+
+We love contributions! Here's how you can help make Trustful Stellar even better:
+
+### 🔥 Quick Contribution Steps
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### 📋 Development Guidelines
+
+- ✅ Use TypeScript for type safety
+- ✅ Follow existing code patterns and structure
+- ✅ Add comments and documentation
+- ✅ Write tests when applicable
+- ✅ Use semantic HTML and ARIA attributes
+- ✅ Leverage Tailwind CSS classes from `globals.css`
+
+### 🐛 Bug Reports & Feature Requests
+
+Found a bug or have an idea? [Open an issue](https://github.com/blockful-io/trustful-stellar/issues) and let's discuss it!
+
+---
+
+## 🏢 About Blockful
+
+<div align="center">
+  
+**Built with ❤️ by [Blockful](https://blockful.io)**
+
+We're passionate about building the future of decentralized technologies and creating tools that empower communities.
+
+[🌐 Website](https://blockful.io) • [🐦 X](https://x.com/blockful_io) • [💼 LinkedIn](https://linkedin.com/company/blockful)
+
+</div>
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+### 🌟 Star this repository if you found it helpful!
+
+**Made with 💜 for the Stellar Ecosystem**
+
+[⬆️ Back to Top](#-trustful-stellar)
+
+</div>

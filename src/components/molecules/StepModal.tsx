@@ -30,6 +30,7 @@ import { KeyIcon } from '../atoms/icons/KeyIcon';
 import { TrashIcon } from '../atoms/icons/TrashIcon';
 import { TrophyIcon } from '../atoms/icons/TrophyIcon';
 import useBadgeInfoController, { Badge } from '../badge-info/hooks/Controller';
+import { ALBEDO, STELLAR } from '@/lib/environmentVars';
 
 interface ModalProps {
   isOpen: boolean;
@@ -55,11 +56,11 @@ const BADGE_OPTIONS: BadgeOption[] = [
 const BadgeInfoMessage = () => {
   return (
     <div className="flex items-start flex-row gap-2 p-4 bg-darkRedOpacity text-white rounded-lg shadow-lg max-w-md">
-      <AlertIcon width={24}
-        height={24} />
+      <AlertIcon width={24} height={24} />
       <div>
         <p className="text-sm font-light">
-          Please make sure all your information is correct before proceeding, as it cannot be changed later.
+          Please make sure all your information is correct before proceeding, as
+          it cannot be changed later.
         </p>
       </div>
     </div>
@@ -249,17 +250,27 @@ export const StepModal: React.FC<ModalProps> = ({
       const fetchAndSetBadges = async () => {
         setLoadingBadgeListType(true);
         try {
-          const badgeTypesToFetch = selectedBadge.filter(type => type !== 'custom');
+          const badgeTypesToFetch = selectedBadge.filter(
+            type => type !== 'custom'
+          );
           const details = await getBadgesByTypes(badgeTypesToFetch);
           if (details) {
             setBadges(details);
           }
-          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && (!details || details.length === 0)) {
+          if (
+            selectedBadge.includes('custom') &&
+            selectedBadge.length === 1 &&
+            (!details || details.length === 0)
+          ) {
             addEmptyBadge();
           }
         } catch (error) {
           console.error('Error fetching badge details:', error);
-          if (selectedBadge.includes('custom') && selectedBadge.length === 1 && badges.length === 0) {
+          if (
+            selectedBadge.includes('custom') &&
+            selectedBadge.length === 1 &&
+            badges.length === 0
+          ) {
             addEmptyBadge();
           }
         } finally {
@@ -272,7 +283,14 @@ export const StepModal: React.FC<ModalProps> = ({
         setLoadingBadgeListType(false);
       }
     }
-  }, [badges?.length, currentStep, getBadgesByTypes, selectedBadge, setBadges, badges]);
+  }, [
+    badges?.length,
+    currentStep,
+    getBadgesByTypes,
+    selectedBadge,
+    setBadges,
+    badges,
+  ]);
 
   // Helper function to add an empty badge
   const addEmptyBadge = () => {
@@ -359,44 +377,39 @@ export const StepModal: React.FC<ModalProps> = ({
         return;
       }
 
-      const sortedBadges = filteredBadges.sort((a, b) => a.name.localeCompare(b.name));
+      const sortedBadges = filteredBadges.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
 
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
       }); //Todo-user logged
 
-      const FACTORY_CONTRACT_ID =
-        process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ID ||
-        'CDWMRLNMJELIYNXWKGYCHP6NLT75W42OSK23CN4ZM4S2Z6EC2YPJGIDZ';
-      const RPC_URL =
-        process.env.NEXT_PUBLIC_RPCURL || 'https://soroban-testnet.stellar.org';
-
-      const server = new rpc.Server(RPC_URL, { allowHttp: true });
+      const server = new rpc.Server(STELLAR.RPC_URL, { allowHttp: true });
+      console.log('Server Creating Community', server);
 
       const account = await server.getAccount(pubkey);
-
+      console.log('Account Creating Community', account);
       const saltBuffer = Buffer.alloc(32);
       for (let i = 0; i < 32; i++) {
         saltBuffer[i] = Math.floor(Math.random() * 256);
       }
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
-
-      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(
-        badgeType => {
-          const badgeIdVector = xdr.ScVal.scvVec([
-            xdr.ScVal.scvString(badgeType.name),
-            new Address(badgeType.issuer.toUpperCase()).toScVal(),
-          ]);
-          return new xdr.ScMapEntry({
-            key: badgeIdVector,
-            val: xdr.ScVal.scvU32(badgeType.score),
-          });
-        }
-      );
-
+      console.log('Admin Address Creating Community', adminAddressScVal);
+      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(badgeType => {
+        const badgeIdVector = xdr.ScVal.scvVec([
+          xdr.ScVal.scvString(badgeType.name),
+          new Address(badgeType.issuer.toUpperCase()).toScVal(),
+        ]);
+        return new xdr.ScMapEntry({
+          key: badgeIdVector,
+          val: xdr.ScVal.scvU32(badgeType.score),
+        });
+      });
+      console.log('Badge Map Entries Creating Community', badgeMapEntries);
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
-
+      console.log('Badge Map Sc Val Creating Community', badgeMapScVal);
       const initArgsScVal = xdr.ScVal.scvVec([
         adminAddressScVal,
         badgeMapScVal,
@@ -404,15 +417,16 @@ export const StepModal: React.FC<ModalProps> = ({
         xdr.ScVal.scvString(data.description),
         xdr.ScVal.scvString(data.avatar),
       ]);
+      console.log('Init Args Sc Val Creating Community', initArgsScVal);
 
       const transaction = new TransactionBuilder(account, {
         fee: BASE_FEE,
-        networkPassphrase: Networks.TESTNET,
+        networkPassphrase: STELLAR.NETWORK_PASSPHRASE,
       })
         .addOperation(
           Operation.invokeContractFunction({
             function: 'create_scorer',
-            contract: FACTORY_CONTRACT_ID,
+            contract: STELLAR.FACTORY_CONTRACT_ID,
             args: [
               new Address(pubkey).toScVal(),
               saltScVal,
@@ -424,15 +438,21 @@ export const StepModal: React.FC<ModalProps> = ({
         .setTimeout(30)
         .build();
 
-      const preparedTransaction = await server.prepareTransaction(transaction);
-      const transactionXDR = preparedTransaction.toXDR();
+      console.log('Transaction Creating Community', transaction);
 
+      const preparedTransaction = await server.prepareTransaction(transaction);
+      console.log(
+        'Prepared Transaction Creating Community',
+        preparedTransaction
+      );
+      const transactionXDR = preparedTransaction.toXDR();
+      console.log('Transaction XDR Creating Community', transactionXDR);
       const result = await albedo.tx({
         xdr: transactionXDR,
-        network: 'testnet',
+        network: ALBEDO.NETWORK_TYPE,
         submit: true,
       });
-
+      console.log('Result Creating Community', result);
       if (!result.tx_hash) {
         console.error('No tx_hash returned from Albedo.');
         setIsSubmitting(false);
@@ -468,6 +488,7 @@ export const StepModal: React.FC<ModalProps> = ({
         toast.error('Transaction failed');
       }
     } catch (error: any) {
+      console.error('Error Creating Community', error);
       setIsSubmitting(false);
       toast.error('Invalid badge name. Please use a valid one.');
     }
@@ -535,8 +556,9 @@ export const StepModal: React.FC<ModalProps> = ({
                       key={id}
                       type="button"
                       onClick={e => handleAvatarSelect(e, id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
-                        }`}
+                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
+                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                      }`}
                     >
                       {icon}
                     </button>
@@ -562,10 +584,11 @@ export const StepModal: React.FC<ModalProps> = ({
                           className="hidden"
                         />
                         <span
-                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${selectedBadge.includes(id)
-                            ? 'border-brandGreen bg-darkGreenOpacity01'
-                            : 'border-whiteOpacity008'
-                            }`}
+                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${
+                            selectedBadge.includes(id)
+                              ? 'border-brandGreen bg-darkGreenOpacity01'
+                              : 'border-whiteOpacity008'
+                          }`}
                         >
                           {selectedBadge.includes(id) && (
                             <span className="w-2.5 h-2.5 bg-brandGreen"></span>
@@ -818,7 +841,11 @@ export const StepModal: React.FC<ModalProps> = ({
     e.preventDefault();
 
     // Ensure at least one empty badge exists when only 'custom' is selected
-    if (currentStep === 1 && selectedBadge.includes('custom') && selectedBadge.length === 1) {
+    if (
+      currentStep === 1 &&
+      selectedBadge.includes('custom') &&
+      selectedBadge.length === 1
+    ) {
       if (badges.length === 0) {
         const newBadge = addEmptyBadge();
         setBadges([newBadge]);

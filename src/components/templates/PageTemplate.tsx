@@ -8,6 +8,7 @@ import { IconPosition } from '@/types/iconPosition';
 import { PlusIcon } from '../atoms';
 import { StepModal } from '../molecules/StepModal';
 import { useAuthContext } from '../auth/Context';
+import { DappHeader } from '../organisms';
 
 interface PageTemplateProps extends React.ComponentPropsWithoutRef<'div'> {
   className: string;
@@ -51,14 +52,12 @@ export const PageTemplate = ({
 
   return (
     <div
-      className={cc([
-        className,
-        'flex flex-col w-full h-[calc(100vh-74px)] bg-brandBlack',
-      ])}
+      className={cc([className, 'flex flex-col w-full h-full  bg-brandBlack'])}
     >
-      <PerfectScrollbar className="h-full flex flex-col">
+      <DappHeader />
+      <PerfectScrollbar className="h-full flex flex-col w-full">
         <div className="text-left text-[26px] pl-12 pt-8 pb-3 flex justify-between items-center">
-          <h1 className="font-space-grotesk">{title}</h1>{' '}
+          <h1 className="font-spaceGrotesk">{title}</h1>{' '}
           {isCommunity && (
             <div className="py-6 px-12">
               <PrimaryButton

@@ -1,17 +1,12 @@
-import * as StellarSdk from "@stellar/stellar-sdk";
-import { isTestnet } from "@/lib/wallet/chains";
-
+import * as StellarSdk from '@stellar/stellar-sdk';
+import { STELLAR } from '@/lib/environmentVars';
 
 export const checkIfWalletIsInitialized = async (address: string) => {
-  const testnet = process.env.NEXT_PUBLIC_TESTNET_NETWORK ?? ""
-  const publicNetwork = process.env.NEXT_PUBLIC_NETWORK ?? ""
-
   try {
-    const horizonServer = new StellarSdk.Horizon.Server(
-      isTestnet ? testnet : publicNetwork
-    );
+    const horizonServer = new StellarSdk.Horizon.Server(STELLAR.NETWORK);
     await horizonServer.loadAccount(address);
   } catch (error) {
+    console.log('error', error);
     throw error;
   }
 };

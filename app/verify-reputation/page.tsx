@@ -1,10 +1,12 @@
+'use client';
+
 import { IssuerTableCell } from '@/components/atoms/verify-reputation/IssuerTableCell';
 import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
 import { SearchBar } from '@/components/search/SearchBar';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { ProfileBox } from '@/components/organisms/ProfileBox';
 import { PageTemplate } from '@/components/templates/PageTemplate';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   SearchContextProvider,
   useSearchContext,
@@ -12,11 +14,11 @@ import {
 import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
 import tailwindConfig from 'tailwind.config';
 import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCommunityContext } from '@/components/community/Context';
 import { CardWrapper } from '@/components/templates/CardWrapper';
 import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
-import CustomModal from '../communities/components/molecules/custom-modal';
+import { CustomModal } from '@/components/molecules';
 import { TagIcon } from '@/components';
 import useVerifyReputationController, {
   Badge,
@@ -39,14 +41,38 @@ interface VerifyReputationProps {
   users_points?: number;
 }
 
-function VerifyReputationPage() {
+// Loading component for Suspense fallback
+function VerifyReputationPageLoading() {
+  return (
+    <PageTemplate
+      className="h-full"
+      title="Verify Reputation"
+      tooltip={{
+        tooltipId: 'verify-reputation-tip',
+        tooltipText:
+          'Enter a Stellar public address to check the reputation and score associated with it.',
+      }}
+    >
+      <div className="animate-pulse">
+        <div className="h-32 bg-whiteOpacity005 rounded-lg mb-6"></div>
+        <div className="h-64 bg-whiteOpacity005 rounded-lg"></div>
+      </div>
+    </PageTemplate>
+  );
+}
+
+// Main content component that uses useSearchParams
+function VerifyReputationContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [inputText, setInputText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reputationDetail, setReputationDetail] = useState<
     VerifyReputationProps | undefined
   >();
-  const { badgeDetails, getBagdeDetails, setBadgeDetails } = useVerifyReputationController();
+  const { badgeDetails, getBagdeDetails, setBadgeDetails } =
+    useVerifyReputationController();
   const { userAddress } = useAuthContext();
 
   const {
@@ -66,14 +92,15 @@ function VerifyReputationPage() {
   };
 
   useEffect(() => {
-    const userAddressFromQuery = router.query.searchAddress as string;
-    const addressToUse = userAddressFromQuery || userAddress || searchedUserAddress;
+    const userAddressFromQuery = searchParams.get('searchAddress');
+    const addressToUse =
+      userAddressFromQuery || userAddress || searchedUserAddress;
 
     if (addressToUse) {
       setInputText(addressToUse);
       getVerifyReputationList(addressToUse);
     }
-  }, [router.query, userAddress, searchedUserAddress]);
+  }, [searchParams, userAddress, searchedUserAddress]);
 
   const reputation = [
     {
@@ -102,7 +129,7 @@ function VerifyReputationPage() {
 
   return (
     <PageTemplate
-      className="h-full"
+      className="h-full w-full"
       title="Verify Reputation"
       tooltip={{
         tooltipId: 'verify-reputation-tip',
@@ -110,7 +137,7 @@ function VerifyReputationPage() {
           'Enter a Stellar public address to check the reputation and score associated with it.',
       }}
     >
-      <div className="">
+      <div className="w-full h-full">
         <ProfileBox
           userAddress={searchedUserAddress}
           userBadgesQuantity={searchedUserBadges?.length}
@@ -199,7 +226,8 @@ function VerifyReputationPage() {
                 <span className="text-sm w-24 text-center">Status</span>
               </div>
 
-              {badgeDetails && Array.isArray(badgeDetails.community_badges) &&
+              {badgeDetails &&
+                Array.isArray(badgeDetails.community_badges) &&
                 badgeDetails.community_badges.map((item: Badge) => (
                   <div
                     key={`${item.community_address}-${item.name}`}
@@ -237,12 +265,17 @@ function VerifyReputationPage() {
   );
 }
 
-export default function VerifyReputationPageWithContext(
-  props: React.ComponentPropsWithRef<'div'>
-) {
+interface PageProps {
+  params?: any;
+  searchParams?: any;
+}
+
+export default function VerifyReputationPageWithContext(props: PageProps) {
   return (
     <SearchContextProvider>
-      <VerifyReputationPage {...props}></VerifyReputationPage>
+      <Suspense fallback={<VerifyReputationPageLoading />}>
+        <VerifyReputationContent />
+      </Suspense>
     </SearchContextProvider>
   );
 }

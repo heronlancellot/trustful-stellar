@@ -1,3 +1,5 @@
+'use client';
+
 import { ContentTabs, GenericModal, StarIcon } from '@/components';
 import { useAuthContext } from '@/components/auth/Context';
 import { useCommunityContext } from '@/components/community/Context';
@@ -6,7 +8,7 @@ import { PageTemplate } from '@/components/templates/PageTemplate';
 import { useUsersContext } from '@/components/user/Context';
 import communityClient from '@/lib/http-clients/CommunityClient';
 import usersClient from '@/lib/http-clients/UsersClient';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef, Suspense } from 'react';
 import _ from 'lodash';
 import { CommunityQuests } from '@/components/community/types';
 import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
@@ -19,17 +21,37 @@ import assetClient from '@/lib/http-clients/AssetClient';
 import toast from 'react-hot-toast';
 import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
 import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
-import { useRouter } from 'next/router';
-import useCommunitiesController from '../../components/community/hooks/controller';
-import { useCommunities, useCommunitiesByStatus } from '@/lib/hooks/api/useCommunities';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import useCommunitiesController from '@/components/community/hooks/controller';
+import {
+  useCommunities,
+  useCommunitiesByStatus,
+} from '@/lib/hooks/api/useCommunities';
 
-export default function CommunitiesPage() {
+// Loading component for Suspense fallback
+function CommunitiesPageLoading() {
+  return (
+    <PageTemplate className="pb-4" title="Communities" isCommunity>
+      <div className="animate-pulse">
+        <div className="h-12 bg-whiteOpacity005 rounded-lg mb-6"></div>
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(index => (
+            <div
+              key={index}
+              className="bg-whiteOpacity005 rounded-lg h-48"
+            ></div>
+          ))}
+        </div>
+      </div>
+    </PageTemplate>
+  );
+}
+
+// Main content component that uses useSearchParams
+function CommunitiesContent() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const {
-    setCommunityQuests,
-    communityQuests,
-    setCommunities,
-  } = useCommunityContext();
+  const { setCommunityQuests, communityQuests, setCommunities } =
+    useCommunityContext();
   const {
     userBadgesImported,
     setUserBadgesImported,
@@ -40,7 +62,9 @@ export default function CommunitiesPage() {
   const { inputText, setInputText } = useCommunitiesController();
 
   const router = useRouter();
-  const { status } = router.query;
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const status = searchParams.get('status');
 
   const [isLoading, setIsLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
@@ -53,17 +77,40 @@ export default function CommunitiesPage() {
     joined: 'joined',
     created: 'created',
     hidden: 'hidden',
-  };
+  } as const;
 
   const currentStatus = (status as string) || statusList.all;
 
-  const { data: allCommunities, isLoading: isLoadingAllCommunities } = useCommunities(userAddress);
-  const { data: statusCommunities, isLoading: isLoadingStatusCommunities } = useCommunitiesByStatus(
-    currentStatus !== statusList.all ? currentStatus : '',
-    userAddress
+  const { data: allCommunities, isLoading: isLoadingAllCommunities } =
+    useCommunities(userAddress);
+  const { data: statusCommunities, isLoading: isLoadingStatusCommunities } =
+    useCommunitiesByStatus(
+      currentStatus !== statusList.all ? currentStatus : '',
+      userAddress
+    );
+
+  const communities =
+    currentStatus !== statusList.all && userAddress
+      ? statusCommunities
+      : allCommunities;
+
+  const handleTabChange = useCallback(
+    (tabName: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('status', tabName);
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams]
   );
 
-  const communities = currentStatus !== statusList.all && userAddress ? statusCommunities : allCommunities;
+  const handleCommunityClick = useCallback(
+    (communityAddress: string, targetStatus: string) => {
+      const params = new URLSearchParams();
+      params.set('status', targetStatus);
+      router.push(`/communities/${communityAddress}?${params.toString()}`);
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (communities) {
@@ -190,10 +237,7 @@ export default function CommunitiesPage() {
         key={community.community_address}
         community={community}
         onClick={() =>
-          router.push({
-            pathname: `communities/${community.community_address}`,
-            query: { status: targetStatus },
-          })
+          handleCommunityClick(community.community_address, targetStatus)
         }
         currentTab={targetStatus as 'all' | 'joined' | 'created' | 'hidden'}
       />
@@ -215,12 +259,7 @@ export default function CommunitiesPage() {
         inputText={inputText}
         setInputText={setInputText}
         inputSearch
-        onButtonClick={tabName => {
-          router.push({
-            pathname: router.pathname,
-            query: { status: tabName },
-          });
-        }}
+        onButtonClick={handleTabChange}
         tabs={{
           All: {
             content: <CardWrapper>{renderCommunityCards('all')}</CardWrapper>,
@@ -249,7 +288,7 @@ export default function CommunitiesPage() {
             disabled: !userAddress,
           },
         }}
-      ></ContentTabs>
+      />
       {userAddress ? (
         <GenericModal
           isOpen={isImportModalOpen}
@@ -301,5 +340,13 @@ export default function CommunitiesPage() {
       )}
       <ActivityIndicatorModal isOpen={isLoading && !dataFetched} />
     </PageTemplate>
+  );
+}
+
+export default function CommunitiesPage() {
+  return (
+    <Suspense fallback={<CommunitiesPageLoading />}>
+      <CommunitiesContent />
+    </Suspense>
   );
 }

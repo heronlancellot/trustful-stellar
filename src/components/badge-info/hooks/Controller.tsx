@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getApiUrl } from '@/lib/environmentVars';
 
 export type Badge = {
   issuer: string;
@@ -35,11 +36,11 @@ export default function useBadgeInfoController() {
   const getBadgesByTypes = async (selectedTypes: string[]) => {
     try {
       const promises = selectedTypes.map(type =>
-        fetch(
-          `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/badges/${type}`
-        ).then(async (response: CustomResponse) => {
-          return response.json();
-        })
+        fetch(getApiUrl(`/badges/${type}`)).then(
+          async (response: CustomResponse) => {
+            return response.json();
+          }
+        )
       );
 
       const results = await Promise.all(promises);

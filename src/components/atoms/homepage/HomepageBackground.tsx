@@ -1,13 +1,16 @@
-import cc from "classcat";
+import cc from 'classcat';
 
 interface HomepageBackgroundProps
-  extends React.ComponentPropsWithoutRef<"div"> {}
+  extends React.ComponentPropsWithoutRef<'div'> {}
 
-export const HomepageBackground: React.FC<HomepageBackgroundProps> = (
-  props
-) => {
+export const HomepageBackground: React.FC<HomepageBackgroundProps> = props => {
   return (
-    <div className={cc(["absolute top-0 left-[-15vw] w-screen h-[calc(100vh-72px)] z-[-1]", props.className])}>
+    <div
+      className={cc([
+        'absolute top-0 left-[-15vw] w-screen h-[calc(100vh-72px)] z-10',
+        props.className,
+      ])}
+    >
       <svg
         width="100%"
         height="100%"

@@ -1,3 +1,5 @@
+'use client';
+
 import { Tabs } from '@/components/organisms/types';
 import cc from 'classcat';
 import React, { Dispatch, SetStateAction, useState } from 'react';
@@ -40,7 +42,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   };
 
   return (
-    <div className={cc([className, 'w-screen h-max bg-brandBlack'])} {...props}>
+    <div className={cc([className, 'w-full h-max bg-brandBlack'])} {...props}>
       <nav className="flex nav-bar px-12 justify-between cursor-pointer items-center">
         <div className="flex">
           {Object.entries(tabs)

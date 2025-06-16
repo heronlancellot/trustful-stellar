@@ -1,30 +1,30 @@
-import { useAuthContext } from "@/components/auth/Context";
+import { useAuthContext } from '@/components/auth/Context';
 import {
   ALBEDO_ID,
   AlbedoModule,
   StellarWalletsKit,
   WalletNetwork,
   xBullModule,
-} from "@creit.tech/stellar-wallets-kit";
-import cc from "classcat";
-import { UserDropdown } from "../molecules";
-import { isTestnet } from "@/lib/wallet/chains";
-import { setLocalStorageUserAddress } from "@/lib/local-storage/auth";
-import { checkIfWalletIsInitialized } from "@/lib/stellar/isFundedStellarWallet";
-import toast from "react-hot-toast";
+} from '@creit.tech/stellar-wallets-kit';
+import cc from 'classcat';
+import { UserDropdown } from '../molecules';
+import { setLocalStorageUserAddress } from '@/lib/local-storage/auth';
+import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
+import toast from 'react-hot-toast';
+import { STELLAR } from '@/lib/environmentVars';
 
 interface ConnectWalletProps {
   customClassNames?: string;
 }
 
 export const kit: StellarWalletsKit = new StellarWalletsKit({
-  network: isTestnet ? WalletNetwork.TESTNET : WalletNetwork.PUBLIC,
+  network: STELLAR.WALLET_NETWORK,
   selectedWalletId: ALBEDO_ID,
   modules: [new AlbedoModule()],
 });
 
 export const ConnectStellarWallet = ({
-  customClassNames = "",
+  customClassNames = '',
 }: ConnectWalletProps) => {
   const { setUserAddress, userAddress } = useAuthContext();
 
@@ -38,7 +38,7 @@ export const ConnectStellarWallet = ({
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
       );
-      setUserAddress("");
+      setUserAddress('');
     }
   };
 
@@ -47,7 +47,7 @@ export const ConnectStellarWallet = ({
   ) : (
     <button
       className={cc([
-        "text-base text-brandBlack font-medium bg-brandGreen p-2 px-6 rounded-lg",
+        'text-base text-brandBlack font-medium bg-brandGreen p-2 px-6 rounded-lg',
         customClassNames,
       ])}
       onClick={handleConnect}

@@ -1,16 +1,15 @@
+'use client';
+
 import React, { createContext, useContext, useState } from 'react';
 import {
   CommunityContext,
   CommunityContextProviderProps,
   CommunityQuests,
 } from './types';
-import {
-  Communities,
-  CommunityBadges,
-  MembersList,
-} from '@/types/communities';
+import { Communities, CommunityBadges, MembersList } from '@/types/communities';
 import { useAuthContext } from '../auth/Context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getApiUrl } from '@/lib/environmentVars';
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);
 
@@ -38,7 +37,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunities = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
+        getApiUrl(`/communities?user_address=${userAddress}`)
       );
       const data = await response.json();
 
@@ -54,7 +53,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     const userAddresFormated = userAddress?.toLowerCase();
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${status}/${userAddresFormated}`
+        getApiUrl(`/communities/${status}/${userAddresFormated}`)
       );
       const data = await response.json();
 
@@ -70,13 +69,16 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
     const userAddresFormated = userAddress?.toLowerCase();
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/joined/${userAddresFormated}`
+        getApiUrl(`/communities/joined/${userAddresFormated}`)
       );
       const data = await response.json();
 
       setVerifyReputationcommunities(data);
 
-      queryClient.setQueryData(['communities', 'verify-reputation', userAddress], data);
+      queryClient.setQueryData(
+        ['communities', 'verify-reputation', userAddress],
+        data
+      );
     } catch (error) {
       console.error(error);
     }
@@ -88,14 +90,17 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   ) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAdress}?user_address=${userAddress}`
+        getApiUrl(`/communities/${communityAdress}?user_address=${userAddress}`)
       );
       const data = await response.json();
 
       setCommunitiesDetail(data);
       setCommunities([data]);
 
-      queryClient.setQueryData(['community-details', communityAdress, userAddress], data);
+      queryClient.setQueryData(
+        ['community-details', communityAdress, userAddress],
+        data
+      );
     } catch (error) {
       console.error(error);
     }
@@ -104,7 +109,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const refetchCommunitiesAll = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities?user_address=${userAddress}`
+        getApiUrl(`/communities?user_address=${userAddress}`)
       );
       const data = await response.json();
 
@@ -119,13 +124,18 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunitiesBadgesList = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/badges?user_address=${userAddress}`
+        getApiUrl(
+          `/communities/${communityAddress}/badges?user_address=${userAddress}`
+        )
       );
       const data = await response.json();
 
       setCommunitiesBadgesList(data);
 
-      queryClient.setQueryData(['community-badges', communityAddress, userAddress], data);
+      queryClient.setQueryData(
+        ['community-badges', communityAddress, userAddress],
+        data
+      );
     } catch (error) {
       console.error(error);
     }
@@ -134,7 +144,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const getCommunitiesMembersList = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/members`
+        getApiUrl(`/communities/${communityAddress}/members`)
       );
       const data = await response.json();
 
@@ -149,7 +159,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const updateHideCommunities = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/visibility`,
+        getApiUrl(`/communities/${communityAddress}/visibility`),
         {
           method: 'PATCH',
           headers: {
@@ -173,7 +183,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
   const updateShowCommunities = async (communityAddress: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL_INTERNAL}/communities/${communityAddress}/visibility`,
+        getApiUrl(`/communities/${communityAddress}/visibility`),
         {
           method: 'PATCH',
           headers: {
@@ -218,7 +228,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         verifyReputationcommunities,
         setVerifyReputationcommunities,
         updateHideCommunities,
-        updateShowCommunities
+        updateShowCommunities,
       }}
     >
       {props.children}

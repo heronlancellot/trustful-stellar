@@ -1,3 +1,5 @@
+'use client'
+
 import { CardTemplate } from "@/components";
 import { CardWrapper } from "@/components/templates/CardWrapper";
 import { PageTemplate } from "@/components/templates/PageTemplate";
