@@ -1,9 +1,9 @@
+import { ComponentPropsWithoutRef } from 'react';
 import cc from 'classcat';
 
-interface HomepageBackgroundProps
-  extends React.ComponentPropsWithoutRef<'div'> {}
+interface HomepageBackgroundProps extends ComponentPropsWithoutRef<'div'> {}
 
-export const HomepageBackground: React.FC<HomepageBackgroundProps> = props => {
+export const HomepageBackground = (props: HomepageBackgroundProps) => {
   return (
     <div
       className={cc([

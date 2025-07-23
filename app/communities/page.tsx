@@ -6,11 +6,7 @@ import { useCommunityContext } from '@/components/community/Context';
 import { CardWrapper } from '@/components/templates/CardWrapper';
 import { PageTemplate } from '@/components/templates/PageTemplate';
 import { useUsersContext } from '@/components/user/Context';
-import communityClient from '@/lib/http-clients/CommunityClient';
-import usersClient from '@/lib/http-clients/UsersClient';
-import { useCallback, useEffect, useState, useRef, Suspense } from 'react';
-import _ from 'lodash';
-import { CommunityQuests } from '@/components/community/types';
+import { useCallback, useEffect, useState, Suspense } from 'react';
 import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
 import { sendSignedTransaction } from '@/lib/stellar/signTransaction';
 import { WalletIcon } from '@/components/atoms/icons/WalletIcon';
@@ -50,15 +46,8 @@ function CommunitiesPageLoading() {
 // Main content component that uses useSearchParams
 function CommunitiesContent() {
   const { userAddress, setUserAddress } = useAuthContext();
-  const { setCommunityQuests, communityQuests, setCommunities } =
-    useCommunityContext();
-  const {
-    userBadgesImported,
-    setUserBadgesImported,
-    userBadgesToImport,
-    setUserBadgesToImport,
-  } = useUsersContext();
-
+  const { communityQuests, setCommunities } = useCommunityContext();
+  const { userBadgesImported, userBadgesToImport } = useUsersContext();
   const { inputText, setInputText } = useCommunitiesController();
 
   const router = useRouter();

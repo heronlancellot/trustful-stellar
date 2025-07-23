@@ -1,5 +1,5 @@
+import { ComponentPropsWithoutRef } from 'react';
 import cc from 'classcat';
-import React, { useEffect } from 'react';
 import { Communities } from '@/types/communities';
 import {
   InformationIcon,
@@ -9,9 +9,6 @@ import {
   UserIcon,
 } from './icons';
 import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
-import { kit } from '../auth/ConnectStellarWallet';
-import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
-import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import toast from 'react-hot-toast';
 import { useAuthContext } from '../auth/Context';
 import { Minus } from 'lucide-react';
@@ -21,19 +18,19 @@ import { useCommunityContext } from '../community/Context';
 import { STELLAR } from '@/lib/environmentVars';
 
 interface CommunitiesCardProps
-  extends Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'> {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'onClick'> {
   community: Communities;
   onClick?: () => void;
   currentTab?: 'all' | 'joined' | 'created' | 'hidden';
 }
 
-export const CommunitiesCard: React.FC<CommunitiesCardProps> = ({
+export const CommunitiesCard = ({
   community,
   className,
   onClick,
   currentTab = 'all',
   ...props
-}) => {
+}: CommunitiesCardProps) => {
   const { userAddress, setUserAddress } = useAuthContext();
   const queryClient = useQueryClient();
   const { getCommunities } = useCommunityContext();

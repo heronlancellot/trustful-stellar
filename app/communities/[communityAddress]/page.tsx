@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import {
-  CheckIcon,
   ContentTabs,
   DappHeader,
   PlusIcon,
@@ -11,7 +11,6 @@ import {
   UserIcon,
 } from '@/components';
 import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
-import { ArrowIcon } from '@/components/atoms/icons/ArrowIcon';
 import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
 import { CustomTable } from '@/components/organisms/CustomTable';
 import { IconPosition } from '@/types/iconPosition';
@@ -21,16 +20,12 @@ import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
 import { useModal } from '@/hooks/useModal';
 import { CustomModal } from '@/components/molecules';
 import LeaderboardTable from '@/components/molecules/leaderboard-table';
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CommunityTableCell } from '@/components/molecules/CommunityTableCell';
 import { useCommunityContext } from '@/components/community/Context';
 import { useAuthContext } from '@/components/auth/Context';
 import useCommunitiesController from '@/components/community/hooks/controller';
 import toast from 'react-hot-toast';
-import { addUser, mainTestnet } from '@/testCall';
-import { kit } from '@/components/auth/ConnectStellarWallet';
-import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
-import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
 import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon } from 'lucide-react';
 import cc from 'classcat';
 import {
@@ -117,8 +112,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     hasOfferedRedirect,
   ]);
 
-  console.log('communityAddress', communityAddress);
-  console.log('status', status);
   if (!communityAddress || !status) {
     return <h1>Loading...</h1>;
   }
