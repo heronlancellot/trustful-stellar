@@ -1,7 +1,6 @@
 import cc from 'classcat';
-import { ReactNode, useState } from 'react';
+import { ComponentPropsWithoutRef, ReactNode, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { PrimaryButton } from '../atoms/PrimaryButton';
 import { IconPosition } from '@/types/iconPosition';
@@ -10,7 +9,7 @@ import { StepModal } from '../molecules/StepModal';
 import { useAuthContext } from '../auth/Context';
 import { DappHeader } from '../organisms';
 
-interface PageTemplateProps extends React.ComponentPropsWithoutRef<'div'> {
+interface PageTemplateProps extends ComponentPropsWithoutRef<'div'> {
   className: string;
   title: string;
   children: ReactNode;
@@ -25,16 +24,17 @@ export const PageTemplate = ({
   tooltip,
   isCommunity,
 }: PageTemplateProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] =
+    useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const { userAddress } = useAuthContext();
 
-  const handleCreateClick = () => {
-    setIsModalOpen(true);
+  const handleCreateCommunity = () => {
+    setIsCommunityModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseCommunityModal = () => {
+    setIsCommunityModalOpen(false);
     setCurrentStep(1);
   };
 
@@ -47,7 +47,7 @@ export const PageTemplate = ({
   };
 
   const handleConfirm = () => {
-    handleCloseModal();
+    handleCloseCommunityModal();
   };
 
   return (
@@ -71,7 +71,7 @@ export const PageTemplate = ({
                 label="Create"
                 icon={<PlusIcon color="black" width={16} height={16} />}
                 iconPosition={IconPosition.LEFT}
-                onClick={handleCreateClick}
+                onClick={handleCreateCommunity}
                 disabled={!userAddress}
               />
             </div>
@@ -79,12 +79,12 @@ export const PageTemplate = ({
         </div>
         <div className="flex">{children}</div>
       </PerfectScrollbar>
-      {!!tooltip ? <Tooltip id={tooltip?.tooltipId} /> : <></>}
+      {!!tooltip && <Tooltip id={tooltip?.tooltipId} />}
 
-      {isModalOpen && (
+      {isCommunityModalOpen && (
         <StepModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
+          isOpen={isCommunityModalOpen}
+          onClose={handleCloseCommunityModal}
           currentStep={currentStep}
           onNext={handleNext}
           onBack={handleBack}
