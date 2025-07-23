@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-page-custom-font */
 import '@/styles/globals.css';
 import '@/styles/card-link.css';
 import '@/styles/content-tabs.css';
@@ -8,11 +7,9 @@ import 'tailwindcss/tailwind.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
-import { DappHeader } from '@/components/organisms';
 import { AuthProvider } from '@/components/auth/Context';
 import { UserContextProvider } from '@/components/user/Context';
 import { CommunityContextProvider } from '@/components/community/Context';
-import { Tooltip } from 'react-tooltip';
 import { ReactQueryProvider } from '@/lib/providers/ReactQueryProvider';
 import { ReactNode } from 'react';
 
