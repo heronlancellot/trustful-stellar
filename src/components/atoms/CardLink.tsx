@@ -1,24 +1,24 @@
 import cc from 'classcat';
-import { ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-interface CardLinkProps extends React.ComponentPropsWithoutRef<'div'> {
+interface CardLinkProps extends ComponentPropsWithoutRef<'div'> {
   mainIcon: ReactNode;
   actionIcon: ReactNode;
   title: string;
 }
 
-export const CardLink: React.FC<CardLinkProps> = ({
+export const CardLink = ({
   children,
   mainIcon,
   actionIcon,
   title,
   className,
   ...props
-}) => {
+}: CardLinkProps) => {
   return (
     <div
       className={cc([
-        'flex min-w-[572px] min-h-[232px] card-link cursor-pointer',
+        'flex sm:min-w-[572px] min-w-[300px] sm:min-h-[232px] card-link cursor-pointer',
         className,
       ])}
       {...props}
@@ -34,7 +34,7 @@ export const CardLink: React.FC<CardLinkProps> = ({
       <div className="flex flex-col">
         <div className="card-link-notched-corner"></div>
         <div className="card-link-action-icon-container">
-          <div className="w-6 h-6">{actionIcon}</div>
+          <div className="size-6">{actionIcon}</div>
         </div>
       </div>
     </div>

@@ -73,15 +73,15 @@ export default function HomePage(): JSX.Element {
           opacity: 0.3,
         }}
       />
-      <main className="w-screen h-screen flex z-10 px-[60px] py-[80px]">
+      <main className="w-screen h-screen flex sm:flex-row flex-col z-10 sm:px-[60px] px-4 sm:py-[80px] py-4">
         <section className="flex flex-1 flex-col justify-between ">
           <div className="max-w-md">
-            <h1 className="font-space-grotesk text-7xl leading-tight text-brandWhite">
+            <h1 className="font-space-grotesk sm:text-7xl text-6xl leading-tight text-brandWhite">
               Online reputation made easy
             </h1>
           </div>
 
-          <footer className="w-full max-w-lg">
+          <footer className="w-full max-w-lg sm:flex hidden">
             <BlockfulCredits />
           </footer>
         </section>
@@ -94,10 +94,13 @@ export default function HomePage(): JSX.Element {
               mainIcon={icon}
               actionIcon={actionIcon}
               onClick={() => handleNavigation(path)}
-              className="transition-transform duration-200 hover:scale-[1.02]"
+              className="transition-transform duration-200 hover:scale-[1.02]  "
             />
           ))}
         </aside>
+        <footer className="w-full max-w-lg sm:hidden flex justify-center mt-4">
+          <BlockfulCredits />
+        </footer>
       </main>
     </div>
   );
