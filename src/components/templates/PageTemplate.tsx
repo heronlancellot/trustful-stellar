@@ -1,15 +1,15 @@
-import cc from 'classcat';
-import { ComponentPropsWithoutRef, ReactNode, useState } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import { Tooltip } from 'react-tooltip';
-import { PrimaryButton } from '../atoms/PrimaryButton';
-import { IconPosition } from '@/types/iconPosition';
-import { PlusIcon } from '../atoms';
-import { StepModal } from '../molecules/StepModal';
-import { useAuthContext } from '../auth/Context';
-import { DappHeader } from '../organisms';
+import cc from "classcat";
+import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import { Tooltip } from "react-tooltip";
+import { PrimaryButton } from "../atoms/PrimaryButton";
+import { IconPosition } from "@/types/iconPosition";
+import { PlusIcon } from "../atoms";
+import { StepModal } from "../molecules/StepModal";
+import { useAuthContext } from "../auth/Context";
+import { DappHeader } from "../organisms";
 
-interface PageTemplateProps extends ComponentPropsWithoutRef<'div'> {
+interface PageTemplateProps extends ComponentPropsWithoutRef<"div"> {
   className: string;
   title: string;
   children: ReactNode;
@@ -39,11 +39,11 @@ export const PageTemplate = ({
   };
 
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 3));
+    setCurrentStep((prev) => Math.min(prev + 1, 3));
   };
 
   const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleConfirm = () => {
@@ -52,19 +52,19 @@ export const PageTemplate = ({
 
   return (
     <div
-      className={cc([className, 'flex flex-col w-full h-full  bg-brandBlack'])}
+      className={cc([className, "flex h-full w-full flex-col bg-brandBlack"])}
     >
       <DappHeader />
-      <PerfectScrollbar className="h-full flex flex-col w-full">
-        <div className="text-left text-[26px] sm:px-12 sm:pt-8 sm:pb-3 flex justify-between items-center px-6 py-4">
-          <h1 className="font-spaceGrotesk">{title}</h1>{' '}
+      <PerfectScrollbar className="flex h-full w-full flex-col">
+        <div className="flex items-center justify-between px-6 py-4 text-left text-[26px] sm:px-12 sm:pb-3 sm:pt-8">
+          <h1 className="font-spaceGrotesk">{title}</h1>{" "}
           {isCommunity && (
             <div className="">
               <PrimaryButton
                 className={cc([
-                  'rounded-lg w-max',
+                  "w-max rounded-lg",
                   {
-                    'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                    "cursor-not-allowed bg-darkGreenOpacity01 opacity-30":
                       !userAddress,
                   },
                 ])}

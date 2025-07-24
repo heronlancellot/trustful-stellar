@@ -10,7 +10,7 @@ const ActivityIndicatorModal = ({ isOpen }: ActivityIndicatorModalProps) => {
   return (
     <div
       className={cc([
-        "fixed inset-0 bg-opacity-50 flex backdrop-blur-sm justify-center items-center transition-all duration-300",
+        "fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm transition-all duration-300",
         isOpen ? "z-50 opacity-100" : "hidden",
       ])}
     >

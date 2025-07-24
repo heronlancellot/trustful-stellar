@@ -1,40 +1,40 @@
-'use client';
+"use client";
 
-import { ContentTabs, GenericModal, StarIcon } from '@/components';
-import { useAuthContext } from '@/components/auth/Context';
-import { useCommunityContext } from '@/components/community/Context';
-import { CardWrapper } from '@/components/templates/CardWrapper';
-import { PageTemplate } from '@/components/templates/PageTemplate';
-import { useUsersContext } from '@/components/user/Context';
-import { useCallback, useEffect, useState, Suspense } from 'react';
-import { ImportBadgesModalContent } from '@/components/molecules/ImportBadgesModalContent';
-import { sendSignedTransaction } from '@/lib/stellar/signTransaction';
-import { WalletIcon } from '@/components/atoms/icons/WalletIcon';
-import tailwindConfig from 'tailwind.config';
-import { kit } from '@/components/auth/ConnectStellarWallet';
-import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
-import assetClient from '@/lib/http-clients/AssetClient';
-import toast from 'react-hot-toast';
-import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
-import { CommunitiesCard } from '@/components/atoms/CommunitiesCard';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import useCommunitiesController from '@/components/community/hooks/controller';
+import { ContentTabs, GenericModal, StarIcon } from "@/components";
+import { useAuthContext } from "@/components/auth/Context";
+import { useCommunityContext } from "@/components/community/Context";
+import { CardWrapper } from "@/components/templates/CardWrapper";
+import { PageTemplate } from "@/components/templates/PageTemplate";
+import { useUsersContext } from "@/components/user/Context";
+import { useCallback, useEffect, useState, Suspense } from "react";
+import { ImportBadgesModalContent } from "@/components/molecules/ImportBadgesModalContent";
+import { sendSignedTransaction } from "@/lib/stellar/signTransaction";
+import { WalletIcon } from "@/components/atoms/icons/WalletIcon";
+import tailwindConfig from "tailwind.config";
+import { kit } from "@/components/auth/ConnectStellarWallet";
+import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
+import assetClient from "@/lib/http-clients/AssetClient";
+import toast from "react-hot-toast";
+import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
+import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import useCommunitiesController from "@/components/community/hooks/controller";
 import {
   useCommunities,
   useCommunitiesByStatus,
-} from '@/lib/hooks/api/useCommunities';
+} from "@/lib/hooks/api/useCommunities";
 
 // Loading component for Suspense fallback
 function CommunitiesPageLoading() {
   return (
     <PageTemplate className="pb-4" title="Communities" isCommunity>
       <div className="animate-pulse">
-        <div className="h-12 bg-whiteOpacity005 rounded-lg mb-6"></div>
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(index => (
+        <div className="mb-6 h-12 rounded-lg bg-whiteOpacity005"></div>
+        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((index) => (
             <div
               key={index}
-              className="bg-whiteOpacity005 rounded-lg h-48"
+              className="h-48 rounded-lg bg-whiteOpacity005"
             ></div>
           ))}
         </div>
@@ -53,19 +53,19 @@ function CommunitiesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const status = searchParams.get('status');
+  const status = searchParams.get("status");
 
   const [isLoading, setIsLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
 
   const [isImportModalOpen, setImportModalOpen] = useState(false);
-  const [selectedQuestName, setSelectedQuestName] = useState('');
+  const [selectedQuestName, setSelectedQuestName] = useState("");
 
   const statusList = {
-    all: 'all',
-    joined: 'joined',
-    created: 'created',
-    hidden: 'hidden',
+    all: "all",
+    joined: "joined",
+    created: "created",
+    hidden: "hidden",
   } as const;
 
   const currentStatus = (status as string) || statusList.all;
@@ -74,8 +74,8 @@ function CommunitiesContent() {
     useCommunities(userAddress);
   const { data: statusCommunities, isLoading: isLoadingStatusCommunities } =
     useCommunitiesByStatus(
-      currentStatus !== statusList.all ? currentStatus : '',
-      userAddress
+      currentStatus !== statusList.all ? currentStatus : "",
+      userAddress,
     );
 
   const communities =
@@ -86,19 +86,19 @@ function CommunitiesContent() {
   const handleTabChange = useCallback(
     (tabName: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set('status', tabName);
+      params.set("status", tabName);
       router.push(`${pathname}?${params.toString()}`);
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams],
   );
 
   const handleCommunityClick = useCallback(
     (communityAddress: string, targetStatus: string) => {
       const params = new URLSearchParams();
-      params.set('status', targetStatus);
+      params.set("status", targetStatus);
       router.push(`/communities/${communityAddress}?${params.toString()}`);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -127,7 +127,7 @@ function CommunitiesContent() {
       return true;
     }
     const areBadgesToImport = getModalBadges(questName).some(
-      ({ isImported }) => isImported === false
+      ({ isImported }) => isImported === false,
     );
     return !areBadgesToImport;
   };
@@ -144,21 +144,21 @@ function CommunitiesContent() {
           }
           return assetCodesAcc;
         },
-        [] as string[]
+        [] as string[],
       );
       const transaction = await assetClient.postAsset(
         userAddress,
-        assetCodesToImport
+        assetCodesToImport,
       );
       await sendSignedTransaction(transaction, userAddress);
-      toast.success('The badges were imported with success');
+      toast.success("The badges were imported with success");
     } catch (error: unknown) {
       if (
         (error as Error)?.message.includes(
-          'Action request was rejected by the user.'
+          "Action request was rejected by the user.",
         )
       ) {
-        toast.error('Transaction Rejected by the user');
+        toast.error("Transaction Rejected by the user");
         return;
       } else if (!!(error as Error)?.message) {
         toast.error((error as Error)?.message);
@@ -178,9 +178,9 @@ function CommunitiesContent() {
         description,
         assetCode,
         score,
-      })
+      }),
     );
-    const questBadgesWithIsImported = questBadges.map(questBadge => {
+    const questBadgesWithIsImported = questBadges.map((questBadge) => {
       const isImported = userBadgesImported
         .map(({ assetCode }) => assetCode?.toLocaleLowerCase())
         .includes(questBadge.assetCode?.toLocaleLowerCase());
@@ -202,11 +202,11 @@ function CommunitiesContent() {
   const renderCommunityCards = (targetStatus: string) => {
     if (!dataFetched || isLoading) {
       return (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[1, 2, 3, 4, 5, 6].map(index => (
+        <div className="grid w-full animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((index) => (
             <div
               key={index}
-              className="bg-whiteOpacity005 rounded-lg h-48"
+              className="h-48 rounded-lg bg-whiteOpacity005"
             ></div>
           ))}
         </div>
@@ -215,20 +215,20 @@ function CommunitiesContent() {
 
     if (!Array.isArray(communities) || communities.length === 0) {
       return (
-        <div className="w-full text-center py-12 text-gray-400">
+        <div className="w-full py-12 text-center text-gray-400">
           No communities found
         </div>
       );
     }
 
-    return communities.map(community => (
+    return communities.map((community) => (
       <CommunitiesCard
         key={community.community_address}
         community={community}
         onClick={() =>
           handleCommunityClick(community.community_address, targetStatus)
         }
-        currentTab={targetStatus as 'all' | 'joined' | 'created' | 'hidden'}
+        currentTab={targetStatus as "all" | "joined" | "created" | "hidden"}
       />
     ));
   };
@@ -238,9 +238,9 @@ function CommunitiesContent() {
       className="pb-4"
       title="Communities"
       tooltip={{
-        tooltipId: 'generate-attestation-tip',
+        tooltipId: "generate-attestation-tip",
         tooltipText:
-          'Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.',
+          "Import the available reputation badges. They are linked to a score that may be used in Stellar ecosystem dApps and communities in the future.",
       }}
       isCommunity
     >
@@ -251,27 +251,27 @@ function CommunitiesContent() {
         onButtonClick={handleTabChange}
         tabs={{
           All: {
-            content: <CardWrapper>{renderCommunityCards('all')}</CardWrapper>,
+            content: <CardWrapper>{renderCommunityCards("all")}</CardWrapper>,
             tabNumber: 1,
             disabled: false,
           },
           Joined: {
             content: (
-              <CardWrapper>{renderCommunityCards('joined')}</CardWrapper>
+              <CardWrapper>{renderCommunityCards("joined")}</CardWrapper>
             ),
             tabNumber: 2,
             disabled: !userAddress,
           },
           Created: {
             content: (
-              <CardWrapper>{renderCommunityCards('created')}</CardWrapper>
+              <CardWrapper>{renderCommunityCards("created")}</CardWrapper>
             ),
             tabNumber: 3,
             disabled: !userAddress,
           },
           Hidden: {
             content: (
-              <CardWrapper>{renderCommunityCards('hidden')}</CardWrapper>
+              <CardWrapper>{renderCommunityCards("hidden")}</CardWrapper>
             ),
             tabNumber: 3,
             disabled: !userAddress,
@@ -313,8 +313,8 @@ function CommunitiesContent() {
           }}
           isAsync={true}
         >
-          <div className="p-2 w-full h-full items-center justify-center flex flex-col">
-            <div className="my-8 p-8 pt-6 w-[150px] h-[150px] rounded-full bg-whiteOpacity005 items-center justify-center">
+          <div className="flex h-full w-full flex-col items-center justify-center p-2">
+            <div className="my-8 h-[150px] w-[150px] items-center justify-center rounded-full bg-whiteOpacity005 p-8 pt-6">
               <WalletIcon
                 color={tailwindConfig.theme.extend.colors.brandGreen}
               ></WalletIcon>

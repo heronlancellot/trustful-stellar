@@ -16,20 +16,20 @@ export const SearchBar = (props: SearchBarProps) => {
     <div className="flex flex-row">
       <input
         className={cc([
-          "flex-1 h-10 p-2 pl-5 bg-whiteOpacity008 border border-whiteOpacity008",
-          "rounded-l-lg active:border active:border-brandWhite focus-visible:outline-none",
+          "h-10 flex-1 border border-whiteOpacity008 bg-whiteOpacity008 p-2 pl-5",
+          "rounded-l-lg focus-visible:outline-none active:border active:border-brandWhite",
         ])}
         value={props.inputText}
         onChange={(e) => props.onChangeInputText(e.target.value)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
-            props.onButtonClick(props.inputText)
+          if (event.key === "Enter") {
+            props.onButtonClick(props.inputText);
           }
         }}
         placeholder={props.placeholder}
       />
       <IconicButton
-        className="rounded-r-lg rounded-l-none w-max"
+        className="w-max rounded-l-none rounded-r-lg"
         label="Search"
         icon={<SearchIcon />}
         iconPosition={IconPosition.LEFT}

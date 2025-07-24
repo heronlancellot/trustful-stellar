@@ -1,6 +1,6 @@
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef } from "react";
 
-interface BlockfulCreditsProps extends ComponentPropsWithoutRef<'div'> {}
+interface BlockfulCreditsProps extends ComponentPropsWithoutRef<"div"> {}
 
 export const BlockfulCredits = (props: BlockfulCreditsProps) => {
   return (

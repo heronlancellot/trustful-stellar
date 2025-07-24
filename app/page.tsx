@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { CardLink } from '@/components/atoms/CardLink';
-import { BlockfulCredits } from '@/components/atoms/homepage/BlockfulCredits';
-import { ArrowRightIcon } from '@/components/atoms/icons/ArrowRightIcon';
-import { CommunitiesIcon } from '@/components/atoms/icons/CommunitiesIcon';
-import { VerifyReputationIcon } from '@/components/atoms/icons/VerifyReputationIcon';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { ReactNode, useCallback } from 'react';
-import tailwindConfig from 'tailwind.config';
-import backgroundHome from 'public/home/background-home.png';
-import { DappHeader } from '@/components/organisms/DappHeader';
+import { CardLink } from "@/components/atoms/CardLink";
+import { BlockfulCredits } from "@/components/atoms/homepage/BlockfulCredits";
+import { ArrowRightIcon } from "@/components/atoms/icons/ArrowRightIcon";
+import { CommunitiesIcon } from "@/components/atoms/icons/CommunitiesIcon";
+import { VerifyReputationIcon } from "@/components/atoms/icons/VerifyReputationIcon";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { ReactNode, useCallback } from "react";
+import tailwindConfig from "tailwind.config";
+import backgroundHome from "public/home/background-home.png";
+import { DappHeader } from "@/components/organisms/DappHeader";
 
 interface NavigationAction {
   path: string;
@@ -25,13 +25,13 @@ export default function HomePage(): JSX.Element {
     (path: string) => {
       router.push(path);
     },
-    [router]
+    [router],
   );
 
   const navigationActions: NavigationAction[] = [
     {
-      path: '/communities',
-      title: 'Communities',
+      path: "/communities",
+      title: "Communities",
       icon: (
         <CommunitiesIcon
           color={tailwindConfig.theme.extend.colors.brandGreen}
@@ -39,8 +39,8 @@ export default function HomePage(): JSX.Element {
       ),
     },
     {
-      path: '/verify-reputation',
-      title: 'Verify Reputation',
+      path: "/verify-reputation",
+      title: "Verify Reputation",
       icon: (
         <VerifyReputationIcon
           color={tailwindConfig.theme.extend.colors.brandGreen}
@@ -54,8 +54,8 @@ export default function HomePage(): JSX.Element {
   );
 
   return (
-    <div className="w-screen flex flex-col h-screen overflow-hidden bg-brandBlack z-10">
-      <div className="w-full h-fit z-20">
+    <div className="z-10 flex h-screen w-screen flex-col overflow-hidden bg-brandBlack">
+      <div className="z-20 h-fit w-full">
         <DappHeader />
       </div>
       {/* Background Layer */}
@@ -65,28 +65,28 @@ export default function HomePage(): JSX.Element {
         fill={true}
         quality={100}
         style={{
-          objectFit: 'cover',
-          backgroundPosition: 'top left',
-          backgroundSize: 'cover',
+          objectFit: "cover",
+          backgroundPosition: "top left",
+          backgroundSize: "cover",
           zIndex: 0,
-          left: '-20vw',
+          left: "-20vw",
           opacity: 0.3,
         }}
       />
-      <main className="w-screen h-screen flex sm:flex-row flex-col z-10 sm:px-[60px] px-4 sm:py-[80px] py-4">
-        <section className="flex flex-1 flex-col justify-between ">
+      <main className="z-10 flex h-screen w-screen flex-col px-4 py-4 sm:flex-row sm:px-[60px] sm:py-[80px]">
+        <section className="flex flex-1 flex-col justify-between">
           <div className="max-w-md">
-            <h1 className="font-space-grotesk sm:text-7xl text-6xl leading-tight text-brandWhite">
+            <h1 className="font-space-grotesk text-6xl leading-tight text-brandWhite sm:text-7xl">
               Online reputation made easy
             </h1>
           </div>
 
-          <footer className="w-full max-w-lg sm:flex hidden">
+          <footer className="hidden w-full max-w-lg sm:flex">
             <BlockfulCredits />
           </footer>
         </section>
 
-        <aside className="flex flex-1 flex-col lg:justify-between xl:justify-center gap-8 ">
+        <aside className="flex flex-1 flex-col gap-8 lg:justify-between xl:justify-center">
           {navigationActions.map(({ path, title, icon }) => (
             <CardLink
               key={path}
@@ -94,11 +94,11 @@ export default function HomePage(): JSX.Element {
               mainIcon={icon}
               actionIcon={actionIcon}
               onClick={() => handleNavigation(path)}
-              className="transition-transform duration-200 hover:scale-[1.02]  "
+              className="transition-transform duration-200 hover:scale-[1.02]"
             />
           ))}
         </aside>
-        <footer className="w-full max-w-lg sm:hidden flex justify-center mt-4">
+        <footer className="mt-4 flex w-full max-w-lg justify-center sm:hidden">
           <BlockfulCredits />
         </footer>
       </main>

@@ -1,17 +1,17 @@
-import { useAuthContext } from '@/components/auth/Context';
+import { useAuthContext } from "@/components/auth/Context";
 import {
   ALBEDO_ID,
   AlbedoModule,
   StellarWalletsKit,
   WalletNetwork,
   xBullModule,
-} from '@creit.tech/stellar-wallets-kit';
-import cc from 'classcat';
-import { UserDropdown } from '../molecules';
-import { setLocalStorageUserAddress } from '@/lib/local-storage/auth';
-import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
-import toast from 'react-hot-toast';
-import { STELLAR } from '@/lib/environmentVars';
+} from "@creit.tech/stellar-wallets-kit";
+import cc from "classcat";
+import { UserDropdown } from "../molecules";
+import { setLocalStorageUserAddress } from "@/lib/local-storage/auth";
+import { checkIfWalletIsInitialized } from "@/lib/stellar/isFundedStellarWallet";
+import toast from "react-hot-toast";
+import { STELLAR } from "@/lib/environmentVars";
 
 interface ConnectWalletProps {
   customClassNames?: string;
@@ -24,7 +24,7 @@ export const kit: StellarWalletsKit = new StellarWalletsKit({
 });
 
 export const ConnectStellarWallet = ({
-  customClassNames = '',
+  customClassNames = "",
 }: ConnectWalletProps) => {
   const { setUserAddress, userAddress } = useAuthContext();
 
@@ -36,9 +36,9 @@ export const ConnectStellarWallet = ({
       setUserAddress(address);
     } catch (error) {
       toast.error(
-        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet",
       );
-      setUserAddress('');
+      setUserAddress("");
     }
   };
 
@@ -47,7 +47,7 @@ export const ConnectStellarWallet = ({
   ) : (
     <button
       className={cc([
-        'text-base text-brandBlack font-medium bg-brandGreen p-2 px-6 rounded-lg',
+        "rounded-lg bg-brandGreen p-2 px-6 text-base font-medium text-brandBlack",
         customClassNames,
       ])}
       onClick={handleConnect}

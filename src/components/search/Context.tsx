@@ -8,13 +8,12 @@ import {
 const searchCtx = createContext<SearchContext | undefined>(undefined);
 
 const SearchContextProvider: React.FC<SearchContextProviderProps> = (
-  props: SearchContextProviderProps
+  props: SearchContextProviderProps,
 ) => {
   const [searchedUserAddress, setSearchedUserAddress] = useState<string>("");
 
-  const [searchedUserBadges, setSearchedUserBadges] = useState<
-    SearchedUserBadge[]
-  >();
+  const [searchedUserBadges, setSearchedUserBadges] =
+    useState<SearchedUserBadge[]>();
 
   const [searchedUserScore, setSearchedUserScore] = useState<number>();
 

@@ -1,34 +1,34 @@
-import { ComponentPropsWithoutRef } from 'react';
-import cc from 'classcat';
-import { Communities } from '@/types/communities';
+import { ComponentPropsWithoutRef } from "react";
+import cc from "classcat";
+import { Communities } from "@/types/communities";
 import {
   InformationIcon,
   PlusIcon,
   StarIcon,
   TagIcon,
   UserIcon,
-} from './icons';
-import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
-import toast from 'react-hot-toast';
-import { useAuthContext } from '../auth/Context';
-import { Minus } from 'lucide-react';
-import { CakeIcon } from './icons/CakeIcon';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCommunityContext } from '../community/Context';
-import { STELLAR } from '@/lib/environmentVars';
+} from "./icons";
+import { useStellarContract } from "@/lib/stellar/transactions/hooks/useStellarContract";
+import toast from "react-hot-toast";
+import { useAuthContext } from "../auth/Context";
+import { Minus } from "lucide-react";
+import { CakeIcon } from "./icons/CakeIcon";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCommunityContext } from "../community/Context";
+import { STELLAR } from "@/lib/environmentVars";
 
 interface CommunitiesCardProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'onClick'> {
+  extends Omit<ComponentPropsWithoutRef<"div">, "onClick"> {
   community: Communities;
   onClick?: () => void;
-  currentTab?: 'all' | 'joined' | 'created' | 'hidden';
+  currentTab?: "all" | "joined" | "created" | "hidden";
 }
 
 export const CommunitiesCard = ({
   community,
   className,
   onClick,
-  currentTab = 'all',
+  currentTab = "all",
   ...props
 }: CommunitiesCardProps) => {
   const { userAddress, setUserAddress } = useAuthContext();
@@ -38,7 +38,7 @@ export const CommunitiesCard = ({
   const formattedContractAddress = community.community_address.toUpperCase();
 
   const hideExitButton =
-    (currentTab === 'joined' || currentTab === 'all') &&
+    (currentTab === "joined" || currentTab === "all") &&
     userAddress &&
     community.creator_address.toLocaleLowerCase() ===
       userAddress.toLocaleLowerCase();
@@ -50,81 +50,81 @@ export const CommunitiesCard = ({
 
   const handleJoin = async () => {
     if (!userAddress) {
-      toast.error('Please connect your wallet first');
+      toast.error("Please connect your wallet first");
       return;
     }
     try {
       const result = await stellarContractJoinCommunities.addUser();
-      console.log('result', result);
+      console.log("result", result);
       if (result.success) {
-        console.log('result when success', result);
-        toast.success('Successfully joined community');
-        console.log('Transaction successful:', result.txHash);
+        console.log("result when success", result);
+        toast.success("Successfully joined community");
+        console.log("Transaction successful:", result.txHash);
 
-        queryClient.invalidateQueries({ queryKey: ['communities'] });
+        queryClient.invalidateQueries({ queryKey: ["communities"] });
         queryClient.invalidateQueries({
-          queryKey: ['communities', 'joined', userAddress],
+          queryKey: ["communities", "joined", userAddress],
         });
         queryClient.invalidateQueries({
           queryKey: [
-            'community-details',
+            "community-details",
             community.community_address,
             userAddress,
           ],
         });
 
         await getCommunities();
-        console.log('communities', await getCommunities());
+        console.log("communities", await getCommunities());
 
         setTimeout(() => {
           queryClient.resetQueries();
         }, 500);
 
         const currentData = queryClient.getQueryData([
-          'communities',
+          "communities",
           userAddress,
         ]) as Communities[] | undefined;
-        console.log('currentData', currentData);
+        console.log("currentData", currentData);
         if (currentData) {
-          const updatedData = currentData.map(c =>
+          const updatedData = currentData.map((c) =>
             c.community_address === community.community_address
               ? { ...c, is_joined: true }
-              : c
+              : c,
           );
-          console.log('updatedData', updatedData);
-          queryClient.setQueryData(['communities', userAddress], updatedData);
+          console.log("updatedData", updatedData);
+          queryClient.setQueryData(["communities", userAddress], updatedData);
         }
       } else {
-        toast.error('Failed to join community');
-        console.error('Transaction failed:', result.error);
+        toast.error("Failed to join community");
+        console.error("Transaction failed:", result.error);
       }
     } catch (error) {
       toast.error(
-        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet",
       );
-      setUserAddress('');
+      setUserAddress("");
     }
   };
 
   const handleExit = async () => {
     if (!userAddress) {
-      toast.error('Please connect your wallet first');
+      toast.error("Please connect your wallet first");
       return;
     }
     try {
       const result = await stellarContractJoinCommunities.removeUser();
 
       if (result.success) {
-        toast.success('Successfully left community');
-        console.log('Transaction successful:', result.txHash);
+        toast.success("Successfully left community");
+        console.log("Transaction successful:", result.txHash);
 
-        queryClient.invalidateQueries({ queryKey: ['communities'] });
+        queryClient.invalidateQueries({ queryKey: ["communities"] });
         queryClient.invalidateQueries({
-          queryKey: ['communities', 'joined', userAddress],
+          queryKey: ["communities", "joined", userAddress],
         });
         queryClient.invalidateQueries({
           queryKey: [
-            'community-details',
+            "community-details",
             community.community_address,
             userAddress,
           ],
@@ -137,41 +137,41 @@ export const CommunitiesCard = ({
         }, 500);
 
         const currentData = queryClient.getQueryData([
-          'communities',
+          "communities",
           userAddress,
         ]) as Communities[] | undefined;
         if (currentData) {
-          const updatedData = currentData.map(c =>
+          const updatedData = currentData.map((c) =>
             c.community_address === community.community_address
               ? { ...c, is_joined: false }
-              : c
+              : c,
           );
-          queryClient.setQueryData(['communities', userAddress], updatedData);
+          queryClient.setQueryData(["communities", userAddress], updatedData);
         }
       } else {
-        toast.error('Failed to leave community');
-        console.error('Transaction failed:', result.error);
+        toast.error("Failed to leave community");
+        console.error("Transaction failed:", result.error);
       }
     } catch (error) {
       toast.error(
-        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet"
+        "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet",
       );
-      setUserAddress('');
+      setUserAddress("");
     }
   };
 
   return (
     <div
       className={cc([
-        'group rounded-lg flex flex-col border border-whiteOpacity008 max-w-sm w-[376px] h-[212px] bg-whiteOpacity005 hover:bg-whiteOpacity008 transition-colors duration-300 ease-linear',
+        "group flex h-[212px] w-[376px] max-w-sm flex-col rounded-lg border border-whiteOpacity008 bg-whiteOpacity005 transition-colors duration-300 ease-linear hover:bg-whiteOpacity008",
         className,
       ])}
       {...props}
-      style={{ boxSizing: 'border-box' }}
+      style={{ boxSizing: "border-box" }}
     >
-      <div className="flex  justify-between items-center p-3">
-        <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008 flex items-center justify-center overflow-hidden">
-          <div className="w-4 h-4 ">
+      <div className="flex items-center justify-between p-3">
+        <div className="flex h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-full bg-whiteOpacity008 p-2">
+          <div className="h-4 w-4">
             {community?.icon ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -188,55 +188,55 @@ export const CommunitiesCard = ({
         <div className="flex items-center gap-1">
           <div>
             <button
-              className="overflow-hidden w-8 h-8 group-hover:w-16 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center gap-2 group-hover:justify-start px-3 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out"
+              className="flex h-8 w-8 items-center justify-center gap-2 overflow-hidden rounded-md bg-whiteOpacity005 bg-opacity-25 px-3 text-lime-400 transition-all duration-300 ease-in-out hover:bg-whiteOpacity008 group-hover:w-16 group-hover:justify-start"
               onClick={onClick}
             >
-              {' '}
-              <div className="flex justify-center items-center">
+              {" "}
+              <div className="flex items-center justify-center">
                 <InformationIcon className="transition-all duration-500 ease-in-out" />
-                <span className="hidden font-inter text-sm group-hover:inline-block ml-2  group-hover:opacity-100 transition-all duration-500 ease-in-out">
+                <span className="ml-2 hidden font-inter text-sm transition-all duration-500 ease-in-out group-hover:inline-block group-hover:opacity-100">
                   Info
                 </span>
               </div>
             </button>
           </div>
 
-          {currentTab !== 'created' &&
-            currentTab !== 'hidden' &&
+          {currentTab !== "created" &&
+            currentTab !== "hidden" &&
             !hideExitButton && (
               <div>
                 <button
                   className={cc([
-                    'overflow-hidden w-8 h-8 group-hover:w-auto group-hover:min-w-16 group-hover:px-3 bg-whiteOpacity005 bg-opacity-25 text-lime-400 flex items-center justify-center group-hover:justify-start px-2 rounded-md hover:bg-whiteOpacity008 transition-all duration-300 ease-in-out',
-                    { 'opacity-50 cursor-not-allowed': !userAddress },
+                    "flex h-8 w-8 items-center justify-center overflow-hidden rounded-md bg-whiteOpacity005 bg-opacity-25 px-2 text-lime-400 transition-all duration-300 ease-in-out hover:bg-whiteOpacity008 group-hover:w-auto group-hover:min-w-16 group-hover:justify-start group-hover:px-3",
+                    { "cursor-not-allowed opacity-50": !userAddress },
                   ])}
                   disabled={!userAddress}
                 >
-                  {!('is_joined' in community) ? (
-                    <div className="flex justify-center items-center">
+                  {!("is_joined" in community) ? (
+                    <div className="flex items-center justify-center">
                       <Minus className="transition-all duration-500 ease-in-out" />
                       <span
-                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        className="ml-2 hidden font-inter text-sm transition-all duration-500 ease-in-out group-hover:inline-block group-hover:opacity-100"
                         onClick={handleExit}
                       >
                         Exit
                       </span>
                     </div>
                   ) : community.is_joined ? (
-                    <div className="flex justify-center items-center">
+                    <div className="flex items-center justify-center">
                       <Minus className="transition-all duration-500 ease-in-out" />
                       <span
-                        className="hidden font-inter text-sm group-hover:inline-block ml-2 whitespace-nowrap group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        className="ml-2 hidden whitespace-nowrap font-inter text-sm transition-all duration-500 ease-in-out group-hover:inline-block group-hover:opacity-100"
                         onClick={handleExit}
                       >
                         Exit
                       </span>
                     </div>
                   ) : (
-                    <div className="flex justify-center items-center">
+                    <div className="flex items-center justify-center">
                       <PlusIcon className="transition-all duration-500 ease-in-out" />
                       <span
-                        className="hidden font-inter text-sm group-hover:inline-block ml-2 group-hover:opacity-100 transition-all duration-500 ease-in-out"
+                        className="ml-2 hidden font-inter text-sm transition-all duration-500 ease-in-out group-hover:inline-block group-hover:opacity-100"
                         onClick={handleJoin}
                       >
                         Join
@@ -248,21 +248,21 @@ export const CommunitiesCard = ({
             )}
         </div>
       </div>
-      <div className="flex flex-col p-3 gap-1 justify-center">
+      <div className="flex flex-col justify-center gap-1 p-3">
         <div className="title">
-          <span className="text-lg font-inter font-medium border-s-violet-600">
+          <span className="border-s-violet-600 font-inter text-lg font-medium">
             {community?.name}
           </span>
         </div>
         <div className="description">
-          <span className="font-inter font-normal text-sm block overflow-hidden text-ellipsis text-whiteOpacity05">
+          <span className="block overflow-hidden text-ellipsis font-inter text-sm font-normal text-whiteOpacity05">
             {community?.description}
           </span>
         </div>
 
-        <div className="flex flex-start mt-10 gap-3">
-          <div className="flex items-center text-xs justify-center gap-1">
-            <div className="w-3 h-3">
+        <div className="flex-start mt-10 flex gap-3">
+          <div className="flex items-center justify-center gap-1 text-xs">
+            <div className="h-3 w-3">
               <UserIcon />
             </div>
             <div className="flex justify-center">
@@ -270,8 +270,8 @@ export const CommunitiesCard = ({
             </div>
           </div>
 
-          <div className="flex items-center text-xs justify-center gap-2">
-            <div className=" w-3 h-3">
+          <div className="flex items-center justify-center gap-2 text-xs">
+            <div className="h-3 w-3">
               <TagIcon />
             </div>
             <div className="flex justify-center">

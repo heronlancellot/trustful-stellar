@@ -12,4 +12,3 @@ export * from "./InformationIcon";
 export * from "./PlusIcon";
 export * from "./SearchIconPrimary";
 export * from "./TrashIcon";
-

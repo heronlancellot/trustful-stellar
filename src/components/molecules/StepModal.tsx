@@ -1,8 +1,8 @@
-import { useAuthContext } from '@/components/auth/Context';
-import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
-import { useBadgeStore } from '@/store/badgeStore';
-import albedo from '@albedo-link/intent';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthContext } from "@/components/auth/Context";
+import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
+import { useBadgeStore } from "@/store/badgeStore";
+import albedo from "@albedo-link/intent";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Address,
   BASE_FEE,
@@ -11,26 +11,26 @@ import {
   rpc,
   TransactionBuilder,
   xdr,
-} from '@stellar/stellar-sdk';
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
-import * as z from 'zod';
-import { PlusIcon, StarIcon, TagIcon, UserIcon } from '../atoms/icons';
-import { AlertIcon } from '../atoms/icons/AlertIcon';
-import { AwardIcon } from '../atoms/icons/AwardIcon';
-import { BankIcon } from '../atoms/icons/BankIcon';
-import { CakeIcon } from '../atoms/icons/CakeIcon';
-import { CloseIcon } from '../atoms/icons/CloseIcon';
-import { EthereumIcon } from '../atoms/icons/EthereumIcon';
-import { GithubIcon } from '../atoms/icons/GithubIcon';
-import { HeartIcon } from '../atoms/icons/HeartIcon';
-import { KeyIcon } from '../atoms/icons/KeyIcon';
-import { TrashIcon } from '../atoms/icons/TrashIcon';
-import { TrophyIcon } from '../atoms/icons/TrophyIcon';
-import useBadgeInfoController, { Badge } from '../badge-info/hooks/Controller';
-import { ALBEDO, STELLAR } from '@/lib/environmentVars';
+} from "@stellar/stellar-sdk";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import * as z from "zod";
+import { PlusIcon, StarIcon, TagIcon, UserIcon } from "../atoms/icons";
+import { AlertIcon } from "../atoms/icons/AlertIcon";
+import { AwardIcon } from "../atoms/icons/AwardIcon";
+import { BankIcon } from "../atoms/icons/BankIcon";
+import { CakeIcon } from "../atoms/icons/CakeIcon";
+import { CloseIcon } from "../atoms/icons/CloseIcon";
+import { EthereumIcon } from "../atoms/icons/EthereumIcon";
+import { GithubIcon } from "../atoms/icons/GithubIcon";
+import { HeartIcon } from "../atoms/icons/HeartIcon";
+import { KeyIcon } from "../atoms/icons/KeyIcon";
+import { TrashIcon } from "../atoms/icons/TrashIcon";
+import { TrophyIcon } from "../atoms/icons/TrophyIcon";
+import useBadgeInfoController, { Badge } from "../badge-info/hooks/Controller";
+import { ALBEDO, STELLAR } from "@/lib/environmentVars";
 
 interface ModalProps {
   isOpen: boolean;
@@ -47,15 +47,15 @@ interface BadgeOption {
 }
 
 const BADGE_OPTIONS: BadgeOption[] = [
-  { id: 'stellar', label: 'Stellar' },
-  { id: 'soroban', label: 'Soroban' },
-  { id: 'blockful', label: 'Blockful' },
-  { id: 'custom', label: 'Custom' },
+  { id: "stellar", label: "Stellar" },
+  { id: "soroban", label: "Soroban" },
+  { id: "blockful", label: "Blockful" },
+  { id: "custom", label: "Custom" },
 ];
 
 const BadgeInfoMessage = () => {
   return (
-    <div className="flex items-start flex-row gap-2 p-4 bg-darkRedOpacity text-white rounded-lg shadow-lg max-w-md">
+    <div className="flex max-w-md flex-row items-start gap-2 rounded-lg bg-darkRedOpacity p-4 text-white shadow-lg">
       <AlertIcon width={24} height={24} />
       <div>
         <p className="text-sm font-light">
@@ -69,7 +69,7 @@ const BadgeInfoMessage = () => {
 
 const CustomBadge = () => {
   return (
-    <div className="flex flex-row gap-2 p-4 bg-darkRedOpacity text-white rounded-lg shadow-lg max-w-md">
+    <div className="flex max-w-md flex-row gap-2 rounded-lg bg-darkRedOpacity p-4 text-white shadow-lg">
       <AlertIcon />
       <div>
         <p className="text-sm font-light">
@@ -83,25 +83,25 @@ const CustomBadge = () => {
 
 const CustomHR = () => {
   return (
-    <div className="w-full bg-whiteOpacity008 mb-4">
-      <hr className="w-full h-[1px] border-whiteOpacity008" />
+    <div className="mb-4 w-full bg-whiteOpacity008">
+      <hr className="h-[1px] w-full border-whiteOpacity008" />
     </div>
   );
 };
 
 const createCommunitySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, "Name is required"),
   description: z
     .string()
-    .max(120, 'Description must be less than 120 characters'),
-  avatar: z.string().min(1, 'Avatar is required'),
-  badgeType: z.string().min(1, 'Badge is required'),
+    .max(120, "Description must be less than 120 characters"),
+  avatar: z.string().min(1, "Avatar is required"),
+  badgeType: z.string().min(1, "Badge is required"),
   badges: z.array(
     z.object({
-      name: z.string().min(1, 'Required'),
-      issuer: z.string().min(1, 'Required'),
-      score: z.number().min(1, 'Required'),
-    })
+      name: z.string().min(1, "Required"),
+      issuer: z.string().min(1, "Required"),
+      score: z.number().min(1, "Required"),
+    }),
   ),
 });
 
@@ -124,11 +124,11 @@ export const StepModal: React.FC<ModalProps> = ({
     trigger,
     unregister,
   } = useForm<CreateCommunityForm>({
-    mode: 'onBlur',
+    mode: "onBlur",
     resolver: zodResolver(createCommunitySchema),
   });
   const { userAddress } = useAuthContext();
-  const [selectedAvatar, setSelectedAvatar] = useState<string>('');
+  const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedBadge, setSelectedBadge] = useState<string[]>([]);
   const [badgeCount, setBadgeCount] = useState<number>(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,7 +144,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <StarIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/star.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/star.svg",
     },
     {
       icon: (
@@ -152,7 +152,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <TrophyIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/trophy.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/trophy.svg",
     },
     {
       icon: (
@@ -160,7 +160,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <KeyIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/key.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/key.svg",
     },
     {
       icon: (
@@ -168,7 +168,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <HeartIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/heart.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/heart.svg",
     },
     {
       icon: (
@@ -176,7 +176,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <EthereumIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/etherum.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/etherum.svg",
     },
     {
       icon: (
@@ -184,7 +184,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <CakeIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/birthday.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/birthday.svg",
     },
     {
       icon: (
@@ -192,7 +192,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <BankIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/lib.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/lib.svg",
     },
     {
       icon: (
@@ -200,7 +200,7 @@ export const StepModal: React.FC<ModalProps> = ({
           <AwardIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/badge.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/badge.svg",
     },
     {
       icon: (
@@ -208,17 +208,17 @@ export const StepModal: React.FC<ModalProps> = ({
           <GithubIcon />
         </div>
       ),
-      id: 'https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/github.svg',
+      id: "https://cdn.jsdelivr.net/gh/blockful-io/trustful-stellar-icons-cdn@main/github.svg",
     },
   ];
 
   useEffect(() => {
-    setValue('avatar', selectedAvatar);
-    setValue('badgeType', selectedBadge.join(','));
+    setValue("avatar", selectedAvatar);
+    setValue("badgeType", selectedBadge.join(","));
   }, [selectedAvatar, selectedBadge, setValue]);
 
   useEffect(() => {
-    const currentFields = watch('badges') || [];
+    const currentFields = watch("badges") || [];
     currentFields.forEach((_, index) => {
       unregister(`badges.${index}`);
     });
@@ -233,7 +233,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
     for (let i = badges?.length; i < badgeCount; i++) {
       if (!watch(`badges.${i}`)) {
-        setValue(`badges.${i}`, { name: '', issuer: '', score: 0 });
+        setValue(`badges.${i}`, { name: "", issuer: "", score: 0 });
       }
     }
   }, [badges, badgeCount, setValue, watch, unregister]);
@@ -251,23 +251,23 @@ export const StepModal: React.FC<ModalProps> = ({
         setLoadingBadgeListType(true);
         try {
           const badgeTypesToFetch = selectedBadge.filter(
-            type => type !== 'custom'
+            (type) => type !== "custom",
           );
           const details = await getBadgesByTypes(badgeTypesToFetch);
           if (details) {
             setBadges(details);
           }
           if (
-            selectedBadge.includes('custom') &&
+            selectedBadge.includes("custom") &&
             selectedBadge.length === 1 &&
             (!details || details.length === 0)
           ) {
             addEmptyBadge();
           }
         } catch (error) {
-          console.error('Error fetching badge details:', error);
+          console.error("Error fetching badge details:", error);
           if (
-            selectedBadge.includes('custom') &&
+            selectedBadge.includes("custom") &&
             selectedBadge.length === 1 &&
             badges.length === 0
           ) {
@@ -295,13 +295,13 @@ export const StepModal: React.FC<ModalProps> = ({
   // Helper function to add an empty badge
   const addEmptyBadge = () => {
     const newBadge = {
-      name: '',
-      issuer: '',
+      name: "",
+      issuer: "",
       score: 0,
     } as Badge;
 
     useBadgeStore.getState().addBadge(newBadge);
-    setBadgeCount(prev => Math.max(prev, 1));
+    setBadgeCount((prev) => Math.max(prev, 1));
     return newBadge;
   };
 
@@ -317,12 +317,14 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const updateBadgesFromSelection = async (selectedTypes: string[]) => {
     if (selectedTypes.length > 0) {
-      const badgeTypesToFetch = selectedTypes.filter(type => type !== 'custom');
+      const badgeTypesToFetch = selectedTypes.filter(
+        (type) => type !== "custom",
+      );
       if (badgeTypesToFetch.length > 0) {
         const newBadges = await getBadgesByTypes(badgeTypesToFetch);
         setBadges(newBadges);
       } else {
-        if (selectedTypes.includes('custom') && badges.length === 0) {
+        if (selectedTypes.includes("custom") && badges.length === 0) {
           useBadgeStore.getState().clearBadges();
           addEmptyBadge();
         } else {
@@ -336,10 +338,10 @@ export const StepModal: React.FC<ModalProps> = ({
 
   const handleBadgeSelect = (
     e: React.MouseEvent | React.ChangeEvent,
-    id: string
+    id: string,
   ) => {
     const newSelectedBadges = selectedBadge.includes(id)
-      ? selectedBadge.filter(badge => badge !== id)
+      ? selectedBadge.filter((badge) => badge !== id)
       : [...selectedBadge, id];
 
     setSelectedBadge(newSelectedBadges);
@@ -351,7 +353,7 @@ export const StepModal: React.FC<ModalProps> = ({
     setBadgeCount(0);
     setSelectedBadge([]);
 
-    const currentFields = watch('badges') || [];
+    const currentFields = watch("badges") || [];
     currentFields.forEach((_, index) => {
       unregister(`badges.${index}`);
     });
@@ -368,17 +370,17 @@ export const StepModal: React.FC<ModalProps> = ({
 
     try {
       const filteredBadges = data.badges.filter(
-        badge => badge && badge.name && badge.name.trim() !== ''
+        (badge) => badge && badge.name && badge.name.trim() !== "",
       );
 
       if (filteredBadges.length === 0) {
-        toast.error('At least one badge is required.');
+        toast.error("At least one badge is required.");
         setIsSubmitting(false);
         return;
       }
 
       const sortedBadges = filteredBadges.sort((a, b) =>
-        a.name.localeCompare(b.name)
+        a.name.localeCompare(b.name),
       );
 
       const { pubkey } = await albedo.publicKey({
@@ -386,30 +388,32 @@ export const StepModal: React.FC<ModalProps> = ({
       }); //Todo-user logged
 
       const server = new rpc.Server(STELLAR.RPC_URL, { allowHttp: true });
-      console.log('Server Creating Community', server);
+      console.log("Server Creating Community", server);
 
       const account = await server.getAccount(pubkey);
-      console.log('Account Creating Community', account);
+      console.log("Account Creating Community", account);
       const saltBuffer = Buffer.alloc(32);
       for (let i = 0; i < 32; i++) {
         saltBuffer[i] = Math.floor(Math.random() * 256);
       }
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
-      console.log('Admin Address Creating Community', adminAddressScVal);
-      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(badgeType => {
-        const badgeIdVector = xdr.ScVal.scvVec([
-          xdr.ScVal.scvString(badgeType.name),
-          new Address(badgeType.issuer.toUpperCase()).toScVal(),
-        ]);
-        return new xdr.ScMapEntry({
-          key: badgeIdVector,
-          val: xdr.ScVal.scvU32(badgeType.score),
-        });
-      });
-      console.log('Badge Map Entries Creating Community', badgeMapEntries);
+      console.log("Admin Address Creating Community", adminAddressScVal);
+      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(
+        (badgeType) => {
+          const badgeIdVector = xdr.ScVal.scvVec([
+            xdr.ScVal.scvString(badgeType.name),
+            new Address(badgeType.issuer.toUpperCase()).toScVal(),
+          ]);
+          return new xdr.ScMapEntry({
+            key: badgeIdVector,
+            val: xdr.ScVal.scvU32(badgeType.score),
+          });
+        },
+      );
+      console.log("Badge Map Entries Creating Community", badgeMapEntries);
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
-      console.log('Badge Map Sc Val Creating Community', badgeMapScVal);
+      console.log("Badge Map Sc Val Creating Community", badgeMapScVal);
       const initArgsScVal = xdr.ScVal.scvVec([
         adminAddressScVal,
         badgeMapScVal,
@@ -417,7 +421,7 @@ export const StepModal: React.FC<ModalProps> = ({
         xdr.ScVal.scvString(data.description),
         xdr.ScVal.scvString(data.avatar),
       ]);
-      console.log('Init Args Sc Val Creating Community', initArgsScVal);
+      console.log("Init Args Sc Val Creating Community", initArgsScVal);
 
       const transaction = new TransactionBuilder(account, {
         fee: BASE_FEE,
@@ -425,36 +429,36 @@ export const StepModal: React.FC<ModalProps> = ({
       })
         .addOperation(
           Operation.invokeContractFunction({
-            function: 'create_scorer',
+            function: "create_scorer",
             contract: STELLAR.FACTORY_CONTRACT_ID,
             args: [
               new Address(pubkey).toScVal(),
               saltScVal,
-              xdr.ScVal.scvSymbol('initialize'),
+              xdr.ScVal.scvSymbol("initialize"),
               initArgsScVal,
             ],
-          })
+          }),
         )
         .setTimeout(30)
         .build();
 
-      console.log('Transaction Creating Community', transaction);
+      console.log("Transaction Creating Community", transaction);
 
       const preparedTransaction = await server.prepareTransaction(transaction);
       console.log(
-        'Prepared Transaction Creating Community',
-        preparedTransaction
+        "Prepared Transaction Creating Community",
+        preparedTransaction,
       );
       const transactionXDR = preparedTransaction.toXDR();
-      console.log('Transaction XDR Creating Community', transactionXDR);
+      console.log("Transaction XDR Creating Community", transactionXDR);
       const result = await albedo.tx({
         xdr: transactionXDR,
         network: ALBEDO.NETWORK_TYPE,
         submit: true,
       });
-      console.log('Result Creating Community', result);
+      console.log("Result Creating Community", result);
       if (!result.tx_hash) {
-        console.error('No tx_hash returned from Albedo.');
+        console.error("No tx_hash returned from Albedo.");
         setIsSubmitting(false);
         return;
       }
@@ -464,43 +468,43 @@ export const StepModal: React.FC<ModalProps> = ({
       let txResponse;
 
       do {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         txResponse = await server.getTransaction(result.tx_hash);
         attempts++;
-      } while (txResponse.status === 'NOT_FOUND' && attempts < maxAttempts);
+      } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
 
-      if (txResponse.status === 'SUCCESS') {
-        console.log('Scorer contract created!');
-        console.log('Contract Address:', txResponse.returnValue?.toString());
-        console.log('Transaction Hash:', result.tx_hash);
+      if (txResponse.status === "SUCCESS") {
+        console.log("Scorer contract created!");
+        console.log("Contract Address:", txResponse.returnValue?.toString());
+        console.log("Transaction Hash:", result.tx_hash);
 
         setIsSubmitting(false);
         onClose();
         clearAllBadges();
-        toast.success('Successful transaction');
+        toast.success("Successful transaction");
 
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } else {
-        console.error('❌ Transaction failed:', txResponse.status);
+        console.error("❌ Transaction failed:", txResponse.status);
         setIsSubmitting(false);
-        toast.error('Transaction failed');
+        toast.error("Transaction failed");
       }
     } catch (error: any) {
-      console.error('Error Creating Community', error);
+      console.error("Error Creating Community", error);
       setIsSubmitting(false);
-      toast.error('Invalid badge name. Please use a valid one.');
+      toast.error("Invalid badge name. Please use a valid one.");
     }
   };
 
   const handleRemoveBadge = (index: number) => {
     removeBadge(index);
-    setBadgeCount(prev => prev - 1);
+    setBadgeCount((prev) => prev - 1);
     unregister(`badges.${index}`);
 
     const remainingFields =
-      watch('badges')?.filter((_, i) => i !== index) || [];
+      watch("badges")?.filter((_, i) => i !== index) || [];
     remainingFields.forEach((field, i) => {
       setValue(`badges.${i}`, field);
     });
@@ -513,51 +517,51 @@ export const StepModal: React.FC<ModalProps> = ({
           <>
             <div className="space-y-4 pb-4">
               <div>
-                <label className="block text-sm mb-2 font-light">Name</label>
+                <label className="mb-2 block text-sm font-light">Name</label>
                 <input
-                  {...register('name')}
+                  {...register("name")}
                   type="text"
-                  className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
+                  className="w-full rounded-lg bg-gray-700 bg-whiteOpacity008 p-2"
                 />
                 {errors.name && (
-                  <span className="text-red-500 text-sm">
+                  <span className="text-sm text-red-500">
                     {errors.name?.message}
                   </span>
                 )}
               </div>
               <div>
-                <label className="block text-sm mb-2 font-light">
+                <label className="mb-2 block text-sm font-light">
                   Description
                 </label>
                 <textarea
-                  {...register('description')}
-                  className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008 max-h-[200px] min-h-[100px]"
+                  {...register("description")}
+                  className="max-h-[200px] min-h-[100px] w-full rounded-lg bg-gray-700 bg-whiteOpacity008 p-2"
                   rows={4}
-                  onChange={e => {
+                  onChange={(e) => {
                     e.stopPropagation();
-                    register('description').onChange(e);
+                    register("description").onChange(e);
                   }}
                 />
                 {errors.description && (
-                  <span className="text-red-500 text-sm">
+                  <span className="text-sm text-red-500">
                     {errors.description?.message}
                   </span>
                 )}
                 <div className="text-right text-sm text-gray-400">
-                  {watch('description')?.length || 0}
+                  {watch("description")?.length || 0}
                   /120
                 </div>
               </div>
               <div>
-                <label className="block text-sm mb-2">Avatar</label>
-                <div className="flex gap-1.5 w-8 h-10 rounded">
+                <label className="mb-2 block text-sm">Avatar</label>
+                <div className="flex h-10 w-8 gap-1.5 rounded">
                   {ICONS_MAPPER.map(({ icon, id }) => (
                     <button
                       key={id}
                       type="button"
-                      onClick={e => handleAvatarSelect(e, id)}
-                      className={`p-3 rounded-full bg-whiteOpacity005 hover:bg-gray-600 transition-colors ${
-                        selectedAvatar === id ? 'ring-2 ring-brandGreen' : ''
+                      onClick={(e) => handleAvatarSelect(e, id)}
+                      className={`rounded-full bg-whiteOpacity005 p-3 transition-colors hover:bg-gray-600 ${
+                        selectedAvatar === id ? "ring-2 ring-brandGreen" : ""
                       }`}
                     >
                       {icon}
@@ -565,50 +569,50 @@ export const StepModal: React.FC<ModalProps> = ({
                   ))}
                 </div>
                 {errors.avatar && (
-                  <span className="text-red-500 text-sm">
+                  <span className="text-sm text-red-500">
                     {errors.avatar?.message}
                   </span>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm mb-2">Badges</label>
+                <label className="mb-2 block text-sm">Badges</label>
                 <div className="flex gap-4">
                   {BADGE_OPTIONS.map(({ id, label }) => (
                     <div className="flex" key={id}>
-                      <label className="flex items-center cursor-pointer gap-x-0.5 flex-nowrap">
+                      <label className="flex cursor-pointer flex-nowrap items-center gap-x-0.5">
                         <input
                           type="checkbox"
                           checked={selectedBadge.includes(id)}
-                          onChange={e => handleBadgeSelect(e, id)}
+                          onChange={(e) => handleBadgeSelect(e, id)}
                           className="hidden"
                         />
                         <span
-                          className={`w-4 h-4 flex items-center justify-center border-2 rounded ${
+                          className={`flex h-4 w-4 items-center justify-center rounded border-2 ${
                             selectedBadge.includes(id)
-                              ? 'border-brandGreen bg-darkGreenOpacity01'
-                              : 'border-whiteOpacity008'
+                              ? "border-brandGreen bg-darkGreenOpacity01"
+                              : "border-whiteOpacity008"
                           }`}
                         >
                           {selectedBadge.includes(id) && (
-                            <span className="w-2.5 h-2.5 bg-brandGreen"></span>
+                            <span className="h-2.5 w-2.5 bg-brandGreen"></span>
                           )}
                         </span>
-                        <span className="ml-2 font-light text-sm">{label}</span>
+                        <span className="ml-2 text-sm font-light">{label}</span>
                       </label>
                     </div>
                   ))}
                 </div>
                 {errors.badgeType && (
-                  <span className="text-red-500 text-sm">
+                  <span className="text-sm text-red-500">
                     {errors.badgeType?.message}
                   </span>
                 )}
               </div>
             </div>
 
-            {selectedBadge.includes('custom') && (
-              <div className="pt-2 pb-4">
+            {selectedBadge.includes("custom") && (
+              <div className="pb-4 pt-2">
                 <CustomBadge />
               </div>
             )}
@@ -619,19 +623,19 @@ export const StepModal: React.FC<ModalProps> = ({
       case 2: {
         return (
           <>
-            <div className="space-y-4 p-1 h-full w-full overflow-y-auto min-h-80 max-h-80 overflow-x-hidden">
+            <div className="h-full max-h-80 min-h-80 w-full space-y-4 overflow-y-auto overflow-x-hidden p-1">
               {loadingBadgeListType ? (
                 <>Loading...</>
               ) : (
                 <>
-                  <div className="grid grid-cols-[140px_100px_80px] gap-3 overflow-x-hidden w-full">
-                    <span className="font-light text-xs text-whiteOpacity05">
+                  <div className="grid w-full grid-cols-[140px_100px_80px] gap-3 overflow-x-hidden">
+                    <span className="text-xs font-light text-whiteOpacity05">
                       Badge
                     </span>
-                    <span className="font-light text-xs text-whiteOpacity05">
+                    <span className="text-xs font-light text-whiteOpacity05">
                       Issuer
                     </span>
-                    <span className="font-light text-xs text-whiteOpacity05">
+                    <span className="text-xs font-light text-whiteOpacity05">
                       Score
                     </span>
                   </div>
@@ -643,48 +647,48 @@ export const StepModal: React.FC<ModalProps> = ({
                         <div className="flex- flex-col">
                           <input
                             {...register(`badges.${index}.name`, {
-                              required: 'Required',
+                              required: "Required",
                             })}
                             type="text"
                             placeholder={`Badge Name #${index + 1}`}
-                            defaultValue={badgeTypeDetails[index]?.name || ''}
-                            className="bg-whiteOpacity005 px-2 max-h-10 h-10 rounded-lg  max-w-full"
+                            defaultValue={badgeTypeDetails[index]?.name || ""}
+                            className="h-10 max-h-10 max-w-full rounded-lg bg-whiteOpacity005 px-2"
                           />
                           {errors?.badges && errors.badges[index]?.name && (
-                            <span className="text-red-500 text-[10px] mt-1">
+                            <span className="mt-1 text-[10px] text-red-500">
                               {errors.badges[index]?.name?.message}
                             </span>
                           )}
                         </div>
-                        <div className="h-full flex flex-col">
-                          {badgeTypeDetails[index]?.issuer !== '' ? (
-                            <div className="py-2 overflow-hidden">
+                        <div className="flex h-full flex-col">
+                          {badgeTypeDetails[index]?.issuer !== "" ? (
+                            <div className="overflow-hidden py-2">
                               {getEllipsedAddress(
-                                badgeTypeDetails[index]?.issuer || ''
+                                badgeTypeDetails[index]?.issuer || "",
                               )}
                             </div>
                           ) : (
                             <input
                               {...register(`badges.${index}.issuer`, {
-                                required: 'Required',
-                                onChange: e => {
+                                required: "Required",
+                                onChange: (e) => {
                                   const value = e.target.value;
-                                  if (value !== '') {
-                                    e.target.value = '';
+                                  if (value !== "") {
+                                    e.target.value = "";
                                     setValue(`badges.${index}.issuer`, value);
                                   }
                                 },
                               })}
                               type="text"
                               defaultValue={
-                                badgeTypeDetails[index]?.issuer || ''
+                                badgeTypeDetails[index]?.issuer || ""
                               }
                               placeholder={`Issuer #${index + 1}`}
-                              className="bg-whiteOpacity005 max-h-10 rounded-lg p-2 flex-1 border-whiteOpacity008 w-full"
+                              className="max-h-10 w-full flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                             />
                           )}
                           {errors?.badges && errors.badges[index]?.issuer && (
-                            <span className="text-red-500 text-[10px]  mt-1">
+                            <span className="mt-1 text-[10px] text-red-500">
                               {errors.badges[index]?.issuer?.message}
                             </span>
                           )}
@@ -694,31 +698,31 @@ export const StepModal: React.FC<ModalProps> = ({
                             <input
                               {...register(`badges.${index}.score`, {
                                 valueAsNumber: true,
-                                required: 'Required',
-                                onChange: e => {
+                                required: "Required",
+                                onChange: (e) => {
                                   const value = e.target.value;
-                                  if (value === '') {
-                                    e.target.value = '';
+                                  if (value === "") {
+                                    e.target.value = "";
                                     setValue(`badges.${index}.score`, 0);
                                   } else {
                                     setValue(
                                       `badges.${index}.score`,
-                                      parseInt(value) || 0
+                                      parseInt(value) || 0,
                                     );
                                   }
                                 },
                               })}
                               type="number"
                               defaultValue={
-                                badgeTypeDetails[index]?.score || ''
+                                badgeTypeDetails[index]?.score || ""
                               }
                               placeholder="Score"
-                              className="bg-whiteOpacity005 max-h-10 rounded-lg p-2 flex-1 max-w-20 border-whiteOpacity008"
+                              className="max-h-10 max-w-20 flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                             />
                             <button
                               type="button"
                               onClick={() => handleRemoveBadge(index)}
-                              className="text-gray-400 ml-2 shrink-0"
+                              className="ml-2 shrink-0 text-gray-400"
                             >
                               <div className="w-6">
                                 <TrashIcon />
@@ -726,7 +730,7 @@ export const StepModal: React.FC<ModalProps> = ({
                             </button>
                           </div>
                           {errors?.badges && errors.badges[index]?.score && (
-                            <span className="text-red-500 text-[10px] mt-1">
+                            <span className="mt-1 text-[10px] text-red-500">
                               {errors.badges[index]?.score?.message}
                             </span>
                           )}
@@ -738,7 +742,7 @@ export const StepModal: React.FC<ModalProps> = ({
                 </>
               )}
             </div>
-            {selectedBadge.includes('custom') && (
+            {selectedBadge.includes("custom") && (
               <button
                 type="button"
                 onClick={addNewBadge}
@@ -751,31 +755,31 @@ export const StepModal: React.FC<ModalProps> = ({
         );
       }
       case 3: {
-        const avatar = watch('avatar');
-        const badges = watch('badges');
-        const description = watch('description');
-        const name = watch('name');
+        const avatar = watch("avatar");
+        const badges = watch("badges");
+        const description = watch("description");
+        const name = watch("name");
         const icon =
-          avatar && ICONS_MAPPER.find(icon => icon.id === avatar)?.icon;
+          avatar && ICONS_MAPPER.find((icon) => icon.id === avatar)?.icon;
 
         return (
-          <div className="space-y-4 h-96">
-            <div className="w-16 h-16 bg-whiteOpacity008 rounded-full flex items-center justify-center">
+          <div className="h-96 space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-whiteOpacity008">
               {icon}
             </div>
-            <h2 className="text-xl font-bold font-space-grotesk break-words">
+            <h2 className="font-space-grotesk break-words text-xl font-bold">
               {name}
             </h2>
-            <p className="text-whiteOpacity05 text-sm font-light break-words whitespace-normal">
+            <p className="whitespace-normal break-words text-sm font-light text-whiteOpacity05">
               {description}
             </p>
             <div className="flex flex-row items-center gap-2">
-              <div className="w-5 h-5 overflow-hidden rounded-full">
+              <div className="h-5 w-5 overflow-hidden rounded-full">
                 <UserIcon />
               </div>
               <div>
-                <p className="font-light text-sm text-whiteOpacity05">
-                  Created by {getEllipsedAddress(userAddress || '')}
+                <p className="text-sm font-light text-whiteOpacity05">
+                  Created by {getEllipsedAddress(userAddress || "")}
                 </p>
               </div>
             </div>
@@ -794,28 +798,28 @@ export const StepModal: React.FC<ModalProps> = ({
         return (
           <div className="space-y-4">
             <div className="flex justify-between">
-              <p className="font-light text-xs text-whiteOpacity05">
+              <p className="text-xs font-light text-whiteOpacity05">
                 Badge Name
               </p>
-              <p className="font-light text-xs text-whiteOpacity05 mr-36">
+              <p className="mr-36 text-xs font-light text-whiteOpacity05">
                 Issuer
               </p>
             </div>
             <CustomHR />
             {[1].map((num, index) => (
               <React.Fragment key={num}>
-                {' '}
-                <div className="flex justify-between items-center gap-4">
+                {" "}
+                <div className="flex items-center justify-between gap-4">
                   <input
                     type="number"
-                    className="bg-whiteOpacity005 rounded-lg p-2 border-whiteOpacity008"
+                    className="rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                   />
                   <div className="flex items-center justify-between">
                     <input
                       type="number"
-                      className="bg-whiteOpacity005 rounded-lg p-2 w-full border-whiteOpacity008"
+                      className="w-full rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                     />
-                    <button className="text-gray-400 ml-2">
+                    <button className="ml-2 text-gray-400">
                       <div className="w-6">
                         <TrashIcon />
                       </div>
@@ -843,7 +847,7 @@ export const StepModal: React.FC<ModalProps> = ({
     // Ensure at least one empty badge exists when only 'custom' is selected
     if (
       currentStep === 1 &&
-      selectedBadge.includes('custom') &&
+      selectedBadge.includes("custom") &&
       selectedBadge.length === 1
     ) {
       if (badges.length === 0) {
@@ -856,7 +860,7 @@ export const StepModal: React.FC<ModalProps> = ({
 
     const isValid = await trigger();
     if (!isValid) {
-      badges.map(item => {
+      badges.map((item) => {
         if (item.message) return toast.error(item.message);
       });
 
@@ -867,21 +871,21 @@ export const StepModal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-grey02 rounded-lg p-6 w-full max-w-md z-50 relative"
+        className="relative z-50 w-full max-w-md rounded-lg bg-grey02 p-6"
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-space-grotesk">Create community</h2>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="font-space-grotesk text-xl">Create community</h2>
           <button
             type="button"
-            onClick={e => {
+            onClick={(e) => {
               e.preventDefault();
               onClose();
             }}
           >
-            <div className="w-4 ">
+            <div className="w-4">
               <CloseIcon />
             </div>
           </button>
@@ -890,12 +894,12 @@ export const StepModal: React.FC<ModalProps> = ({
 
         {renderStep()}
 
-        <div className="flex justify-end gap-4 mt-6">
+        <div className="mt-6 flex justify-end gap-4">
           {currentStep > 1 && (
             <button
               type="button"
               onClick={onBack}
-              className="px-4 py-2 bg-darkGreenOpacity01 rounded-lg w-24"
+              className="w-24 rounded-lg bg-darkGreenOpacity01 px-4 py-2"
             >
               <p className="text-brandGreen">Back</p>
             </button>
@@ -904,7 +908,7 @@ export const StepModal: React.FC<ModalProps> = ({
             <button
               type="button"
               onClick={handleNextClick}
-              className="px-4 py-2 bg-brandGreen w-24 rounded-lg text-black"
+              className="w-24 rounded-lg bg-brandGreen px-4 py-2 text-black"
             >
               Next
             </button>
@@ -912,9 +916,9 @@ export const StepModal: React.FC<ModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-brandGreen rounded-lg text-black"
+              className="rounded-lg bg-brandGreen px-4 py-2 text-black"
             >
-              {isSubmitting ? 'Processing...' : 'Confirm'}
+              {isSubmitting ? "Processing..." : "Confirm"}
             </button>
           )}
         </div>

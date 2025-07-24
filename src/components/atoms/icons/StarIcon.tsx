@@ -1,5 +1,5 @@
-import { SVGProps } from 'react';
-import tailwindConfig from 'tailwind.config';
+import { SVGProps } from "react";
+import tailwindConfig from "tailwind.config";
 
 export const StarIcon = (props: SVGProps<SVGSVGElement>) => {
   return (

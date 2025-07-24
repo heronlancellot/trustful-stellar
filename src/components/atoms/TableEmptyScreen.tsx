@@ -14,16 +14,16 @@ export const TableEmptyScreen = ({
   description,
 }: TableEmptyScreenProps) => {
   return (
-    <div className="h-full w-full min-h-[200px] flex items-center justify-center">
-      <div className="w-max h-max flex flex-col items-center justify-center">
-        <div className="rounded-full bg-whiteOpacity008 h-20 w-20 items-center justify-center flex">
-          <div className="w-7 h-7">{icon}</div>
+    <div className="flex h-full min-h-[200px] w-full items-center justify-center">
+      <div className="flex h-max w-max flex-col items-center justify-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-whiteOpacity008">
+          <div className="h-7 w-7">{icon}</div>
         </div>
-        <div className="w-full items-center justify-center text-center pt-4">
+        <div className="w-full items-center justify-center pt-4 text-center">
           <span>{title}</span>
         </div>
         <div className="w-full items-center justify-center text-center">
-          <span className="text-whiteOpacity05 text-sm font-light">
+          <span className="text-sm font-light text-whiteOpacity05">
             {description}
           </span>
         </div>

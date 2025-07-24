@@ -5,9 +5,9 @@ import {
   Networks,
   Operation,
   Address,
-} from '@stellar/stellar-sdk';
-import albedo from '@albedo-link/intent';
-import { STELLAR, ALBEDO } from '@/lib/environmentVars';
+} from "@stellar/stellar-sdk";
+import albedo from "@albedo-link/intent";
+import { STELLAR, ALBEDO } from "@/lib/environmentVars";
 
 interface UseStellarContractProps {
   contractId: string;
@@ -36,7 +36,7 @@ export const useStellarContract = ({
             function: functionName,
             contract: contractId,
             args: [new Address(pubkey).toScVal()],
-          })
+          }),
         )
         .setTimeout(30)
         .build();
@@ -52,17 +52,17 @@ export const useStellarContract = ({
 
       return { success: true, txHash: signResult.tx_hash };
     } catch (error: any) {
-      console.error('Contract execution error:', error);
+      console.error("Contract execution error:", error);
       return {
         success: false,
-        error: error.message || 'Failed to process transaction',
+        error: error.message || "Failed to process transaction",
       };
     }
   };
 
   return {
     executeContractFunction,
-    addUser: () => executeContractFunction('add_user'),
-    removeUser: () => executeContractFunction('remove_user'),
+    addUser: () => executeContractFunction("add_user"),
+    removeUser: () => executeContractFunction("remove_user"),
   };
 };

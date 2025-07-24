@@ -1,4 +1,9 @@
-import { BadgesList, Communities, CommunityBadges, MembersList } from "@/types/communities";
+import {
+  BadgesList,
+  Communities,
+  CommunityBadges,
+  MembersList,
+} from "@/types/communities";
 import { ReactNode } from "react";
 
 export type CommunityContext = {
@@ -7,18 +12,27 @@ export type CommunityContext = {
   communities: Communities[];
   setCommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
   verifyReputationcommunities: Communities[];
-  setVerifyReputationcommunities: React.Dispatch<React.SetStateAction<Communities[]>>;
+  setVerifyReputationcommunities: React.Dispatch<
+    React.SetStateAction<Communities[]>
+  >;
   communitiesDetail: Communities | undefined;
   setCommunitiesDetail: Communities | undefined | any;
   communitiesBadgesList: CommunityBadges;
-  setCommunitiesBadgesList: React.Dispatch<React.SetStateAction<CommunityBadges>>;
+  setCommunitiesBadgesList: React.Dispatch<
+    React.SetStateAction<CommunityBadges>
+  >;
   communitiesMembersList: MembersList[];
-  setCommunitiesMembersList: React.Dispatch<React.SetStateAction<MembersList[]>>;
+  setCommunitiesMembersList: React.Dispatch<
+    React.SetStateAction<MembersList[]>
+  >;
   isJoined: boolean;
   getCommunities: () => Promise<void>;
   getCommunitiesStatus: (status: string) => Promise<void>;
   refetchCommunitiesAll: () => Promise<void>;
-  getCommunitiesDetails: (communityAddress: string, userAddress?: string) => Promise<void>;
+  getCommunitiesDetails: (
+    communityAddress: string,
+    userAddress?: string,
+  ) => Promise<void>;
   getVerifyReputationList: (userAddress: string) => Promise<void>;
   getCommunitiesBadgesList: (communityAddress: string) => Promise<void>;
   getCommunitiesMembersList: (communityAddress: string) => Promise<void>;

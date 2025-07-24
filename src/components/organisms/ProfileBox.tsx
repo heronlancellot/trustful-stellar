@@ -24,9 +24,9 @@ export const ProfileBox = ({
   searchBar,
 }: ProfileBoxProps) => {
   return (
-    <div className="flex flex-row w-full min-w-[500px] h-[100px] bg-whiteOpacity008 rounded-md border border-whiteOpacity008 justify-between">
-      <div className="flex flex-row flex-1 min-w-[300px] p-[26px] items-center">
-        <div className="h-[52px] w-[52px] flex rounded-md bg-whiteOpacity008 items-center justify-center">
+    <div className="flex h-[100px] w-full min-w-[500px] flex-row justify-between rounded-md border border-whiteOpacity008 bg-whiteOpacity008">
+      <div className="flex min-w-[300px] flex-1 flex-row items-center p-[26px]">
+        <div className="flex h-[52px] w-[52px] items-center justify-center rounded-md bg-whiteOpacity008">
           <div className="h-6 w-6">
             <UserIcon
               color={
@@ -37,20 +37,20 @@ export const ProfileBox = ({
             ></UserIcon>
           </div>
         </div>
-        <div className="flex flex-col text-left pl-4">
-          <div className="flex flex-row gap-2 items-center">
-            <span className="text-brandWhite text-lg font-medium">
+        <div className="flex flex-col pl-4 text-left">
+          <div className="flex flex-row items-center gap-2">
+            <span className="text-lg font-medium text-brandWhite">
               {userAddress
                 ? getEllipsedAddress(userAddress)
                 : "No user selected"}
             </span>
             {userAddress && (
               <div
-                className="w-3 h-3 hover:cursor-pointer items-center justify-center"
+                className="h-3 w-3 items-center justify-center hover:cursor-pointer"
                 onClick={() => {
                   if (!navigator.clipboard) {
                     toast.error(
-                      "Copy to clipboard not allowed by the navigator"
+                      "Copy to clipboard not allowed by the navigator",
                     );
                   } else {
                     navigator.clipboard.writeText(userAddress || "");
@@ -64,7 +64,7 @@ export const ProfileBox = ({
           </div>
           <div className="flex flex-row gap-4">
             {userBadgesQuantity !== undefined ? (
-              <span className="text-whiteOpacity05 text-sm font-normal">
+              <span className="text-sm font-normal text-whiteOpacity05">
                 {userBadgesQuantity > 1
                   ? `${userBadgesQuantity} badges`
                   : `${userBadgesQuantity || "0"} badge`}
@@ -73,7 +73,7 @@ export const ProfileBox = ({
               <></>
             )}
             {userScore !== undefined ? (
-              <span className="text-whiteOpacity05 text-sm font-normal">
+              <span className="text-sm font-normal text-whiteOpacity05">
                 {userScore} points
               </span>
             ) : (
@@ -82,8 +82,8 @@ export const ProfileBox = ({
           </div>
         </div>
       </div>
-      <div className="w-max min-w-[200px] flex flex-row h-full items-center pr-[26px]">
-        <div className="w-max h-10 pr-2">
+      <div className="flex h-full w-max min-w-[200px] flex-row items-center pr-[26px]">
+        <div className="h-10 w-max pr-2">
           {isClearButtonVisible && (
             <IconicButton
               className="bg-darkGreenOpacity01 text-brandGreen"
@@ -97,7 +97,7 @@ export const ProfileBox = ({
             />
           )}
         </div>
-        <div className="min-w-[200px] w-full h-max">{searchBar}</div>
+        <div className="h-max w-full min-w-[200px]">{searchBar}</div>
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { Tabs } from '@/components/organisms/types';
-import cc from 'classcat';
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import { SearchIconPrimary } from '../atoms';
-import { SearchBar } from '../search/SearchBar';
-import useCommunitiesController from '../community/hooks/controller';
-import { useCommunityContext } from '../community/Context';
+import { Tabs } from "@/components/organisms/types";
+import cc from "classcat";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { SearchIconPrimary } from "../atoms";
+import { SearchBar } from "../search/SearchBar";
+import useCommunitiesController from "../community/hooks/controller";
+import { useCommunityContext } from "../community/Context";
 
 export interface TabProps {
   content: React.ReactNode;
@@ -16,7 +16,7 @@ export interface TabProps {
 }
 
 export interface ContentTabsProps
-  extends React.ComponentPropsWithoutRef<'div'> {
+  extends React.ComponentPropsWithoutRef<"div"> {
   tabs: Record<string, TabProps>;
   onButtonClick?: (tabName: string) => void;
   inputText?: string;
@@ -28,7 +28,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   className,
   tabs,
   inputSearch,
-  inputText = '',
+  inputText = "",
   setInputText,
   onButtonClick,
   ...props
@@ -42,8 +42,8 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   };
 
   return (
-    <div className={cc([className, 'w-full h-max bg-brandBlack'])} {...props}>
-      <nav className="flex flex-col sm:flex-row nav-bar sm:px-12 justify-between cursor-pointer items-center">
+    <div className={cc([className, "h-max w-full bg-brandBlack"])} {...props}>
+      <nav className="nav-bar flex cursor-pointer flex-col items-center justify-between sm:flex-row sm:px-12">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)
@@ -52,9 +52,9 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
                 <div
                   key={tabName}
                   className={cc([
-                    { 'tab-active': tabName == selectedTab },
-                    { 'opacity-50 cursor-not-allowed': tabProps.disabled },
-                    'tab p-2 px-4',
+                    { "tab-active": tabName == selectedTab },
+                    { "cursor-not-allowed opacity-50": tabProps.disabled },
+                    "tab p-2 px-4",
                   ])}
                   onClick={() => {
                     if (!tabProps.disabled) {
@@ -68,10 +68,10 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
               );
             })}
         </div>
-        <div className="py-4 flex ">
+        <div className="flex py-4">
           {inputSearch && setInputText && (
             <SearchBar
-              placeholder={'Paste the address...'}
+              placeholder={"Paste the address..."}
               onButtonClick={onSearch}
               inputText={inputText}
               onChangeInputText={setInputText}

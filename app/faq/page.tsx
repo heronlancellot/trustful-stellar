@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { CardTemplate } from "@/components";
 import { CardWrapper } from "@/components/templates/CardWrapper";
@@ -8,9 +8,9 @@ export default function IssueBadgePage() {
   return (
     <PageTemplate className="" title={"FAQ"}>
       <CardWrapper className="flex">
-        <CardTemplate className="bg-whiteOpacity005 p-8 border border-whiteOpacity05 w-[calc(33vw-26px-1.5rem)] hover:bg-whiteOpacity008">
-          <div className="w-full flex justify-center">
-            <h2 className="text-2xl font-bold pt-1 pb-3 text-whiteOpacity05">
+        <CardTemplate className="w-[calc(33vw-26px-1.5rem)] border border-whiteOpacity05 bg-whiteOpacity005 p-8 hover:bg-whiteOpacity008">
+          <div className="flex w-full justify-center">
+            <h2 className="pb-3 pt-1 text-2xl font-bold text-whiteOpacity05">
               Why Trustful?
             </h2>
           </div>
@@ -22,9 +22,9 @@ export default function IssueBadgePage() {
             empowering users to prove their contributions over time.
           </span>
         </CardTemplate>
-        <CardTemplate className="bg-whiteOpacity005 p-8 border border-whiteOpacity05 w-[calc(33vw-27px-1.5rem)] hover:bg-whiteOpacity008">
-          <div className="w-full flex justify-center">
-            <h2 className="text-2xl font-bold pt-1 pb-3 text-whiteOpacity05">
+        <CardTemplate className="w-[calc(33vw-27px-1.5rem)] border border-whiteOpacity05 bg-whiteOpacity005 p-8 hover:bg-whiteOpacity008">
+          <div className="flex w-full justify-center">
+            <h2 className="pb-3 pt-1 text-2xl font-bold text-whiteOpacity05">
               Why import badges?
             </h2>
           </div>
@@ -35,9 +35,9 @@ export default function IssueBadgePage() {
             grants, or ambassador programs within Stellar and other dApps.
           </span>
         </CardTemplate>
-        <CardTemplate className="bg-whiteOpacity005 p-8 border border-whiteOpacity05 w-[calc(34vw-27px-1.5rem)] hover:bg-whiteOpacity008">
-          <div className="w-full flex justify-center">
-            <h2 className="text-2xl font-bold pt-1 pb-5 text-whiteOpacity05">
+        <CardTemplate className="w-[calc(34vw-27px-1.5rem)] border border-whiteOpacity05 bg-whiteOpacity005 p-8 hover:bg-whiteOpacity008">
+          <div className="flex w-full justify-center">
+            <h2 className="pb-5 pt-1 text-2xl font-bold text-whiteOpacity05">
               How can communities verify my reputation?
             </h2>
           </div>
@@ -47,9 +47,9 @@ export default function IssueBadgePage() {
             associated reputation scores.
           </span>
         </CardTemplate>
-        <CardTemplate className="bg-whiteOpacity005 p-8 border border-whiteOpacity05 w-[calc(49.5vw-40px-0.75rem)] hover:bg-whiteOpacity008">
-          <div className="w-full flex justify-center">
-            <h2 className="text-2xl font-bold pt-1 pb-8 text-whiteOpacity05">
+        <CardTemplate className="w-[calc(49.5vw-40px-0.75rem)] border border-whiteOpacity05 bg-whiteOpacity005 p-8 hover:bg-whiteOpacity008">
+          <div className="flex w-full justify-center">
+            <h2 className="pb-8 pt-1 text-2xl font-bold text-whiteOpacity05">
               How can I create a reputation framework for my community?
             </h2>
           </div>
@@ -60,9 +60,9 @@ export default function IssueBadgePage() {
             scorers, and attestations for your community.
           </span>
         </CardTemplate>
-        <CardTemplate className="bg-whiteOpacity005 p-8 border border-whiteOpacity05 w-[calc(49.5vw-40px-0.75rem)] hover:bg-whiteOpacity008">
-          <div className="w-full flex justify-center">
-            <h2 className="text-2xl font-bold pt-1 pb-8 text-whiteOpacity05">
+        <CardTemplate className="w-[calc(49.5vw-40px-0.75rem)] border border-whiteOpacity05 bg-whiteOpacity005 p-8 hover:bg-whiteOpacity008">
+          <div className="flex w-full justify-center">
+            <h2 className="pb-8 pt-1 text-2xl font-bold text-whiteOpacity05">
               What are the benefits of using Trustful?
             </h2>
           </div>

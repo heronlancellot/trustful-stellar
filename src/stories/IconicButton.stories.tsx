@@ -51,7 +51,7 @@ export const ImportButtonExample: Story = {
 export const ReimportButtonExample: Story = {
   args: {
     icon: (
-      <div className="transform rotate-180">
+      <div className="rotate-180 transform">
         <ArrowIcon color={tailwindConfig.theme.extend.colors.brandBlack} />
       </div>
     ),

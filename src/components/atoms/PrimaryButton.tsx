@@ -26,7 +26,7 @@ export const PrimaryButton = ({
       {...props}
       onClick={onClick}
       className={cc([
-        "flex w-full space-x-3 items-center justify-center gap-2 px-4 py-2 text-base font-medium text-brandBlack hover:bg-primary transition",
+        "hover:bg-primary flex w-full items-center justify-center gap-2 space-x-3 px-4 py-2 text-base font-medium text-brandBlack transition",
         { "flex-row-reverse": iconPosition === IconPosition.RIGHT },
         { "bg-whiteOpacity05": disabled },
         { "bg-brandGreen": !disabled },
@@ -35,7 +35,7 @@ export const PrimaryButton = ({
       disabled={disabled}
     >
       {!isLoading ? (
-        icon && <div className="w-5 h-5">{icon}</div>
+        icon && <div className="h-5 w-5">{icon}</div>
       ) : (
         <PulseLoader size={8}></PulseLoader>
       )}

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { DisconnectIcon, UserIcon } from '@/components/atoms';
-import { useAuthContext } from '@/components/auth/Context';
-import tailwindConfig from 'tailwind.config';
-import cc from 'classcat';
-import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect } from "react";
+import { DisconnectIcon, UserIcon } from "@/components/atoms";
+import { useAuthContext } from "@/components/auth/Context";
+import tailwindConfig from "tailwind.config";
+import cc from "classcat";
+import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
+import { useRouter } from "next/navigation";
 
 export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,20 +26,20 @@ export const UserDropdown = () => {
   const handleProfileClick = () => {
     if (!userAddress) return;
     const searchParams = new URLSearchParams();
-    searchParams.set('searchAddress', userAddress);
+    searchParams.set("searchAddress", userAddress);
     router.push(`/verify-reputation?${searchParams.toString()}`);
     setIsOpen(false);
   };
 
   const disconnect = () => {
-    setUserAddress('');
+    setUserAddress("");
     setIsOpen(false);
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -54,10 +54,10 @@ export const UserDropdown = () => {
         <div
           className={cc([
             {
-              'text-brandWhite border bg-whiteOpacity008': !isOpen,
-              'text-brandBlack bg-brandGreen': isOpen,
+              "border bg-whiteOpacity008 text-brandWhite": !isOpen,
+              "bg-brandGreen text-brandBlack": isOpen,
             },
-            'border-whiteOpacity008 rounded-lg p-2',
+            "rounded-lg border-whiteOpacity008 p-2",
           ])}
         >
           <div className="flex items-center justify-center gap-2">
@@ -70,7 +70,7 @@ export const UserDropdown = () => {
               }
             />
             <h2 className="hidden sm:flex">
-              {getEllipsedAddress(userAddress || '')}
+              {getEllipsedAddress(userAddress || "")}
             </h2>
           </div>
         </div>
@@ -79,7 +79,7 @@ export const UserDropdown = () => {
       {isOpen && (
         <div
           id="user-menu"
-          className="z-auto origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-fit rounded-md shadow-lg bg-brandBlack"
+          className="absolute right-0 z-auto mt-2 w-fit origin-top-right rounded-md border border-whiteOpacity008 bg-brandBlack shadow-lg"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="user-menu-button"
@@ -87,7 +87,7 @@ export const UserDropdown = () => {
           <div>
             <button
               onClick={handleProfileClick}
-              className="flex justify-between rounded-md items-center gap-2 cursor-pointer p-3 text-base hover:bg-whiteOpacity05 w-full text-left transition-colors duration-300"
+              className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md p-3 text-left text-base transition-colors duration-300 hover:bg-whiteOpacity05"
               role="menuitem"
             >
               <div className="flex items-center justify-center gap-2">
@@ -100,7 +100,7 @@ export const UserDropdown = () => {
             </button>
             <button
               onClick={disconnect}
-              className="flex gap-2 rounded-md cursor-pointer items-center p-3 text-base hover:bg-whiteOpacity05 w-full transition-colors duration-300"
+              className="flex w-full cursor-pointer items-center gap-2 rounded-md p-3 text-base transition-colors duration-300 hover:bg-whiteOpacity05"
               role="menuitem"
             >
               <DisconnectIcon
