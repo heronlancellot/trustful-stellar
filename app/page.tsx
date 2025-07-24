@@ -55,7 +55,7 @@ export default function HomePage(): JSX.Element {
 
   return (
     <div className="w-screen flex flex-col h-screen overflow-hidden bg-brandBlack z-10">
-      <div className="w-full h-fit z-10">
+      <div className="w-full h-fit z-20">
         <DappHeader />
       </div>
       {/* Background Layer */}

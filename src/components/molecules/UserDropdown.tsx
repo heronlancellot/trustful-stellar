@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { DisconnectIcon, UserIcon } from '@/components/atoms';
@@ -75,9 +75,9 @@ export const UserDropdown = () => {
       </button>
 
       {isOpen && (
-        <div 
+        <div
           id="user-menu"
-          className="z-50 origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-[15vw] rounded-md shadow-lg bg-brandBlack"
+          className="z-auto origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-[15vw] rounded-md shadow-lg bg-brandBlack"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="user-menu-button"
