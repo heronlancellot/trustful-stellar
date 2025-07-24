@@ -8,7 +8,7 @@ import {
 } from "./types";
 import { Communities, CommunityBadges, MembersList } from "@/types/communities";
 import { useAuthContext } from "../auth/Context";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { getApiUrl } from "@/lib/environmentVars";
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);

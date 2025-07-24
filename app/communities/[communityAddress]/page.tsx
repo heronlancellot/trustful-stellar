@@ -36,6 +36,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateCommunityVisibility } from "@/lib/hooks/api/useCommunities";
 import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
+import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
 
 interface DetailsProps {
   params: {
@@ -45,20 +46,20 @@ interface DetailsProps {
 
 export default function DetailsCommunity({ params }: DetailsProps) {
   const { openModal, closeModal, isOpen } = useModal();
-  const { userAddress, setUserAddress } = useAuthContext();
+  const { userAddress } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const communityAddress = params.communityAddress;
+  const queryClient = useQueryClient();
 
   const { stellarContractJoinCommunities, stellarContractManagers } =
     useCommunitiesController({ communityAddress });
 
-  const [newManager, setNewManager] = useState("");
-  const [removeManager, setRemoveManager] = useState("");
-  const queryClient = useQueryClient();
-  const [isHiding, setIsHiding] = useState(false);
-  const [hasOfferedRedirect, setHasOfferedRedirect] = useState(false);
+  const [newManager, setNewManager] = useState<string>("");
+  const [removeManager, setRemoveManager] = useState<string>("");
+  const [isHiding, setIsHiding] = useState<boolean>(false);
+  const [hasOfferedRedirect, setHasOfferedRedirect] = useState<boolean>(false);
 
   const { data: communitiesDetail, isLoading: isLoadingDetails } =
     useCommunityDetails(communityAddress as string, userAddress);
@@ -80,14 +81,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     userAddress.toLowerCase() ===
       communitiesDetail.creator_address.toLowerCase();
 
-  const statusList = {
-    all: "all",
-    joined: "joined",
-    created: "created",
-    hidden: "hidden",
-  };
-
-  const { all, joined, created, hidden } = statusList;
+  const { all, joined, created, hidden } = NAVIGATION_STATUS_LIST;
 
   useEffect(() => {
     if (

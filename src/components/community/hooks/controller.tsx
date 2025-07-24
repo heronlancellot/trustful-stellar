@@ -14,7 +14,7 @@ interface UseCommunitiesControllerParams {
 export default function useCommunitiesController({
   communityAddress,
 }: UseCommunitiesControllerParams = {}) {
-  const [inputText, setInputText] = useState("");
+  const [inputText, setInputText] = useState<string>("");
 
   const communityAddressFormatted =
     typeof communityAddress === "string" ? communityAddress.toUpperCase() : "";

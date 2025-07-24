@@ -23,6 +23,7 @@ import {
   useCommunities,
   useCommunitiesByStatus,
 } from "@/lib/hooks/api/useCommunities";
+import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
 
 // Loading component for Suspense fallback
 function CommunitiesPageLoading() {
@@ -55,31 +56,24 @@ function CommunitiesContent() {
   const pathname = usePathname();
   const status = searchParams.get("status");
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [dataFetched, setDataFetched] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [dataFetched, setDataFetched] = useState<boolean>(false);
 
-  const [isImportModalOpen, setImportModalOpen] = useState(false);
-  const [selectedQuestName, setSelectedQuestName] = useState("");
+  const [isImportModalOpen, setImportModalOpen] = useState<boolean>(false);
+  const [selectedQuestName, setSelectedQuestName] = useState<string>("");
 
-  const statusList = {
-    all: "all",
-    joined: "joined",
-    created: "created",
-    hidden: "hidden",
-  } as const;
-
-  const currentStatus = (status as string) || statusList.all;
+  const currentStatus = (status as string) || NAVIGATION_STATUS_LIST.all;
 
   const { data: allCommunities, isLoading: isLoadingAllCommunities } =
     useCommunities(userAddress);
   const { data: statusCommunities, isLoading: isLoadingStatusCommunities } =
     useCommunitiesByStatus(
-      currentStatus !== statusList.all ? currentStatus : "",
+      currentStatus !== NAVIGATION_STATUS_LIST.all ? currentStatus : "",
       userAddress,
     );
 
   const communities =
-    currentStatus !== statusList.all && userAddress
+    currentStatus !== NAVIGATION_STATUS_LIST.all && userAddress
       ? statusCommunities
       : allCommunities;
 
