@@ -56,10 +56,10 @@ export const PageTemplate = ({
     >
       <DappHeader />
       <PerfectScrollbar className="h-full flex flex-col w-full">
-        <div className="text-left text-[26px] pl-12 pt-8 pb-3 flex justify-between items-center">
+        <div className="text-left text-[26px] sm:px-12 sm:pt-8 sm:pb-3 flex justify-between items-center px-6 py-4">
           <h1 className="font-spaceGrotesk">{title}</h1>{' '}
           {isCommunity && (
-            <div className="py-6 px-12">
+            <div className="">
               <PrimaryButton
                 className={cc([
                   'rounded-lg w-max',

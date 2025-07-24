@@ -43,7 +43,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
 
   return (
     <div className={cc([className, 'w-full h-max bg-brandBlack'])} {...props}>
-      <nav className="flex nav-bar px-12 justify-between cursor-pointer items-center">
+      <nav className="flex flex-col sm:flex-row nav-bar sm:px-12 justify-between cursor-pointer items-center">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)
@@ -68,7 +68,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
               );
             })}
         </div>
-        <div className="py-4">
+        <div className="py-4 flex ">
           {inputSearch && setInputText && (
             <SearchBar
               placeholder={'Paste the address...'}

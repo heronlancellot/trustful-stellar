@@ -69,7 +69,9 @@ export const UserDropdown = () => {
                   : tailwindConfig.theme.extend.colors.brandGreen
               }
             />
-            <h2>{getEllipsedAddress(userAddress || '')}</h2>
+            <h2 className="hidden sm:flex">
+              {getEllipsedAddress(userAddress || '')}
+            </h2>
           </div>
         </div>
       </button>
@@ -77,7 +79,7 @@ export const UserDropdown = () => {
       {isOpen && (
         <div
           id="user-menu"
-          className="z-auto origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-[15vw] rounded-md shadow-lg bg-brandBlack"
+          className="z-auto origin-top-right border-whiteOpacity008 border absolute right-0 mt-2 w-fit rounded-md shadow-lg bg-brandBlack"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="user-menu-button"

@@ -14,7 +14,7 @@ export const DappHeader = () => {
   const path = usePathname();
   return (
     <div className="w-full  flex items-center mx-auto px-6 pb-0 max-w-[100vw] h-[72px] justify-between border-t-none border border-r-none border-l-none border-whiteOpacity008 bg-brandBlack z-10">
-      <div className="flex h-full items-center gap-6">
+      <div className="flex h-full items-center gap-6 overflow-x-auto scrollbar-hide">
         <Link href="/">
           <Image
             alt="Trustful Stellar Icon"
