@@ -2,18 +2,9 @@ import { CustomTable } from "@/components/organisms/CustomTable";
 import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
 import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
 import tailwindConfig from "tailwind.config";
-import { IssuerTableCell } from "@/components/atoms/verify-reputation/IssuerTableCell";
 import { RankIcon } from "@/components/atoms/icons/RankIcon";
 import { MembersList } from "@/types/communities";
 import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
-
-type LeaderboardPlayer = {
-  rank: number;
-  address: string;
-  points: number;
-  badges: number;
-  avatarUrl?: string;
-};
 
 function getRankIconColor(rank: number) {
   const colorsMap = {
@@ -86,7 +77,7 @@ export default function LeaderboardTable({
             {player.badges}
           </span>
           <span className="text-whiteOpacity05">
-            {player.points} / {player.badges_count}
+            {`${player.badges_count}/${totalBadgesMemberList}`}
           </span>
         </div>
       ),
@@ -111,7 +102,7 @@ export default function LeaderboardTable({
         headers={["rank", "address", "points", "badges"]}
         headersClassnames={["w-[8%]"]}
         data={leaderboardRenderData}
-      ></CustomTable>
+      />
     </div>
   );
 }

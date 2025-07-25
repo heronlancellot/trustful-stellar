@@ -236,7 +236,7 @@ function VerifyReputationContent() {
             <div className="flex max-h-[440px] flex-col rounded-xl border border-whiteOpacity005">
               <div className="flex items-center justify-between border-b border-whiteOpacity005 px-6 py-4">
                 <span className="text-left text-sm">Name</span>
-                <span className="w-24 text-right text-sm">Score</span>
+                <span className="w-24 text-left text-sm">Score</span>
                 <span className="w-24 text-center text-sm">Status</span>
               </div>
 
