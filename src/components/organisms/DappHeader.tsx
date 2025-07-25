@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ConnectStellarWallet } from "../auth/ConnectStellarWallet";
-import { useUsersContext } from "../user/Context";
+import { ConnectStellarWallet } from "@/components/auth/ConnectStellarWallet";
+import { useUsersContext } from "@/components/user/Context";
 import { useRouter, usePathname } from "next/navigation";
 import cc from "classcat";
-import React from "react";
-import { useAuthContext } from "../auth/Context";
+import { useAuthContext } from "@/components/auth/Context";
 
 export const DappHeader = () => {
   const { userScore } = useUsersContext();

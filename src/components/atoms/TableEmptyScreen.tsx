@@ -1,8 +1,6 @@
-import tailwindConfig from "tailwind.config";
-import { SearchIcon } from "./icons/SearchIcon";
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 
-interface TableEmptyScreenProps extends React.ComponentPropsWithoutRef<"div"> {
+interface TableEmptyScreenProps extends ComponentPropsWithoutRef<"div"> {
   icon: ReactNode;
   title: string;
   description: string;
@@ -16,8 +14,8 @@ export const TableEmptyScreen = ({
   return (
     <div className="flex h-full min-h-[200px] w-full items-center justify-center">
       <div className="flex h-max w-max flex-col items-center justify-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-whiteOpacity008">
-          <div className="h-7 w-7">{icon}</div>
+        <div className="flex size-20 items-center justify-center rounded-full bg-whiteOpacity008">
+          <div className="size-7">{icon}</div>
         </div>
         <div className="w-full items-center justify-center pt-4 text-center">
           <span>{title}</span>

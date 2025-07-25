@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   SearchContext,
   SearchContextProviderProps,
@@ -7,9 +7,7 @@ import {
 
 const searchCtx = createContext<SearchContext | undefined>(undefined);
 
-const SearchContextProvider: React.FC<SearchContextProviderProps> = (
-  props: SearchContextProviderProps,
-) => {
+const SearchContextProvider = ({ children }: SearchContextProviderProps) => {
   const [searchedUserAddress, setSearchedUserAddress] = useState<string>("");
 
   const [searchedUserBadges, setSearchedUserBadges] =
@@ -28,7 +26,7 @@ const SearchContextProvider: React.FC<SearchContextProviderProps> = (
         setSearchedUserScore,
       }}
     >
-      {props.children}
+      {children}
     </searchCtx.Provider>
   );
 };

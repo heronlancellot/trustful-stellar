@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext, AuthProviderProps } from "./types";
 import {
   clearLocalStorageUserAddress,
@@ -9,9 +9,7 @@ import {
 } from "@/lib/local-storage/auth";
 const authCtx = createContext<AuthContext | undefined>(undefined);
 
-const AuthProvider: React.FC<AuthProviderProps> = (
-  props: AuthProviderProps,
-) => {
+const AuthProvider = ({ children }: AuthProviderProps) => {
   const [userAddress, setUserAddress] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -34,7 +32,7 @@ const AuthProvider: React.FC<AuthProviderProps> = (
 
   return (
     <authCtx.Provider value={{ userAddress, setUserAddress }}>
-      {props.children}
+      {children}
     </authCtx.Provider>
   );
 };

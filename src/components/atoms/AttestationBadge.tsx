@@ -1,23 +1,21 @@
-import { SVGProps } from "react";
+import { ComponentPropsWithoutRef, SVGProps } from "react";
 import cc from "classcat";
-import { CheckIcon } from "./icons/CheckIcon";
-import { ArrowIcon } from "./icons/ArrowIcon";
-import React from "react";
+import { ArrowIcon, CheckIcon } from "@/components/atoms/icons";
 import tailwindConfig from "tailwind.config";
 
-interface AttestationBadgeProps extends React.ComponentPropsWithoutRef<"div"> {
+interface AttestationBadgeProps extends ComponentPropsWithoutRef<"div"> {
   title: string;
   imported: boolean | undefined;
   icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
 }
 
-export const AttestationBadge: React.FC<AttestationBadgeProps> = ({
+export const AttestationBadge = ({
   title,
   className,
   imported,
   icon,
   ...props
-}) => {
+}: AttestationBadgeProps) => {
   const Icon = icon;
   return (
     <div

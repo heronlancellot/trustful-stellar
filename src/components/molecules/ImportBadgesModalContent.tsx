@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
-import { AttestationSymbol } from "../atoms/AttestationSymbol";
+import { AttestationSymbol } from "@/components/atoms/AttestationSymbol";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import cc from "classcat";
 import { Tooltip } from "react-tooltip";
-import { QuestCircleIcon } from "../atoms/icons/QuestionCircleIcon";
+import { QuestCircleIcon } from "@/components/atoms/icons";
 import tailwindConfig from "tailwind.config";
 
 interface ImportBadgesModalContentProps {
@@ -27,7 +27,7 @@ export const ImportBadgesModalContent = ({
     <div className="flex h-full w-full flex-col items-center justify-center p-2">
       {title && (
         <div className="flex h-full min-h-[20px] w-full items-center justify-center py-6">
-          {icon && <div className="mx-4 h-[30px] w-[30px]">{icon}</div>}
+          {icon && <div className="mx-4 size-[30px]">{icon}</div>}
           {<h2 className="text-xl">Stellar Quest</h2>}
         </div>
       )}
@@ -53,7 +53,7 @@ export const ImportBadgesModalContent = ({
                       {title}{" "}
                       <div
                         className={cc([
-                          "m-1 ml-2 h-3 w-3",
+                          "m-1 ml-2 size-3",
                           { hidden: !description },
                         ])}
                       >
@@ -65,8 +65,8 @@ export const ImportBadgesModalContent = ({
                             color={
                               tailwindConfig.theme.extend.colors.whiteOpacity05
                             }
-                            className="h-full w-full"
-                          ></QuestCircleIcon>
+                            className="size-full"
+                          />
                         </a>
                       </div>
                     </span>

@@ -19,7 +19,7 @@ import tailwindConfig from "tailwind.config";
 import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
 import { useModal } from "@/hooks/useModal";
 import { CustomModal } from "@/components/molecules";
-import LeaderboardTable from "@/components/molecules/leaderboard-table";
+import { LeaderboardTable } from "@/components/molecules/leaderboard-table";
 import { useState, useEffect } from "react";
 import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
 import { useCommunityContext } from "@/components/community/Context";
@@ -35,7 +35,7 @@ import {
 } from "@/lib/hooks/api/useCommunityDetails";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateCommunityVisibility } from "@/lib/hooks/api/useCommunities";
-import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
+import { ActivityIndicatorModal } from "@/components/molecules/ActivityIndicatorModal";
 import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
 
 interface DetailsProps {

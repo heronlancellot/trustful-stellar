@@ -110,14 +110,14 @@ const createCommunitySchema = z.object({
 
 type CreateCommunityForm = z.infer<typeof createCommunitySchema>;
 
-export const StepModal: React.FC<ModalProps> = ({
+export const StepModal = ({
   isOpen,
   onClose,
   currentStep,
   onNext,
   onBack,
   onConfirm,
-}) => {
+}: ModalProps) => {
   const {
     register,
     handleSubmit,

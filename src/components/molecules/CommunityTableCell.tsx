@@ -1,9 +1,6 @@
-import tailwindConfig from "tailwind.config";
-import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
-import { UserIcon } from "@/components";
+import { ComponentPropsWithoutRef } from "react";
 
-interface CommunityTableCellProps
-  extends React.ComponentPropsWithoutRef<"div"> {
+interface CommunityTableCellProps extends ComponentPropsWithoutRef<"div"> {
   issuerAddress: string;
 }
 

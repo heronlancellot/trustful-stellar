@@ -1,7 +1,14 @@
 import { camelCaseToUpperCaseWords } from "@/lib/utils/camelCaseToWords";
 import cc from "classcat";
 import { Check, Trash2, X } from "lucide-react";
-import React, { ReactElement, ReactNode, useEffect, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  FormEvent,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { PlusIcon } from "../atoms";
 import useCommunitiesController from "../community/hooks/controller";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,7 +18,7 @@ import { useCommunityContext } from "../community/Context";
 import { isValidStellarAddress } from "@/lib/stellar/isValidStellarAddress";
 
 export interface CustomTableProps<T extends Record<string, any>>
-  extends React.ComponentPropsWithoutRef<"div"> {
+  extends ComponentPropsWithoutRef<"div"> {
   childrenForEmptyTable: ReactNode;
   data?: T[];
   headers: string[];
@@ -52,7 +59,7 @@ export const CustomTable = <T extends Record<string, any>>({
   const isDisabled =
     !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {

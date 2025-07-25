@@ -3,12 +3,9 @@ import {
   ALBEDO_ID,
   AlbedoModule,
   StellarWalletsKit,
-  WalletNetwork,
-  xBullModule,
 } from "@creit.tech/stellar-wallets-kit";
 import cc from "classcat";
 import { UserDropdown } from "../molecules";
-import { setLocalStorageUserAddress } from "@/lib/local-storage/auth";
 import { checkIfWalletIsInitialized } from "@/lib/stellar/isFundedStellarWallet";
 import toast from "react-hot-toast";
 import { STELLAR } from "@/lib/environmentVars";

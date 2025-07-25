@@ -15,7 +15,7 @@ import { kit } from "@/components/auth/ConnectStellarWallet";
 import { ALBEDO_ID } from "@creit.tech/stellar-wallets-kit";
 import assetClient from "@/lib/http-clients/AssetClient";
 import toast from "react-hot-toast";
-import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
+import { ActivityIndicatorModal } from "@/components/molecules/ActivityIndicatorModal";
 import { CommunitiesCard } from "@/components/atoms/CommunitiesCard";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useCommunitiesController from "@/components/community/hooks/controller";

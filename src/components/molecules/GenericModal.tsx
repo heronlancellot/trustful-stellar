@@ -1,5 +1,5 @@
 import cc from "classcat";
-import { IconicButton } from "../atoms";
+import { IconicButton } from "@/components/atoms";
 import { useState } from "react";
 
 interface ModalProps {
@@ -23,7 +23,7 @@ export const GenericModal = ({
   isAsync,
   disabledButton,
 }: ModalProps) => {
-  const [isExecuting, setIsExecuting] = useState(false);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const onButtonClickAsync = async () => {
     setIsExecuting(true);
     try {

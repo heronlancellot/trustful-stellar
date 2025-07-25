@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 import {
   IconicButton,
   UserIcon,
@@ -7,7 +7,7 @@ import {
 } from "@/components/atoms";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
 
-interface ProfileBoxProps extends React.ComponentPropsWithoutRef<"div"> {
+interface ProfileBoxProps extends ComponentPropsWithoutRef<"div"> {
   userAddress?: string;
   userBadgesQuantity?: number;
   userScore?: number;
@@ -28,7 +28,7 @@ export const ProfileBox = ({
     <div className="flex h-auto min-h-[100px] w-full min-w-[320px] flex-col justify-between rounded-md border border-whiteOpacity008 bg-whiteOpacity008 md:h-[100px] md:min-w-[500px] md:flex-row">
       <div className="flex min-w-0 flex-1 flex-row items-center p-4 md:min-w-[300px] md:p-[26px]">
         <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-md bg-whiteOpacity008">
-          <div className="h-6 w-6">
+          <div className="size-6">
             <UserIcon
               color={
                 !userAddress

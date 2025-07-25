@@ -25,7 +25,7 @@ export const CustomModal = ({
   disabledButton,
   headerBackgroundColor = "bg-brandBlack",
 }: CustomModalProps) => {
-  const [isExecuting, setIsExecuting] = useState(false);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
 
   const onButtonClickAsync = async () => {
     if (onButtonClick) {

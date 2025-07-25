@@ -13,7 +13,7 @@ import {
 } from "@/components/search/Context";
 import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
 import tailwindConfig from "tailwind.config";
-import ActivityIndicatorModal from "@/components/molecules/ActivityIndicatorModal";
+import { ActivityIndicatorModal } from "@/components/molecules/ActivityIndicatorModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCommunityContext } from "@/components/community/Context";
 import { CardWrapper } from "@/components/templates/CardWrapper";

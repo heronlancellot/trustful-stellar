@@ -9,7 +9,7 @@ import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
 import { useRouter } from "next/navigation";
 
 export const UserDropdown = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { setUserAddress, userAddress } = useAuthContext();

@@ -6,7 +6,9 @@ type ActivityIndicatorModalProps = {
   isOpen: boolean;
 };
 
-const ActivityIndicatorModal = ({ isOpen }: ActivityIndicatorModalProps) => {
+export const ActivityIndicatorModal = ({
+  isOpen,
+}: ActivityIndicatorModalProps) => {
   return (
     <div
       className={cc([
@@ -21,5 +23,3 @@ const ActivityIndicatorModal = ({ isOpen }: ActivityIndicatorModalProps) => {
     </div>
   );
 };
-
-export default ActivityIndicatorModal;

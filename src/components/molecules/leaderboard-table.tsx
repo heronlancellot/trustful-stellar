@@ -35,10 +35,10 @@ function getPointsTextColor(rank: number) {
   return colorsMap[rank as keyof typeof colorsMap] || colorsMap.default;
 }
 
-export default function LeaderboardTable({
+export const LeaderboardTable = ({
   communitiesMembersList,
   totalBadgesMemberList,
-}: any) {
+}: any) => {
   const rankedSorted = Array.isArray(communitiesMembersList)
     ? communitiesMembersList.map((member: MembersList, index: number) => ({
         ...member,
@@ -105,4 +105,4 @@ export default function LeaderboardTable({
       />
     </div>
   );
-}
+};

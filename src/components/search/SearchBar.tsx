@@ -1,8 +1,8 @@
 import { ComponentPropsWithoutRef } from "react";
 import cc from "classcat";
 import { IconPosition } from "@/types/iconPosition";
-import { IconicButton } from "../atoms";
-import { SearchIcon } from "../atoms/icons/SearchIcon";
+import { IconicButton } from "@/components/atoms";
+import { SearchIcon } from "@/components/atoms/icons";
 
 interface SearchBarProps extends ComponentPropsWithoutRef<"div"> {
   placeholder: string;

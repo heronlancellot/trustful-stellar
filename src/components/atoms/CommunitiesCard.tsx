@@ -2,17 +2,16 @@ import { ComponentPropsWithoutRef } from "react";
 import cc from "classcat";
 import { Communities } from "@/types/communities";
 import {
+  CakeIcon,
   InformationIcon,
   PlusIcon,
-  StarIcon,
   TagIcon,
   UserIcon,
-} from "./icons";
+} from "@/components/atoms/icons";
+import { Minus } from "lucide-react";
 import { useStellarContract } from "@/lib/stellar/transactions/hooks/useStellarContract";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../auth/Context";
-import { Minus } from "lucide-react";
-import { CakeIcon } from "./icons/CakeIcon";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCommunityContext } from "../community/Context";
 import { STELLAR } from "@/lib/environmentVars";
@@ -55,11 +54,8 @@ export const CommunitiesCard = ({
     }
     try {
       const result = await stellarContractJoinCommunities.addUser();
-      console.log("result", result);
       if (result.success) {
-        console.log("result when success", result);
         toast.success("Successfully joined community");
-        console.log("Transaction successful:", result.txHash);
 
         queryClient.invalidateQueries({ queryKey: ["communities"] });
         queryClient.invalidateQueries({
@@ -74,7 +70,6 @@ export const CommunitiesCard = ({
         });
 
         await getCommunities();
-        console.log("communities", await getCommunities());
 
         setTimeout(() => {
           queryClient.resetQueries();
@@ -84,14 +79,12 @@ export const CommunitiesCard = ({
           "communities",
           userAddress,
         ]) as Communities[] | undefined;
-        console.log("currentData", currentData);
         if (currentData) {
           const updatedData = currentData.map((c) =>
             c.community_address === community.community_address
               ? { ...c, is_joined: true }
               : c,
           );
-          console.log("updatedData", updatedData);
           queryClient.setQueryData(["communities", userAddress], updatedData);
         }
       } else {
@@ -116,7 +109,6 @@ export const CommunitiesCard = ({
 
       if (result.success) {
         toast.success("Successfully left community");
-        console.log("Transaction successful:", result.txHash);
 
         queryClient.invalidateQueries({ queryKey: ["communities"] });
         queryClient.invalidateQueries({

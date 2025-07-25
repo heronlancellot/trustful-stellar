@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   CommunityContext,
   CommunityContextProviderProps,
@@ -13,9 +13,9 @@ import { getApiUrl } from "@/lib/environmentVars";
 
 const communityCtx = createContext<CommunityContext | undefined>(undefined);
 
-const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
-  props: CommunityContextProviderProps,
-) => {
+const CommunityContextProvider = ({
+  children,
+}: CommunityContextProviderProps) => {
   const [communityQuests, setCommunityQuests] = useState<CommunityQuests>({});
   const { userAddress } = useAuthContext();
   const queryClient = useQueryClient();
@@ -72,7 +72,6 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         getApiUrl(`/communities/joined/${userAddresFormated}`),
       );
       const data = await response.json();
-
       setVerifyReputationcommunities(data);
 
       queryClient.setQueryData(
@@ -233,7 +232,7 @@ const CommunityContextProvider: React.FC<CommunityContextProviderProps> = (
         updateShowCommunities,
       }}
     >
-      {props.children}
+      {children}
     </communityCtx.Provider>
   );
 };
