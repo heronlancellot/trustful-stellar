@@ -59,7 +59,7 @@ export const PageTemplate = ({
         <div className="flex items-center justify-between px-6 py-4 text-left text-[26px] sm:px-12 sm:pb-3 sm:pt-8">
           <h1 className="font-spaceGrotesk">{title}</h1>{" "}
           {isCommunity && (
-            <div className="">
+            <div>
               <PrimaryButton
                 className={cc([
                   "w-max rounded-lg",

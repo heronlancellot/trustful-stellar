@@ -35,7 +35,7 @@ export const PrimaryButton = ({
       disabled={disabled}
     >
       {!isLoading ? (
-        icon && <div className="h-5 w-5">{icon}</div>
+        icon && <div className="flex">{icon}</div>
       ) : (
         <PulseLoader size={8}></PulseLoader>
       )}

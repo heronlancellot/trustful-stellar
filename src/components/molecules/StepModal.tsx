@@ -1,35 +1,38 @@
 import { useAuthContext } from "@/components/auth/Context";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
 import { useBadgeStore } from "@/store/badgeStore";
-import albedo from "@albedo-link/intent";
 import { zodResolver } from "@hookform/resolvers/zod";
+import albedo from "@albedo-link/intent";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import {
   Address,
   BASE_FEE,
-  Networks,
   Operation,
   rpc,
   TransactionBuilder,
   xdr,
 } from "@stellar/stellar-sdk";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import * as z from "zod";
-import { PlusIcon, StarIcon, TagIcon, UserIcon } from "../atoms/icons";
-import { AlertIcon } from "../atoms/icons/AlertIcon";
-import { AwardIcon } from "../atoms/icons/AwardIcon";
-import { BankIcon } from "../atoms/icons/BankIcon";
-import { CakeIcon } from "../atoms/icons/CakeIcon";
-import { CloseIcon } from "../atoms/icons/CloseIcon";
-import { EthereumIcon } from "../atoms/icons/EthereumIcon";
-import { GithubIcon } from "../atoms/icons/GithubIcon";
-import { HeartIcon } from "../atoms/icons/HeartIcon";
-import { KeyIcon } from "../atoms/icons/KeyIcon";
-import { TrashIcon } from "../atoms/icons/TrashIcon";
-import { TrophyIcon } from "../atoms/icons/TrophyIcon";
 import useBadgeInfoController, { Badge } from "../badge-info/hooks/Controller";
+import {
+  AlertIcon,
+  PlusIcon,
+  StarIcon,
+  TagIcon,
+  UserIcon,
+  TrophyIcon,
+  KeyIcon,
+  HeartIcon,
+  EthereumIcon,
+  CakeIcon,
+  BankIcon,
+  AwardIcon,
+  GithubIcon,
+  TrashIcon,
+  CloseIcon,
+} from "@/components/atoms/icons";
 import { ALBEDO, STELLAR } from "@/lib/environmentVars";
 
 interface ModalProps {
@@ -49,7 +52,7 @@ interface BadgeOption {
 const BADGE_OPTIONS: BadgeOption[] = [
   { id: "stellar", label: "Stellar" },
   { id: "soroban", label: "Soroban" },
-  { id: "blockful", label: "Blockful" },
+  // { id: "blockful", label: "Blockful" },
   { id: "custom", label: "Custom" },
 ];
 
