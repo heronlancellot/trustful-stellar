@@ -1,25 +1,13 @@
 "use client";
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useState } from "react";
 import { UserBadge, UserContext, UserContextProviderProps } from "./types";
 import { CommunityBadge } from "../community/types";
-import usersClient from "@/lib/http-clients/UsersClient";
-import { useAuthContext } from "../auth/Context";
-import toast from "react-hot-toast";
 import { BLOCKFUL_QUEST_NAME } from "@/lib/constants";
 
 const userCtx = createContext<UserContext | undefined>(undefined);
 
-const UserContextProvider: React.FC<UserContextProviderProps> = (
-  props: UserContextProviderProps,
-) => {
-  const { userAddress } = useAuthContext();
+const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [userScore, setUserScore] = useState<number>();
   const [userBadgesImported, setUserBadgesImported] = useState<UserBadge[]>([]);
   const [userBadgesToImport, _setUserBadgesToImport] = useState<UserBadge[]>(
@@ -77,7 +65,7 @@ const UserContextProvider: React.FC<UserContextProviderProps> = (
         setUserBadgesToImport,
       }}
     >
-      {props.children}
+      {children}
     </userCtx.Provider>
   );
 };

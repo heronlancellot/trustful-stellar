@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 
-interface CardWrapperProps extends React.ComponentPropsWithoutRef<"div"> {
+interface CardWrapperProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode;
 }
 

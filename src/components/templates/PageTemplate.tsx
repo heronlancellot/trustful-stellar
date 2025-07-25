@@ -2,12 +2,12 @@ import cc from "classcat";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { Tooltip } from "react-tooltip";
-import { PrimaryButton } from "../atoms/PrimaryButton";
+import { PrimaryButton } from "@/components/atoms/PrimaryButton";
 import { IconPosition } from "@/types/iconPosition";
-import { PlusIcon } from "../atoms";
-import { StepModal } from "../molecules/StepModal";
-import { useAuthContext } from "../auth/Context";
-import { DappHeader } from "../organisms";
+import { PlusIcon } from "@/components/atoms";
+import { StepModal } from "@/components/molecules/StepModal";
+import { useAuthContext } from "@/components/auth/Context";
+import { DappHeader } from "@/components/organisms";
 
 interface PageTemplateProps extends ComponentPropsWithoutRef<"div"> {
   className: string;
