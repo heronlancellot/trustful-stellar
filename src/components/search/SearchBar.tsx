@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { IconicButton } from "../atoms";
+import { ComponentPropsWithoutRef } from "react";
 import cc from "classcat";
-import { SearchIcon } from "../atoms/icons/SearchIcon";
 import { IconPosition } from "@/types/iconPosition";
+import { IconicButton } from "../atoms";
+import { SearchIcon } from "../atoms/icons/SearchIcon";
 
-interface SearchBarProps extends React.ComponentPropsWithoutRef<"div"> {
+interface SearchBarProps extends ComponentPropsWithoutRef<"div"> {
   placeholder: string;
   onButtonClick: (value: string) => void;
   inputText: string;

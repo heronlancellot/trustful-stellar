@@ -1,6 +1,6 @@
 import { IconPosition } from "@/types/iconPosition";
 import cc from "classcat";
-import { ClipLoader, PacmanLoader, PulseLoader } from "react-spinners";
+import { PulseLoader } from "react-spinners";
 
 interface IconicButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -28,8 +28,8 @@ export const IconicButton = ({
       className={cc([
         "hover:bg-primary flex w-full items-center justify-center gap-2 space-x-3 rounded-md px-4 py-2 text-base font-medium text-brandBlack transition",
         { "flex-row-reverse": iconPosition === IconPosition.RIGHT },
-        { "bg-whiteOpacity05": disabled },
-        { "bg-brandGreen": !disabled },
+        { "bg-whiteOpacity05 hover:bg-whiteOpacity05/80": disabled },
+        { "bg-brandGreen hover:bg-brandGreen/80": !disabled },
         className,
       ])}
       disabled={disabled}

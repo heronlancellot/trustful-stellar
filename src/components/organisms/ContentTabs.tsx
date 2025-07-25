@@ -43,7 +43,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
 
   return (
     <div className={cc([className, "h-max w-full bg-brandBlack"])} {...props}>
-      <nav className="nav-bar flex cursor-pointer flex-col items-center justify-between sm:flex-row sm:px-12">
+      <nav className="nav-bar flex flex-col items-center justify-between sm:flex-row sm:px-12">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)
@@ -54,7 +54,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
                   className={cc([
                     { "tab-active": tabName == selectedTab },
                     { "cursor-not-allowed opacity-50": tabProps.disabled },
-                    "tab p-2 px-4",
+                    "tab cursor-pointer p-2 px-4",
                   ])}
                   onClick={() => {
                     if (!tabProps.disabled) {
