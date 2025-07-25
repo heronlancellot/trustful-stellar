@@ -497,7 +497,7 @@ export const StepModal: React.FC<ModalProps> = ({
     } catch (error: any) {
       console.error("Error Creating Community", error);
       setIsSubmitting(false);
-      toast.error("Invalid badge name. Please use a valid one.");
+      toast.error(error.message || "Error Creating Community");
     }
   };
 
