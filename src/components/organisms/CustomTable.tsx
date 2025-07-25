@@ -4,12 +4,11 @@ import { Check, Trash2, X } from "lucide-react";
 import React, { ReactElement, ReactNode, useEffect, useState } from "react";
 import { PlusIcon } from "../atoms";
 import useCommunitiesController from "../community/hooks/controller";
-import { useStellarContractBadge } from "@/lib/stellar/transactions/hooks/useStellarContractBadge";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import { useAuthContext } from "../auth/Context";
 import { toast } from "react-hot-toast";
 import { useCommunityContext } from "../community/Context";
+import { isValidStellarAddress } from "@/lib/stellar/isValidStellarAddress";
 
 export interface CustomTableProps<T extends Record<string, any>>
   extends React.ComponentPropsWithoutRef<"div"> {
@@ -57,8 +56,6 @@ export const CustomTable = <T extends Record<string, any>>({
     e.preventDefault();
 
     try {
-      setNewBadgeData({ name: "", issuer: "", score: "" });
-
       if (
         newBadgeData.score === undefined ||
         typeof newBadgeData.score === "string" ||
@@ -69,8 +66,12 @@ export const CustomTable = <T extends Record<string, any>>({
         return;
       }
 
-      console.log("Badge enviado:", newBadgeData);
+      if (!isValidStellarAddress(newBadgeData.issuer)) {
+        toast.error("Invalid issuer address");
+        return;
+      }
 
+      setNewBadgeData({ name: "", issuer: "", score: "" });
       const result = await stellarContractBadges.addBadge(
         newBadgeData.name,
         newBadgeData.issuer,
@@ -332,17 +333,17 @@ export const CustomTable = <T extends Record<string, any>>({
                     />
                     <button
                       type="submit"
-                      className="rounded-lg p-2"
+                      className="cursor-pointer rounded-lg p-2"
                       disabled={!isDisabled}
                     >
-                      <Check className="h-4 w-4 text-white" />
+                      <Check className="size-4 text-white hover:text-white/70" />
                     </button>
                     <button
                       type="button"
                       className="rounded-lg p-2"
                       onClick={() => setIsNewBadge(false)}
                     >
-                      <X className="h-4 w-4 text-white" />
+                      <X className="size-4 text-white hover:text-white/70" />
                     </button>
                   </div>
                 </form>
