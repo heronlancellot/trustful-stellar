@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { CardLink } from "@/components/atoms/CardLink";
@@ -11,6 +12,7 @@ import { ReactNode, useCallback } from "react";
 import tailwindConfig from "tailwind.config";
 import backgroundHome from "public/home/background-home.png";
 import { DappHeader } from "@/components/organisms/DappHeader";
+import { useAuthContext } from "@/components/auth/Context";
 
 interface NavigationAction {
   path: string;
@@ -20,12 +22,19 @@ interface NavigationAction {
 
 export default function HomePage(): JSX.Element {
   const router = useRouter();
+  const { userAddress } = useAuthContext();
+  const searchParams = new URLSearchParams();
 
   const handleNavigation = useCallback(
     (path: string) => {
-      router.push(path);
+      if (path === "/verify-reputation" && userAddress) {
+        searchParams.set("searchAddress", userAddress || "");
+        router.push(`${path}?${searchParams.toString()}`);
+      } else {
+        router.push(path);
+      }
     },
-    [router],
+    [router, userAddress],
   );
 
   const navigationActions: NavigationAction[] = [

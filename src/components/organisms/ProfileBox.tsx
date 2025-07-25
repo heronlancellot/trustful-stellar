@@ -1,8 +1,11 @@
 import { ReactNode } from "react";
-import { IconicButton, UserIcon } from "../atoms";
-import { RotateLeftIcon } from "../atoms/icons/RotateLeftIcon";
+import {
+  IconicButton,
+  UserIcon,
+  RotateLeftIcon,
+  CopyAndPasteButton,
+} from "@/components/atoms";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
-import { CopyAndPasteButton } from "../atoms/CopyAndPasteButton";
 
 interface ProfileBoxProps extends React.ComponentPropsWithoutRef<"div"> {
   userAddress?: string;
@@ -21,7 +24,6 @@ export const ProfileBox = ({
   isClearButtonVisible,
   searchBar,
 }: ProfileBoxProps) => {
-  // console.log("userAddress2", userAddress);
   return (
     <div className="flex h-[100px] w-full min-w-[500px] flex-row justify-between rounded-md border border-whiteOpacity008 bg-whiteOpacity008">
       <div className="flex min-w-[300px] flex-1 flex-row items-center p-[26px]">

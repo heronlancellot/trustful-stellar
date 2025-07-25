@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import { useState, useEffect, Suspense } from "react";
 import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
 import { SearchBar } from "@/components/search/SearchBar";
 import { CustomTable } from "@/components/organisms/CustomTable";
 import { ProfileBox } from "@/components/organisms/ProfileBox";
 import { PageTemplate } from "@/components/templates/PageTemplate";
-import { useState, useEffect, Suspense } from "react";
 import {
   SearchContextProvider,
   useSearchContext,
@@ -23,7 +23,6 @@ import { TagIcon } from "@/components";
 import useVerifyReputationController, {
   Badge,
 } from "@/components/verify-reputation/hooks/Controller";
-import { useAuthContext } from "@/components/auth/Context";
 
 interface VerifyReputationProps {
   community_address?: string;
@@ -63,7 +62,6 @@ function VerifyReputationPageLoading() {
 
 // Main content component that uses useSearchParams
 function VerifyReputationContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [inputText, setInputText] = useState("");
@@ -73,7 +71,8 @@ function VerifyReputationContent() {
   >();
   const { badgeDetails, getBagdeDetails, setBadgeDetails } =
     useVerifyReputationController();
-  const { userAddress } = useAuthContext();
+  const router = useRouter();
+  console.log("badgeDetails", badgeDetails);
 
   const {
     searchedUserAddress,
@@ -83,24 +82,33 @@ function VerifyReputationContent() {
     searchedUserBadges,
     searchedUserScore,
   } = useSearchContext();
-  const { getVerifyReputationList, verifyReputationcommunities } =
-    useCommunityContext();
+  const {
+    getVerifyReputationList,
+    verifyReputationcommunities,
+    setVerifyReputationcommunities,
+  } = useCommunityContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const onSearch = async () => {
-    await getVerifyReputationList(inputText);
+    if (!inputText) {
+      setVerifyReputationcommunities([]);
+      setReputationDetail(undefined);
+      setBadgeDetails(null);
+    } else {
+      await getVerifyReputationList(inputText);
+    }
   };
 
+  /** This is used to set the input text and get the reputation list when the page is loaded with a query param */
   useEffect(() => {
     const userAddressFromQuery = searchParams.get("searchAddress");
-    const addressToUse =
-      userAddressFromQuery || userAddress || searchedUserAddress;
 
-    if (addressToUse) {
-      setInputText(addressToUse);
-      getVerifyReputationList(addressToUse);
+    if (userAddressFromQuery) {
+      setSearchedUserAddress(userAddressFromQuery);
+      setInputText(userAddressFromQuery);
+      getVerifyReputationList(userAddressFromQuery);
     }
-  }, [searchParams, userAddress, searchedUserAddress]);
+  }, [searchParams]);
 
   const reputation = [
     {
@@ -110,8 +118,6 @@ function VerifyReputationContent() {
       statusColor: "bg-darkGreenOpacity01",
     },
   ];
-
-  const statusColor = "bg-darkGreenOpacity01";
 
   const handleDetailCommunity = (communityAddress: string) => {
     const filteredCommunity = verifyReputationcommunities.find(
@@ -125,6 +131,19 @@ function VerifyReputationContent() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setBadgeDetails(null);
+  };
+
+  const handleClear = () => {
+    setInputText("");
+    setSearchedUserAddress("");
+    setSearchedUserBadges([]);
+    setSearchedUserScore(0);
+    setVerifyReputationcommunities([]);
+    setReputationDetail(undefined);
+    setBadgeDetails(null);
+    const searchParams = new URLSearchParams();
+    searchParams.delete("searchAddress");
+    router.push(`/verify-reputation/`);
   };
 
   return (
@@ -142,12 +161,7 @@ function VerifyReputationContent() {
           userAddress={searchedUserAddress}
           userBadgesQuantity={searchedUserBadges?.length}
           userScore={searchedUserScore}
-          onClear={() => {
-            setInputText("");
-            setSearchedUserAddress("");
-            setSearchedUserBadges([]);
-            setSearchedUserScore(0);
-          }}
+          onClear={handleClear}
           isClearButtonVisible={!!searchedUserAddress}
           searchBar={
             <SearchBar
@@ -228,24 +242,29 @@ function VerifyReputationContent() {
 
               {badgeDetails &&
                 Array.isArray(badgeDetails.community_badges) &&
-                badgeDetails.community_badges.map((item: Badge) => (
-                  <div
-                    key={`${item.community_address}-${item.name}`}
-                    className="flex items-center justify-between px-6 py-4"
-                  >
-                    <span className="text-left text-sm text-whiteOpacity05">
-                      {item?.name}
-                    </span>
-                    <span className="w-24 text-left text-sm text-brandWhite">
-                      {item?.score}
-                    </span>
-                    <span
-                      className={`w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs ${reputation[0]?.statusColor}`}
-                    >
-                      {`${item.user_has ? "Completed" : "Pending"}`}
-                    </span>
-                  </div>
-                ))}
+                badgeDetails.community_badges.map((item: Badge) => {
+                  console.log("item", item);
+                  return (
+                    <>
+                      <div
+                        key={`${item.community_address}-${item.name}`}
+                        className="flex items-center justify-between px-6 py-4"
+                      >
+                        <span className="text-left text-sm text-whiteOpacity05">
+                          {item?.name}
+                        </span>
+                        <span className="w-24 text-left text-sm text-brandWhite">
+                          {item?.score}
+                        </span>
+                        <span
+                          className={`w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs ${reputation[0]?.statusColor}`}
+                        >
+                          {`${item.user_has ? "Completed" : "Pending"}`}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })}
 
               {/* {reputationDetail.map(({ item, index }: any) => (
                 <div key={index} className="flex justify-between items-center px-6 py-4">

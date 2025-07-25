@@ -7,11 +7,13 @@ import { useUsersContext } from "../user/Context";
 import { useRouter, usePathname } from "next/navigation";
 import cc from "classcat";
 import React from "react";
+import { useAuthContext } from "../auth/Context";
 
 export const DappHeader = () => {
   const { userScore } = useUsersContext();
   const router = useRouter();
   const path = usePathname();
+  const { userAddress } = useAuthContext();
   return (
     <div className="border-t-none border-r-none border-l-none z-10 mx-auto flex h-[72px] w-full max-w-[100vw] items-center justify-between border border-whiteOpacity008 bg-brandBlack px-6 pb-0">
       <div className="scrollbar-hide flex h-full items-center gap-6 overflow-x-auto">
@@ -39,7 +41,12 @@ export const DappHeader = () => {
                 { "tab-active": path.includes("verify-reputation") },
                 "tab flex cursor-pointer items-center p-2 px-4",
               ])}
-              onClick={() => router.push("/verify-reputation")}
+              onClick={() => {
+                if (!userAddress) return;
+                const searchParams = new URLSearchParams();
+                searchParams.set("searchAddress", userAddress);
+                router.push(`/verify-reputation?${searchParams.toString()}`);
+              }}
             >
               <span className="cursor-pointer">Verify Reputation</span>
             </div>
