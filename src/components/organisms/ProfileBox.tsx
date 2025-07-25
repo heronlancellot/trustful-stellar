@@ -1,10 +1,8 @@
-import React, { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { IconicButton, UserIcon } from "../atoms";
-import tailwindConfig from "tailwind.config";
 import { RotateLeftIcon } from "../atoms/icons/RotateLeftIcon";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
-import { CopyIcon } from "../atoms/icons/CopyIcon";
-import toast from "react-hot-toast";
+import { CopyAndPasteButton } from "../atoms/CopyAndPasteButton";
 
 interface ProfileBoxProps extends React.ComponentPropsWithoutRef<"div"> {
   userAddress?: string;
@@ -23,6 +21,7 @@ export const ProfileBox = ({
   isClearButtonVisible,
   searchBar,
 }: ProfileBoxProps) => {
+  // console.log("userAddress2", userAddress);
   return (
     <div className="flex h-[100px] w-full min-w-[500px] flex-row justify-between rounded-md border border-whiteOpacity008 bg-whiteOpacity008">
       <div className="flex min-w-[300px] flex-1 flex-row items-center p-[26px]">
@@ -31,10 +30,10 @@ export const ProfileBox = ({
             <UserIcon
               color={
                 !userAddress
-                  ? tailwindConfig.theme.extend.colors.whiteOpacity05
-                  : tailwindConfig.theme.extend.colors.brandGreen
+                  ? "rgba(245, 255, 255, 0.5)"
+                  : "rgba(177, 239, 66, 1)"
               }
-            ></UserIcon>
+            />
           </div>
         </div>
         <div className="flex flex-col pl-4 text-left">
@@ -45,21 +44,11 @@ export const ProfileBox = ({
                 : "No user selected"}
             </span>
             {userAddress && (
-              <div
-                className="h-3 w-3 items-center justify-center hover:cursor-pointer"
-                onClick={() => {
-                  if (!navigator.clipboard) {
-                    toast.error(
-                      "Copy to clipboard not allowed by the navigator",
-                    );
-                  } else {
-                    navigator.clipboard.writeText(userAddress || "");
-                    toast.success("User Address copied to the clipboard");
-                  }
-                }}
-              >
-                <CopyIcon />
-              </div>
+              <CopyAndPasteButton
+                textToCopy={userAddress}
+                size="sm"
+                className="flex-shrink-0"
+              />
             )}
           </div>
           <div className="flex flex-row gap-4">
@@ -69,16 +58,12 @@ export const ProfileBox = ({
                   ? `${userBadgesQuantity} badges`
                   : `${userBadgesQuantity || "0"} badge`}
               </span>
-            ) : (
-              <></>
-            )}
+            ) : null}
             {userScore !== undefined ? (
               <span className="text-sm font-normal text-whiteOpacity05">
                 {userScore} points
               </span>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -88,12 +73,8 @@ export const ProfileBox = ({
             <IconicButton
               className="bg-darkGreenOpacity01 text-brandGreen"
               onClick={onClear}
-              label={"Clear"}
-              icon={
-                <RotateLeftIcon
-                  color={tailwindConfig.theme.extend.colors.brandGreen}
-                />
-              }
+              label="Clear"
+              icon={<RotateLeftIcon color="rgba(177, 239, 66, 1)" />}
             />
           )}
         </div>
