@@ -230,10 +230,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       });
 
       console.log("Transaction successful:", result.txHash);
-      closeModal("deleteBadge");
+      closeModal("removeManager");
     } else {
       toast.error("Not Successful Removing Manager");
-      closeModal("deleteBadge");
+      closeModal("removeManager");
       console.error("Removing Manager failed:", result.error);
     }
   };
@@ -807,7 +807,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     >
                       <div className="flex w-full items-center justify-between gap-2">
                         <div className="flex items-center gap-4">
-                          <div className="h-[35px] w-[35px] rounded-full bg-blue-500 p-2">
+                          <div className="size-[35px] rounded-full bg-blue-500 p-2">
                             <StarIcon />
                           </div>
                           <div className="flex flex-col">
@@ -819,15 +819,15 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                             </span>
                           </div>
                         </div>
-                        <div
+                        <button
                           onClick={() => {
-                            openModal("deleteBadge");
+                            openModal("removeManager");
                             setRemoveManager(item);
                           }}
-                          className="h-[15px] w-[15px] cursor-pointer"
+                          className="size-[15px] cursor-pointer hover:bg-whiteOpacity005"
                         >
-                          <TrashIcon />
-                        </div>
+                          <TrashIcon className="size-4" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -839,23 +839,22 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       </CustomModal>
 
       <CustomModal
-        title="Delete badge?"
-        isOpen={isOpen("deleteBadge")}
-        onClose={() => closeModal("deleteBadge")}
+        title="Remove Manager?"
+        isOpen={isOpen("removeManager")}
+        onClose={() => closeModal("removeManager")}
         isAsync={false}
         headerBackgroundColor="bg-whiteOpacity008"
       >
         <>
           <div className="h-[100px] w-[500px] bg-whiteOpacity008 p-6">
             <span className="text-base font-normal">
-              If you delete this badge, it will no longer be valid as a score
-              for your community and may impact the reputation scores of your
-              community members.
+              If you remove this manager, it will no longer be able to manage
+              this community.
             </span>
           </div>
           <div className="flex justify-end gap-2 bg-whiteOpacity008 pb-4 pl-6 pr-6 pt-4">
             <button
-              onClick={() => closeModal("deleteBadge")}
+              onClick={() => closeModal("removeManager")}
               className="h-[36px] w-[153px] rounded-md bg-darkGreenOpacity01 text-center text-sm text-brandGreen"
             >
               No, keep it

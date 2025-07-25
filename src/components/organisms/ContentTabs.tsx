@@ -1,22 +1,18 @@
 "use client";
 
-import { Tabs } from "@/components/organisms/types";
 import cc from "classcat";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { SearchIconPrimary } from "../atoms";
+import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
 import { SearchBar } from "../search/SearchBar";
-import useCommunitiesController from "../community/hooks/controller";
 import { useCommunityContext } from "../community/Context";
 
 export interface TabProps {
-  content: React.ReactNode;
+  content: ReactNode;
   tabNumber: number;
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
   disabled?: boolean;
 }
 
-export interface ContentTabsProps
-  extends React.ComponentPropsWithoutRef<"div"> {
+export interface ContentTabsProps extends ComponentPropsWithoutRef<"div"> {
   tabs: Record<string, TabProps>;
   onButtonClick?: (tabName: string) => void;
   inputText?: string;
@@ -24,7 +20,7 @@ export interface ContentTabsProps
   inputSearch?: boolean;
 }
 
-export const ContentTabs: React.FC<ContentTabsProps> = ({
+export const ContentTabs = ({
   className,
   tabs,
   inputSearch,
@@ -32,7 +28,7 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   setInputText,
   onButtonClick,
   ...props
-}) => {
+}: ContentTabsProps) => {
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
 
   const { getCommunitiesDetails } = useCommunityContext();
