@@ -1,10 +1,10 @@
-import { IconPosition } from "@/types/iconPosition";
 import cc from "classcat";
-import { ClipLoader, PacmanLoader, PulseLoader } from "react-spinners";
+import { ButtonHTMLAttributes, ReactNode } from "react";
+import { PulseLoader } from "react-spinners";
+import { IconPosition } from "@/types/iconPosition";
 
-interface PrimaryButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: React.ReactNode;
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: ReactNode;
   label: string;
   onClick?: () => void;
   iconPosition?: IconPosition;
