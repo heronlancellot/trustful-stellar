@@ -28,7 +28,7 @@ export const DappHeader = () => {
             <div
               className={cc([
                 { "tab-active": path.includes("communities") },
-                "tab flex items-center p-2 px-4",
+                "tab flex cursor-pointer items-center p-2 px-4",
               ])}
               onClick={() => router.push("/communities?status=all")}
             >
@@ -37,7 +37,7 @@ export const DappHeader = () => {
             <div
               className={cc([
                 { "tab-active": path.includes("verify-reputation") },
-                "tab flex items-center p-2 px-4",
+                "tab flex cursor-pointer items-center p-2 px-4",
               ])}
               onClick={() => router.push("/verify-reputation")}
             >
@@ -46,7 +46,7 @@ export const DappHeader = () => {
             <div
               className={cc([
                 { "tab-active": path.includes("faq") },
-                "tab flex items-center p-2 px-4",
+                "tab flex cursor-pointer items-center p-2 px-4",
               ])}
               onClick={() => router.push("/faq")}
             >
