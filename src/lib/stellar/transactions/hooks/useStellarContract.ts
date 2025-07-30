@@ -2,7 +2,6 @@ import {
   rpc,
   TransactionBuilder,
   BASE_FEE,
-  Networks,
   Operation,
   Address,
 } from "@stellar/stellar-sdk";
@@ -12,19 +11,24 @@ import { STELLAR, ALBEDO } from "@/lib/environmentVars";
 interface UseStellarContractProps {
   contractId: string;
   rpcUrl: string;
+  userAddress?: string;
 }
 
 export const useStellarContract = ({
   contractId,
   rpcUrl,
+  userAddress,
 }: UseStellarContractProps) => {
   const executeContractFunction = async (functionName: string) => {
     try {
-      const { pubkey } = await albedo.publicKey({ require_existing: true });
+      // Validate userAddress before proceeding
+      if (!userAddress || userAddress.trim() === "") {
+        return { success: false, error: "User address is required" };
+      }
 
       // Load user account via RPC
       const server = new rpc.Server(rpcUrl, { allowHttp: true });
-      const account = await server.getAccount(pubkey);
+      const account = await server.getAccount(userAddress);
 
       // Create and prepare transaction
       const transaction = new TransactionBuilder(account, {
@@ -35,7 +39,7 @@ export const useStellarContract = ({
           Operation.invokeContractFunction({
             function: functionName,
             contract: contractId,
-            args: [new Address(pubkey).toScVal()],
+            args: [new Address(userAddress).toScVal()],
           }),
         )
         .setTimeout(30)

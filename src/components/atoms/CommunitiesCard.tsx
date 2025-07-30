@@ -45,6 +45,7 @@ export const CommunitiesCard = ({
   const stellarContractJoinCommunities = useStellarContract({
     contractId: formattedContractAddress,
     rpcUrl: STELLAR.RPC_URL,
+    userAddress: userAddress,
   });
 
   const handleJoin = async () => {
@@ -105,7 +106,9 @@ export const CommunitiesCard = ({
       return;
     }
     try {
+      console.log("handleExit - userAddress:", userAddress);
       const result = await stellarContractJoinCommunities.removeUser();
+      console.log("handleExit - result:", result);
 
       if (result.success) {
         toast.success("Successfully left community");
@@ -140,11 +143,13 @@ export const CommunitiesCard = ({
           );
           queryClient.setQueryData(["communities", userAddress], updatedData);
         }
+        console.log("handleExit - currentData:", currentData);
       } else {
         toast.error("Failed to leave community");
         console.error("Transaction failed:", result.error);
       }
     } catch (error) {
+      console.error("handleExit - error:", error);
       toast.error(
         "Can't find your wallet registry, make sure you're trying to connect an initialized(funded) wallet",
       );

@@ -76,9 +76,7 @@ export const ImportBadgesModalContent = ({
                   </div>
                   {isImported !== undefined && (
                     <div>
-                      <AttestationSymbol
-                        checked={isImported}
-                      ></AttestationSymbol>
+                      <AttestationSymbol checked={isImported} />
                     </div>
                   )}
                 </div>

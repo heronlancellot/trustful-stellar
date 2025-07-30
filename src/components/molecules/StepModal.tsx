@@ -134,7 +134,7 @@ export const StepModal = ({
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedBadge, setSelectedBadge] = useState<string[]>([]);
   const [badgeCount, setBadgeCount] = useState<number>(3);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { getBadgesByTypes } = useBadgeInfoController();
   const [badgeTypeDetails, setBadgeTypeDetails] = useState<Badge[]>([]);
   const [loadingBadgeListType, setLoadingBadgeListType] = useState(false);
@@ -471,7 +471,7 @@ export const StepModal = ({
       let txResponse;
 
       do {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         txResponse = await server.getTransaction(result.tx_hash);
         attempts++;
       } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
@@ -488,7 +488,7 @@ export const StepModal = ({
 
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 2000);
       } else {
         console.error("❌ Transaction failed:", txResponse.status);
         setIsSubmitting(false);

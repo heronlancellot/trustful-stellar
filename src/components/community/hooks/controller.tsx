@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { STELLAR } from "@/lib/environmentVars";
 import { useStellarContract } from "@/lib/stellar/transactions/hooks/useStellarContract";
 import { useStellarContractBadge } from "@/lib/stellar/transactions/hooks/useStellarContractBadge";
 import { useStellarContractManager } from "@/lib/stellar/transactions/hooks/useStellarContractManager";
 import { useStellarContractRemoveBadge } from "@/lib/stellar/transactions/hooks/useStellarContractRemoveBadge";
-import { useState } from "react";
+import { useAuthContext } from "@/components/auth/Context";
 
 interface UseCommunitiesControllerParams {
   communityAddress?: string;
@@ -15,6 +16,7 @@ export default function useCommunitiesController({
   communityAddress,
 }: UseCommunitiesControllerParams = {}) {
   const [inputText, setInputText] = useState<string>("");
+  const { userAddress } = useAuthContext();
 
   const communityAddressFormatted =
     typeof communityAddress === "string" ? communityAddress.toUpperCase() : "";
@@ -22,6 +24,7 @@ export default function useCommunitiesController({
   const stellarContractJoinCommunities = useStellarContract({
     contractId: communityAddressFormatted,
     rpcUrl: STELLAR.RPC_URL,
+    userAddress: userAddress,
   });
 
   const stellarContractManagers = useStellarContractManager({

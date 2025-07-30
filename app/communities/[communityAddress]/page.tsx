@@ -37,6 +37,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUpdateCommunityVisibility } from "@/lib/hooks/api/useCommunities";
 import { ActivityIndicatorModal } from "@/components/molecules/ActivityIndicatorModal";
 import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
+import { Badge } from "@/components/badge-info/hooks/Controller";
 
 interface DetailsProps {
   params: {
@@ -61,6 +62,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const [isHiding, setIsHiding] = useState<boolean>(false);
   const [hasOfferedRedirect, setHasOfferedRedirect] = useState<boolean>(false);
 
+  const [isHoveringJoinButton, setIsHoveringJoinButton] =
+    useState<boolean>(false);
+
   const { data: communitiesDetail, isLoading: isLoadingDetails } =
     useCommunityDetails(communityAddress as string, userAddress);
   const { data: communitiesBadgesList, isLoading: isLoadingBadges } =
@@ -74,6 +78,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { setCommunitiesDetail } = useCommunityContext();
 
   const isJoined = communitiesDetail?.is_joined;
+  console.log("isJoined", isJoined);
   const totalBadgesMemberList = communitiesDetail?.total_badges;
   const isCreator =
     userAddress &&
@@ -139,7 +144,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const handleExitCommunities = async (communityAddress: string) => {
+    console.log("handleExitCommunities", communityAddress);
     const result = await stellarContractJoinCommunities.removeUser();
+    console.log("result", result);
 
     if (result.success) {
       toast.success("Successful Exiting Community");
@@ -313,7 +320,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     }
   };
 
-  const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
+  const searchedUserBadges = newCommunitiesBadgesList.map((badge: Badge) => ({
     badgeName: (
       <div className="flex h-7 flex-row items-center">
         <div className="flex flex-col">
@@ -386,8 +393,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                     <div>
                       {typeof isJoined !== "undefined" && isJoined ? (
                         <PrimaryButton
-                          className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
-                          label="Joined"
+                          className="group w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen after:content-['']"
+                          label={isHoveringJoinButton ? "Exit" : "Joined"}
+                          onMouseEnter={() => setIsHoveringJoinButton(true)}
+                          onMouseLeave={() => setIsHoveringJoinButton(false)}
                           icon={
                             <Check
                               color={
@@ -501,7 +510,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       ) : (
                         <PrimaryButton
                           className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
-                          label="Joined"
+                          label={isHoveringJoinButton ? "Exit" : "Joined"}
+                          onMouseEnter={() => setIsHoveringJoinButton(true)}
+                          onMouseLeave={() => setIsHoveringJoinButton(false)}
                           icon={
                             <Check
                               color={

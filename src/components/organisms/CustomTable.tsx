@@ -134,6 +134,7 @@ export const CustomTable = <T extends Record<string, any>>({
   }, [newBadgeData, isDisabled]);
 
   const handleRemoveBadge = async (badge: any) => {
+    console.log("badge2121", badge); //TODO: Find the issuer here to remove the hardcoded issuer address
     try {
       console.log("Badge to remove:", badge);
 
@@ -170,9 +171,10 @@ export const CustomTable = <T extends Record<string, any>>({
       }
 
       const issuerAddress =
-        "GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS";
+        "GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS"; // TODO: Check this hardcoded issuer address
 
       console.log("Extracted data:", { badgeName, issuerAddress });
+      console.log("Full badge object:", badge);
 
       if (!badgeName) {
         console.error("Badge name missing");
@@ -279,7 +281,7 @@ export const CustomTable = <T extends Record<string, any>>({
                       onClick={() => handleRemoveBadge(row)}
                       className="transition-opacity hover:opacity-70"
                     >
-                      <Trash2 className="h-4 w-4 text-whiteOpacity05" />
+                      <Trash2 className="size-4 text-whiteOpacity05" />
                     </button>
                   </td>
                 )}
