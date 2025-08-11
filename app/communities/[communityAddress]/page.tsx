@@ -352,10 +352,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push("/communities")}
-                className="flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                className="flex size-8 items-center justify-center rounded-full transition-colors"
               >
-                <div className="h-4 w-4">
-                  <ArrowLeft />
+                <div className="size-4 group">
+                  <ArrowLeft className="group-hover:text-brandGreen" />
                 </div>
               </button>
               <h1 className="text-2xl">{`${communitiesDetail?.name}`}</h1>
@@ -609,7 +609,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       className="mt-6"
                       headers={["Name", "Score"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -626,7 +626,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             }}
           ></ContentTabs>
         )}
-        {status === created && (
+        {status === created && (  // When the community is created, the user can see the badges that he has created and manage it
           <ContentTabs
             tabs={{
               Badges: {
@@ -650,10 +650,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       }
                       className="mt-6"
                       headers={["Name", "Score", "Status"]}
-                      data={searchedUserBadges}
+                      data={newCommunitiesBadgesList}
                       isLogged
                       isCreated
-                    ></CustomTable>
+                   />
                   </div>
                 ),
                 tabNumber: 1,
@@ -668,7 +668,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 tabNumber: 2,
               },
             }}
-          ></ContentTabs>
+          />
         )}
         {status === joined && (
           <ContentTabs
@@ -695,7 +695,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       className="mt-6"
                       headers={["Name", "Score", "Status"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                   />
                   </div>
                 ),
                 tabNumber: 1,
@@ -737,7 +737,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       className="mt-6"
                       headers={["Name", "Score", "Status"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -752,7 +752,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 tabNumber: 2,
               },
             }}
-          ></ContentTabs>
+          />
         )}
       </div>
 

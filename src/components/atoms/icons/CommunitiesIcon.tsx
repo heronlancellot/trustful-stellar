@@ -13,9 +13,9 @@ export const CommunitiesIcon = (props: SVGProps<SVGSVGElement>) => {
       <path
         d="M56.1941 62.8397L54.0591 45.7597C53.4334 40.7553 49.1794 37 44.1364 37H40.4641H36.7917C31.7487 37 27.4946 40.7553 26.8691 45.7597L24.7341 62.8397C24.2367 66.8187 27.3393 70.3333 31.3493 70.3333H40.4641H49.5787C53.5887 70.3333 56.6914 66.8187 56.1941 62.8397Z"
         stroke="#B1EF42"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M40.4648 30C45.9877 30 50.4648 25.5228 50.4648 20C50.4648 14.4772 45.9877 10 40.4648 10C34.942 10 30.4648 14.4772 30.4648 20C30.4648 25.5228 34.942 30 40.4648 30Z"
@@ -35,16 +35,16 @@ export const CommunitiesIcon = (props: SVGProps<SVGSVGElement>) => {
       <path
         d="M21.9644 43.6666L12.7784 43.6666C9.51954 43.6666 6.73827 46.0226 6.20251 49.2373L5.09137 55.904C4.41414 59.9676 7.54774 63.6666 11.6673 63.6666H23.7976"
         stroke="#B1EF42"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M58.9639 43.6666H68.1499C71.4089 43.6666 74.1902 46.0226 74.7259 49.2373L75.8372 55.904C76.5142 59.9676 73.3812 63.6666 69.2615 63.6666C65.3892 63.6666 60.7815 63.6666 57.1309 63.6666"
         stroke="#B1EF42"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

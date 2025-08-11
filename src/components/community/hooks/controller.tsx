@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { STELLAR } from "@/lib/environmentVars";
 import { useStellarContract } from "@/lib/stellar/transactions/hooks/useStellarContract";
-import { useStellarContractBadge } from "@/lib/stellar/transactions/hooks/useStellarContractBadge";
+import { useStellarContractAddBadge } from "@/lib/stellar/transactions/hooks/useStellarContractAddBadge";
 import { useStellarContractManager } from "@/lib/stellar/transactions/hooks/useStellarContractManager";
 import { useStellarContractRemoveBadge } from "@/lib/stellar/transactions/hooks/useStellarContractRemoveBadge";
 import { useAuthContext } from "@/components/auth/Context";
@@ -33,7 +33,7 @@ export default function useCommunitiesController({
     networkType: STELLAR.NETWORK_TYPE,
   });
 
-  const stellarContractBadges = useStellarContractBadge({
+  const stellarContractAddBadges = useStellarContractAddBadge({
     contractId: communityAddressFormatted,
     rpcUrl: STELLAR.RPC_URL,
     networkType: STELLAR.NETWORK_TYPE,
@@ -50,7 +50,7 @@ export default function useCommunitiesController({
     setInputText,
     stellarContractJoinCommunities,
     stellarContractManagers,
-    stellarContractBadges,
+    stellarContractAddBadges,
     stellarContractRemoveBadges,
   };
 }

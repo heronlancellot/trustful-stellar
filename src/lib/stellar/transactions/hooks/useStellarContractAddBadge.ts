@@ -16,7 +16,7 @@ interface UseStellarContractBadgeProps {
   networkType: "TESTNET" | "PUBLIC";
 }
 
-export const useStellarContractBadge = ({
+export const useStellarContractAddBadge = ({
   contractId,
   rpcUrl,
   networkType = "TESTNET",
@@ -63,7 +63,6 @@ export const useStellarContractBadge = ({
 
       const preparedTransaction = await server.prepareTransaction(transaction);
       const transactionXDR = preparedTransaction.toXDR();
-
       // Sign with Albedo and submit
       const signResult = await albedo.tx({
         xdr: transactionXDR,
@@ -85,7 +84,5 @@ export const useStellarContractBadge = ({
     executeContractFunction,
     addBadge: (badgeName: string, issuer: string, score: number) =>
       executeContractFunction("add_badge", badgeName, issuer, score),
-    removeBadge: (badgeName: string, issuer: string, score: number) =>
-      executeContractFunction("remove_badge", badgeName, issuer, score),
   };
 };
