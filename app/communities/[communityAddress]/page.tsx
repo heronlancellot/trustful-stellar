@@ -26,7 +26,7 @@ import { useCommunityContext } from "@/components/community/Context";
 import { useAuthContext } from "@/components/auth/Context";
 import useCommunitiesController from "@/components/community/hooks/controller";
 import toast from "react-hot-toast";
-import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon } from "lucide-react";
+import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon, X } from "lucide-react";
 import cc from "classcat";
 import {
   useCommunityBadges,
@@ -78,7 +78,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   const { setCommunitiesDetail } = useCommunityContext();
 
   const isJoined = communitiesDetail?.is_joined;
-  console.log("isJoined", isJoined);
   const totalBadgesMemberList = communitiesDetail?.total_badges;
   const isCreator =
     userAddress &&
@@ -170,6 +169,15 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const handleInviteManager = async (newManager: string) => {
+    if (
+      !communitiesMembersList?.some(
+        (member: any) => member.user_address === newManager.toLowerCase(),
+      )
+    ) {
+      toast.error("User is not a member of the community");
+      return;
+    }
+
     const sender = userAddress as string;
     const newManagerFormatted = newManager.toUpperCase();
 
@@ -204,6 +212,22 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       toast.error("Not Successful Inserting Manager");
       console.error("Inserting Manager failed:", result.error);
     }
+  };
+
+  const checkIfHasMoreThanOneManager = (): boolean => {
+    let totalManagers = 0;
+    if (
+      communitiesMembersList.map((member: any) => {
+        if (member.is_manager) {
+          totalManagers++;
+        }
+      })
+    ) {
+      if (totalManagers <= 1) {
+        return false;
+      }
+    }
+    return true;
   };
 
   const handleRemoveManager = async (removedManager: string) => {
@@ -354,7 +378,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 onClick={() => router.push("/communities")}
                 className="flex size-8 items-center justify-center rounded-full transition-colors"
               >
-                <div className="size-4 group">
+                <div className="group size-4">
                   <ArrowLeft className="group-hover:text-brandGreen" />
                 </div>
               </button>
@@ -626,7 +650,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             }}
           ></ContentTabs>
         )}
-        {status === created && (  // When the community is created, the user can see the badges that he has created and manage it
+        {status === created && ( // When the community is created, the user can see the badges that he has created and manage it
           <ContentTabs
             tabs={{
               Badges: {
@@ -653,7 +677,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       data={newCommunitiesBadgesList}
                       isLogged
                       isCreated
-                   />
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -695,7 +719,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       className="mt-6"
                       headers={["Name", "Score", "Status"]}
                       data={searchedUserBadges}
-                   />
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -832,8 +856,15 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         </div>
                         <button
                           onClick={() => {
-                            openModal("removeManager");
-                            setRemoveManager(item);
+                            if (checkIfHasMoreThanOneManager()) {
+                              setRemoveManager(item);
+                              openModal("removeManager");
+                              return;
+                            } else {
+                              toast.error(
+                                "You need at least two managers to remove one",
+                              );
+                            }
                           }}
                           className="size-[15px] cursor-pointer hover:bg-whiteOpacity005"
                         >
