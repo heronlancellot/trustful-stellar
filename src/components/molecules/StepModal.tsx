@@ -382,41 +382,51 @@ export const StepModal = ({
         return;
       }
 
-      const sortedBadges = filteredBadges.sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
+      // CRITICAL: Sort badges by issuer first, then by name
+      // This is required for Soroban SDK - Map keys must be in ascending order
+      const sortedBadges = filteredBadges.sort((a, b) => {
+        // First compare issuers (uppercase for consistency)
+        const issuerCompare = a.issuer.toUpperCase().localeCompare(b.issuer.toUpperCase());
+        if (issuerCompare !== 0) return issuerCompare;
+        
+        // If issuers are equal, compare names
+        return a.name.localeCompare(b.name);
+      });
 
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
       }); //Todo-user logged
 
       const server = new rpc.Server(STELLAR.RPC_URL, { allowHttp: true });
-      console.log("Server Creating Community", server);
-
       const account = await server.getAccount(pubkey);
-      console.log("Account Creating Community", account);
       const saltBuffer = Buffer.alloc(32);
       for (let i = 0; i < 32; i++) {
         saltBuffer[i] = Math.floor(Math.random() * 256);
       }
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
-      console.log("Admin Address Creating Community", adminAddressScVal);
-      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map(
-        (badgeType) => {
-          const badgeIdVector = xdr.ScVal.scvVec([
-            xdr.ScVal.scvString(badgeType.name),
-            new Address(badgeType.issuer.toUpperCase()).toScVal(),
-          ]);
-          return new xdr.ScMapEntry({
-            key: badgeIdVector,
-            val: xdr.ScVal.scvU32(badgeType.score),
-          });
-        },
-      );
-      console.log("Badge Map Entries Creating Community", badgeMapEntries);
+      // Create badge map entries with properly sorted badges
+      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map((badgeType) => {
+        const issuerAddress = badgeType.issuer.toUpperCase();
+        
+        // Create BadgeId as a Map (struct) with fields in alphabetical order
+        const badgeIdMap = xdr.ScVal.scvMap([
+          new xdr.ScMapEntry({
+            key: xdr.ScVal.scvSymbol("issuer"),
+            val: new Address(issuerAddress).toScVal()
+          }),
+          new xdr.ScMapEntry({
+            key: xdr.ScVal.scvSymbol("name"),
+            val: xdr.ScVal.scvString(String(badgeType.name))
+          })
+        ]);
+        
+        return new xdr.ScMapEntry({
+          key: badgeIdMap,
+          val: xdr.ScVal.scvU32(Number(badgeType.score))
+        });
+      });
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
-      console.log("Badge Map Sc Val Creating Community", badgeMapScVal);
       const initArgsScVal = xdr.ScVal.scvVec([
         adminAddressScVal,
         badgeMapScVal,
@@ -424,7 +434,6 @@ export const StepModal = ({
         xdr.ScVal.scvString(data.description),
         xdr.ScVal.scvString(data.avatar),
       ]);
-      console.log("Init Args Sc Val Creating Community", initArgsScVal);
 
       const transaction = new TransactionBuilder(account, {
         fee: BASE_FEE,
@@ -445,15 +454,8 @@ export const StepModal = ({
         .setTimeout(30)
         .build();
 
-      console.log("Transaction Creating Community", transaction);
-
       const preparedTransaction = await server.prepareTransaction(transaction);
-      console.log(
-        "Prepared Transaction Creating Community",
-        preparedTransaction,
-      );
       const transactionXDR = preparedTransaction.toXDR();
-      console.log("Transaction XDR Creating Community", transactionXDR);
       const result = await albedo.tx({
         xdr: transactionXDR,
         network: ALBEDO.NETWORK_TYPE,
