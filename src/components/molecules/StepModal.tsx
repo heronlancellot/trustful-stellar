@@ -382,17 +382,6 @@ export const StepModal = ({
         return;
       }
 
-      // CRITICAL: Sort badges by issuer first, then by name
-      // This is required for Soroban SDK - Map keys must be in ascending order
-      const sortedBadges = filteredBadges.sort((a, b) => {
-        // First compare issuers (uppercase for consistency)
-        const issuerCompare = a.issuer.toUpperCase().localeCompare(b.issuer.toUpperCase());
-        if (issuerCompare !== 0) return issuerCompare;
-        
-        // If issuers are equal, compare names
-        return a.name.localeCompare(b.name);
-      });
-
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
       }); //Todo-user logged
@@ -405,11 +394,12 @@ export const StepModal = ({
       }
       const saltScVal = xdr.ScVal.scvBytes(saltBuffer);
       const adminAddressScVal = new Address(pubkey).toScVal();
-      // Create badge map entries with properly sorted badges
-      const badgeMapEntries: xdr.ScMapEntry[] = sortedBadges.map((badgeType) => {
+      
+      // Create badge map entries
+      const badgeMapEntries: xdr.ScMapEntry[] = filteredBadges.map((badgeType) => {
         const issuerAddress = badgeType.issuer.toUpperCase();
         
-        // Create BadgeId as a Map (struct) with fields in alphabetical order
+        // Create BadgeId as ScMap (struct fields in alphabetical order)
         const badgeIdMap = xdr.ScVal.scvMap([
           new xdr.ScMapEntry({
             key: xdr.ScVal.scvSymbol("issuer"),
@@ -426,7 +416,28 @@ export const StepModal = ({
           val: xdr.ScVal.scvU32(Number(badgeType.score))
         });
       });
+      
+      // Sort map entries by BadgeId keys using XDR comparison (required by Soroban)
+      badgeMapEntries.sort((a, b) => {
+        const mapA = a.key().map();
+        const mapB = b.key().map();
+        
+        if (!mapA || !mapB) return 0;
+        
+        // Compare issuer field (first in alphabetical order)
+        const issuerA = mapA[0].val();
+        const issuerB = mapB[0].val();
+        const issuerCmp = Buffer.from(issuerA.toXDR()).compare(Buffer.from(issuerB.toXDR()));
+        if (issuerCmp !== 0) return issuerCmp;
+        
+        // Compare name field if issuers are equal
+        const nameA = mapA[1].val().str().toString();
+        const nameB = mapB[1].val().str().toString();
+        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+      });
+      
       const badgeMapScVal = xdr.ScVal.scvMap(badgeMapEntries);
+      
       const initArgsScVal = xdr.ScVal.scvVec([
         adminAddressScVal,
         badgeMapScVal,
