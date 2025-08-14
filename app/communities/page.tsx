@@ -69,20 +69,25 @@ function CommunitiesContent() {
     useCommunities(userAddress);
   const { data: statusCommunities, isLoading: isLoadingStatusCommunities } =
     useCommunitiesByStatus(
-      currentStatus !== NAVIGATION_STATUS_LIST.all && currentStatus !== NAVIGATION_STATUS_LIST.created ? currentStatus : "",
+      currentStatus !== NAVIGATION_STATUS_LIST.all &&
+        currentStatus !== NAVIGATION_STATUS_LIST.created
+        ? currentStatus
+        : "",
       userAddress,
     );
   const { data: managedCommunities, isLoading: isLoadingManagedCommunities } =
     useCommunitiesByManager(
-      currentStatus === NAVIGATION_STATUS_LIST.created ? userAddress : undefined,
+      currentStatus === NAVIGATION_STATUS_LIST.created
+        ? userAddress
+        : undefined,
     );
 
   const communities =
     currentStatus === NAVIGATION_STATUS_LIST.created && userAddress
       ? managedCommunities
       : currentStatus !== NAVIGATION_STATUS_LIST.all && userAddress
-      ? statusCommunities
-      : allCommunities;
+        ? statusCommunities
+        : allCommunities;
 
   const handleTabChange = useCallback(
     (tabName: string) => {
@@ -111,7 +116,11 @@ function CommunitiesContent() {
   }, [communities, setCommunities]);
 
   useEffect(() => {
-    if (isLoadingAllCommunities || isLoadingStatusCommunities || isLoadingManagedCommunities) {
+    if (
+      isLoadingAllCommunities ||
+      isLoadingStatusCommunities ||
+      isLoadingManagedCommunities
+    ) {
       setIsLoading(true);
       setDataFetched(false);
     } else {
@@ -121,7 +130,11 @@ function CommunitiesContent() {
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isLoadingAllCommunities, isLoadingStatusCommunities, isLoadingManagedCommunities]);
+  }, [
+    isLoadingAllCommunities,
+    isLoadingStatusCommunities,
+    isLoadingManagedCommunities,
+  ]);
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {
