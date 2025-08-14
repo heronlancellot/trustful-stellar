@@ -23,9 +23,9 @@ export const EmptyContentTabs: Story = {
 export const ContentTabsWith2Tabs: Story = {
   args: {
     tabs: {
-      "Import": {
+      Import: {
         content: (
-          <div className="flex w-full h-full min-h-[300px] justify-center items-center">
+          <div className="flex h-full min-h-[300px] w-full items-center justify-center">
             Hey
           </div>
         ),
@@ -33,7 +33,7 @@ export const ContentTabsWith2Tabs: Story = {
       },
       "Create new": {
         content: (
-          <div className="flex w-full h-full min-h-[300px] justify-center items-center">
+          <div className="flex h-full min-h-[300px] w-full items-center justify-center">
             Hey 2
           </div>
         ),

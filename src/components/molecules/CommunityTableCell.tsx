@@ -1,25 +1,19 @@
-import tailwindConfig from 'tailwind.config';
-import { getEllipsedAddress } from '@/lib/utils/getEllipsedAddress';
-import { UserIcon } from '@/components';
+import { ComponentPropsWithoutRef } from "react";
 
-interface CommunityTableCellProps
-  extends React.ComponentPropsWithoutRef<'div'> {
+interface CommunityTableCellProps extends ComponentPropsWithoutRef<"div"> {
   issuerAddress: string;
 }
 
 export const CommunityTableCell = ({
   issuerAddress,
 }: CommunityTableCellProps) => {
-  const isStatus = issuerAddress === 'Pending' || issuerAddress === 'Completed';
+  const isStatus = issuerAddress === "Pending" || issuerAddress === "Completed";
 
   return (
-    <div className="flex flex-row items-center h-7">
+    <div className="flex h-7 flex-row items-center">
       {isStatus ? (
         <div
-          className={`
-            font-medium text-center px-4 py-1 rounded-full text-sm
-            ${issuerAddress === 'Pending' ? 'text-whiteOpacity05 bg-[rgba(245,255,255,0.08)]' : 'text-brandGreen bg-darkGreenOpacity01'}
-          `}
+          className={`rounded-full px-4 py-1 text-center text-sm font-medium ${issuerAddress === "Pending" ? "bg-[rgba(245,255,255,0.08)] text-whiteOpacity05" : "bg-darkGreenOpacity01 text-brandGreen"} `}
         >
           {issuerAddress}
         </div>

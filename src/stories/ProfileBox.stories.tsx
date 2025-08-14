@@ -29,7 +29,6 @@ type Story = StoryObj<typeof meta>;
 
 export const ProfileBoxWithNoUser: Story = {
   args: {
-    placeholder: "Paste the address...",
     searchBar: <></>,
     isClearButtonVisible: undefined,
   },
@@ -62,7 +61,6 @@ export const ProfileBoxWithNoUser: Story = {
 
 export const ProfileBoxWithUser: Story = {
   args: {
-    placeholder: "Paste the address...",
     searchBar: <></>,
     isClearButtonVisible: undefined,
     userAddress: "GD6IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFYWS",

@@ -1,8 +1,8 @@
-import cc from "classcat";
+import { ComponentPropsWithoutRef } from "react";
 
-interface BlockfulCreditsProps extends React.ComponentPropsWithoutRef<"div"> {}
+interface BlockfulCreditsProps extends ComponentPropsWithoutRef<"div"> {}
 
-export const BlockfulCredits: React.FC<BlockfulCreditsProps> = (props) => {
+export const BlockfulCredits = (props: BlockfulCreditsProps) => {
   return (
     <svg
       width="100%"

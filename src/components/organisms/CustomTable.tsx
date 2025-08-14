@@ -1,18 +1,21 @@
-import { camelCaseToUpperCaseWords } from '@/lib/utils/camelCaseToWords';
-import cc from 'classcat';
-import { Check, Trash2, X } from 'lucide-react';
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
-import { PlusIcon } from '../atoms';
-import useCommunitiesController from '../community/hooks/controller';
-import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
-import { useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
-import { useAuthContext } from '../auth/Context';
-import { toast } from 'react-hot-toast';
-import { useCommunityContext } from '../community/Context';
+import { camelCaseToUpperCaseWords } from "@/lib/utils/camelCaseToWords";
+import cc from "classcat";
+import { Trash2 } from "lucide-react";
+import React, {
+  ComponentPropsWithoutRef,
+  ReactElement,
+  ReactNode,
+} from "react";
+import useCommunitiesController from "../community/hooks/controller";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "../auth/Context";
+import { toast } from "react-hot-toast";
+import { useCommunityContext } from "../community/Context";
+import { Badge } from "@/components/badge-info/hooks/Controller";
+import { NewBadgeTable } from "../atoms/NewBadgeTable";
 
 export interface CustomTableProps<T extends Record<string, any>>
-  extends React.ComponentPropsWithoutRef<'div'> {
+  extends ComponentPropsWithoutRef<"div"> {
   childrenForEmptyTable: ReactNode;
   data?: T[];
   headers: string[];
@@ -34,177 +37,110 @@ export const CustomTable = <T extends Record<string, any>>({
   communityAddress,
 }: CustomTableProps<T>): ReactElement => {
   const hasRowsToDisplay = !!data && data.length > 0;
-  const [isNewBadge, setIsNewBadge] = useState(false);
-  const { stellarContractBadges, stellarContractRemoveBadges } =
+
+  const mapRowData = (row: T, header: string) => {
+    const headerLower = header.toLowerCase();
+
+    if (React.isValidElement(row[header])) {
+      return row[header];
+    }
+
+    switch (headerLower) {
+      case "name":
+        return row.name || row.Name || row.badgeName;
+      case "score":
+        return row.score || row.Score;
+      case "status":
+        return row.user_has ? "Completed" : "Pending";
+      default:
+        return row[header] || row[headerLower] || row[header.toLowerCase()];
+    }
+  };
+  const { stellarContractAddBadges, stellarContractRemoveBadges } =
     useCommunitiesController({ communityAddress });
   const { getCommunitiesBadgesList } = useCommunityContext();
   const queryClient = useQueryClient();
   const { userAddress } = useAuthContext();
-  const [newBadgeData, setNewBadgeData] = useState<{
-    name: string;
-    issuer: string;
-    score?: number | string;
-  }>({
-    name: '',
-    issuer: '',
-    score: '',
-  });
 
-  const isDisabled =
-    !!newBadgeData.name && !!newBadgeData.issuer && !!newBadgeData.score;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleRemoveBadge = async (badge: Badge) => {
     try {
-      setNewBadgeData({ name: '', issuer: '', score: '' });
+      // let badgeName = "";
+      // if (badge.Name) {
+      //   if (typeof badge.Name === "object" && badge.Name.props) {
+      //     badgeName =
+      //       badge.Name.props.issuerAddress || badge.Name.props.children;
+      //   } else {
+      //     badgeName = badge.Name;
+      //   }
+      // } else if (badge.name) {
+      //   badgeName = badge.name;
+      // } else if (badge.badgeName) {
+      //   if (typeof badge.badgeName === "object" && badge.badgeName.props) {
+      //     const children = badge.badgeName.props.children;
+      //     if (Array.isArray(children)) {
+      //       for (const child of children) {
+      //         if (
+      //           typeof child === "object" &&
+      //           child.props &&
+      //           child.props.children
+      //         ) {
+      //           badgeName = child.props.children;
+      //           break;
+      //         }
+      //       }
+      //     } else {
+      //       badgeName = children;
+      //     }
+      //   } else {
+      //     badgeName = badge.badgeName;
+      //   }
+      // }
 
-      if (
-        newBadgeData.score === undefined ||
-        typeof newBadgeData.score === 'string' ||
-        !newBadgeData.name ||
-        !newBadgeData.issuer
-      ) {
-        toast.error('Please fill all badge fields correctly');
+      // const issuerAddress =
+      //   "GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS"; // TODO: Check this hardcoded issuer address
+
+      // console.log("Extracted data:", { badgeName, issuerAddress });
+      // console.log("Full badge object:", badge);
+
+      if (!badge.name) {
+        console.error("Badge name missing");
+        alert("Cannot remove badge: Missing badge name");
         return;
       }
 
-      console.log('Badge enviado:', newBadgeData);
-
-      const result = await stellarContractBadges.addBadge(
-        newBadgeData.name,
-        newBadgeData.issuer,
-        newBadgeData.score
-      );
-
-      if (result.success) {
-        console.log('Transaction successful - TX Hash:', result.txHash);
-        toast.success(`Badge ${newBadgeData.name} added successfully`);
-        setIsNewBadge(false);
-
-        if (communityAddress) {
-          const communityAddressStr = communityAddress.toString();
-
-          queryClient.invalidateQueries({
-            queryKey: ['community-badges', communityAddressStr, userAddress],
-          });
-
-          queryClient.invalidateQueries({
-            queryKey: ['community-details', communityAddressStr, userAddress],
-          });
-
-          queryClient.invalidateQueries({ queryKey: ['communities'] });
-          queryClient.invalidateQueries({
-            queryKey: ['communities', userAddress],
-          });
-
-          if (getCommunitiesBadgesList) {
-            await getCommunitiesBadgesList(communityAddressStr);
-          }
-
-          setTimeout(async () => {
-            if (getCommunitiesBadgesList) {
-              await getCommunitiesBadgesList(communityAddressStr);
-            }
-          }, 5000);
-        }
-      } else {
-        console.error('Transaction failed:', result.error);
-        toast.error(`Failed to add badge: ${result.error}`);
-      }
-    } catch (error) {
-      console.error('Error adding badge:', error);
-      toast.error(
-        `An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
-
-  useEffect(() => {
-    console.log(newBadgeData.score);
-    console.log(isDisabled);
-  }, [newBadgeData, isDisabled]);
-
-  const handleRemoveBadge = async (badge: any) => {
-    try {
-      console.log('Badge to remove:', badge);
-
-      let badgeName = '';
-      if (badge.Name) {
-        if (typeof badge.Name === 'object' && badge.Name.props) {
-          badgeName =
-            badge.Name.props.issuerAddress || badge.Name.props.children;
-        } else {
-          badgeName = badge.Name;
-        }
-      } else if (badge.name) {
-        badgeName = badge.name;
-      } else if (badge.badgeName) {
-        if (typeof badge.badgeName === 'object' && badge.badgeName.props) {
-          const children = badge.badgeName.props.children;
-          if (Array.isArray(children)) {
-            for (const child of children) {
-              if (
-                typeof child === 'object' &&
-                child.props &&
-                child.props.children
-              ) {
-                badgeName = child.props.children;
-                break;
-              }
-            }
-          } else {
-            badgeName = children;
-          }
-        } else {
-          badgeName = badge.badgeName;
-        }
-      }
-
-      const issuerAddress =
-        'GD7IDV44QE7CN35M2QLSAISAYPSOSSZTV7LWMKBU5PKDS7NQKTFRZUTS';
-
-      console.log('Extracted data:', { badgeName, issuerAddress });
-
-      if (!badgeName) {
-        console.error('Badge name missing');
-        alert('Cannot remove badge: Missing badge name');
-        return;
-      }
-
-      if (!stellarContractRemoveBadges) {
-        console.error('Badge removal service not available');
-        alert('Badge removal service not available');
+      if (!stellarContractRemoveBadges.removeBadge) {
+        console.error("Badge removal service not available");
+        alert("Badge removal service not available");
         return;
       }
 
       const result = await stellarContractRemoveBadges.removeBadge(
-        badgeName,
-        issuerAddress
+        badge.name.toUpperCase(),
+        badge.issuer.toUpperCase(),
       );
 
       if (result.success) {
         console.log(
-          `Badge ${badgeName} successfully removed - TX Hash:`,
-          result.txHash
+          `Badge ${badge.name} successfully removed - TX Hash:`,
+          result.txHash,
         );
-        toast.success(`Badge ${badgeName} successfully removed`);
+        toast.success(`Badge ${badge.name} successfully removed`);
 
         if (communityAddress) {
           const communityAddressStr = communityAddress.toString();
 
           // Immediately invalidate all relevant queries
           queryClient.invalidateQueries({
-            queryKey: ['community-badges', communityAddressStr, userAddress],
+            queryKey: ["community-badges", communityAddressStr, userAddress],
           });
 
           queryClient.invalidateQueries({
-            queryKey: ['community-details', communityAddressStr, userAddress],
+            queryKey: ["community-details", communityAddressStr, userAddress],
           });
 
-          queryClient.invalidateQueries({ queryKey: ['communities'] });
+          queryClient.invalidateQueries({ queryKey: ["communities"] });
           queryClient.invalidateQueries({
-            queryKey: ['communities', userAddress],
+            queryKey: ["communities", userAddress],
           });
 
           if (getCommunitiesBadgesList) {
@@ -218,17 +154,17 @@ export const CustomTable = <T extends Record<string, any>>({
           }, 1000);
         }
       } else {
-        console.error('Transaction failed:', result.error);
+        console.error("Transaction failed:", result.error);
         alert(`Failed to remove badge: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error in removal operation:', error);
-      alert('An error occurred while processing the badge removal.');
+      console.error("Error in removal operation:", error);
+      alert("An error occurred while processing the badge removal.");
     }
   };
 
   return (
-    <table className={cc(['custom-table bg-whiteOpacity008', className])}>
+    <table className={cc(["custom-table bg-whiteOpacity008", className])}>
       <thead className="rounded-md">
         <tr>
           {headers.map((header, index) => {
@@ -236,127 +172,63 @@ export const CustomTable = <T extends Record<string, any>>({
               <th
                 key={header}
                 className={cc([
-                  'text-left py-4 px-7 border-none',
+                  "border-none px-7 py-4 text-left",
                   headersClassnames?.[index],
                 ])}
               >
-                <span className="text-whiteOpacity05 text-sm font-light">
+                <span className="text-sm font-light text-whiteOpacity05">
                   {camelCaseToUpperCaseWords(header)}
                 </span>
               </th>
             );
           })}
-          {isCreated && (
-            <th className="text-right py-4 px-7 border-none">
-              <span className="text-whiteOpacity05 text-sm font-light"></span>
+          {isCreated && ( // This is the mock column for the remove badge button.
+            <th className="border-none px-7 py-4 text-right">
+              <span></span>
             </th>
           )}
         </tr>
       </thead>
 
       <tbody className="w-full">
-        {hasRowsToDisplay ? (
+        {!hasRowsToDisplay ? (
+          <tr className={cc([{ hidden: hasRowsToDisplay }])}>
+            <td colSpan={isCreated ? headers.length + 1 : headers.length}>
+              {childrenForEmptyTable}
+            </td>
+          </tr>
+        ) : (
           data.map((row, index) => {
+            console.log("row", row);
             return (
               <tr key={index}>
-                {headers.map(header => (
+                {headers.map((header) => (
                   <td key={`${index}-${header}`} className="px-7 py-4">
-                    {row[header] as ReactNode}
+                    {mapRowData(row, header) as ReactNode}
                   </td>
                 ))}
-
                 {isCreated && (
                   <td className="px-7 py-4 text-right">
                     <button
-                      onClick={() => handleRemoveBadge(row)}
-                      className="hover:opacity-70 transition-opacity"
+                      onClick={() => handleRemoveBadge(row as unknown as Badge)}
+                      className="transition-opacity hover:opacity-70"
                     >
-                      <Trash2 className="w-4 h-4 text-whiteOpacity05" />
+                      <Trash2 className="size-4 text-whiteOpacity05" />
                     </button>
                   </td>
                 )}
               </tr>
             );
           })
-        ) : (
-          <tr className={cc([{ hidden: hasRowsToDisplay }])}>
-            <td colSpan={isCreated ? headers.length + 1 : headers.length}>
-              {childrenForEmptyTable}
-            </td>
-          </tr>
         )}
+
         {isLogged && (
           <tr>
             <td
               colSpan={isCreated ? headers.length + 1 : headers.length}
               className="py-2"
             >
-              {isNewBadge ? (
-                <form onSubmit={handleSubmit}>
-                  <div className="flex p-2 gap-2 items-center w-full ml-3">
-                    <input
-                      type="text"
-                      placeholder="Badge name"
-                      value={newBadgeData.name}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          name: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Issuer"
-                      value={newBadgeData.issuer}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          issuer: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Score"
-                      value={newBadgeData.score}
-                      onChange={e =>
-                        setNewBadgeData({
-                          ...newBadgeData,
-                          score: Number(e.target.value),
-                        })
-                      }
-                      className="w-full bg-gray-700 rounded-lg p-2 bg-whiteOpacity008"
-                    />
-                    <button
-                      type="submit"
-                      className="p-2 rounded-lg"
-                      disabled={!isDisabled}
-                    >
-                      <Check className="text-white w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      className="p-2 rounded-lg"
-                      onClick={() => setIsNewBadge(false)}
-                    >
-                      <X className="text-white w-4 h-4" />
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex gap-2 py-2 items-center ml-10 ">
-                  <PlusIcon color="gray" />
-                  <button
-                    className="text-whiteOpacity05"
-                    onClick={() => setIsNewBadge(true)}
-                  >
-                    New Badge
-                  </button>
-                </div>
-              )}
+              <NewBadgeTable communityAddress={communityAddress} />
             </td>
           </tr>
         )}

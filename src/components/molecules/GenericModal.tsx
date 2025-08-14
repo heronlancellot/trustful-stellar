@@ -1,5 +1,5 @@
 import cc from "classcat";
-import { IconicButton } from "../atoms";
+import { IconicButton } from "@/components/atoms";
 import { useState } from "react";
 
 interface ModalProps {
@@ -23,21 +23,21 @@ export const GenericModal = ({
   isAsync,
   disabledButton,
 }: ModalProps) => {
-  const [isExecuting, setIsExecuting] = useState(false);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const onButtonClickAsync = async () => {
     setIsExecuting(true);
-    try{
+    try {
       await onButtonClick();
       setIsExecuting(false);
-    } catch(error){
+    } catch (error) {
       setIsExecuting(false);
     }
   };
   return (
     <div
       className={cc([
-        "fixed inset-0 bg-opacity-50 flex backdrop-blur-sm justify-center items-center transition-all duration-300",
-        isOpen ? "z-50 opacity-100" : "opacity-0 z-[-50]",
+        "fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm transition-all duration-300",
+        isOpen ? "z-50 opacity-100" : "z-[-50] opacity-0",
       ])}
       onClick={onClose}
     >
@@ -45,13 +45,13 @@ export const GenericModal = ({
         onClick={(event) => {
           event.stopPropagation();
         }}
-        className="bg-brandBlack shadow-2xl border-white border-opacity-10 border rounded-lg w-[480px] overflow-hidden"
+        className="w-[480px] overflow-hidden rounded-lg border border-white border-opacity-10 bg-brandBlack shadow-2xl"
       >
-        <div className="flex justify-between border-white border-opacity-10 items-center p-5 border-b">
-          <h3 className="text-lg text-[20px] font-dm font-medium">{title}</h3>
+        <div className="flex items-center justify-between border-b border-white border-opacity-10 p-5">
+          <h3 className="font-dm text-[20px] text-lg font-medium">{title}</h3>
           <button
             onClick={onClose}
-            className="text-white bg-secondary shadow-white px-2 rounded-md hover:bg-primary text-xl transition-colors duration-300"
+            className="bg-secondary hover:bg-primary rounded-md px-2 text-xl text-white shadow-white transition-colors duration-300"
           >
             &times;
           </button>

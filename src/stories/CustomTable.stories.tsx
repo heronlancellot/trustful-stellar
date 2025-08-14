@@ -34,19 +34,19 @@ export const CustomTableWithCustomCells: Story = {
       {
         badgeName: "Stellar Quests",
         issuer: getEllipsedAddress(
-          "GD6IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFYWS"
+          "GD6IAJEYOCPKJYTYVRJU75TXJGYUW7Z2ONMMJKXF2BFVGCMS3SQDFYWS",
         ),
       },
       {
         badgeName: "Stellar Quests",
         issuer: (
-          <div className="bg-red-500 h-full w-full">This is a custom cell</div>
+          <div className="h-full w-full bg-red-500">This is a custom cell</div>
         ),
       },
       {
         badgeName: "Stellar Quests",
         issuer: (
-          <div className="bg-green-500 h-full w-full">
+          <div className="h-full w-full bg-green-500">
             This is a custom cell
           </div>
         ),
@@ -54,16 +54,16 @@ export const CustomTableWithCustomCells: Story = {
       {
         badgeName: (
           <div className="flex flex-col">
-            <div className="bg-blue-500 h-full w-full">
+            <div className="h-full w-full bg-blue-500">
               <span>This is a custom cell</span>
             </div>
-            <div className="bg-purple-500 h-full w-full">
+            <div className="h-full w-full bg-purple-500">
               <span>This is a custom cell</span>
             </div>
           </div>
         ),
         issuer: (
-          <div className="bg-yellow-500 h-full w-full items-center justify-center flex">
+          <div className="flex h-full w-full items-center justify-center bg-yellow-500">
             This is a custom cell
           </div>
         ),

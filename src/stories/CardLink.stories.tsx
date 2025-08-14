@@ -15,14 +15,14 @@ const meta = {
     children: { control: "select" },
   },
   args: { children: <></> },
-} satisfies Meta<typeof CardLink>;
+} satisfies Meta;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const EmptyCardLink: Story = {
   args: {
-    children: <div className="w-20 h-20"></div>,
+    children: <div className="h-20 w-20"></div>,
     mainIcon: <></>,
     title: "",
     actionIcon: <></>,
@@ -31,7 +31,7 @@ export const EmptyCardLink: Story = {
 
 export const CardLinkWithContent: Story = {
   args: {
-    children: <div className="w-20 h-20"></div>,
+    children: <div className="h-20 w-20"></div>,
     mainIcon: (
       <BadgeIcon color={tailwindConfig.theme.extend.colors.brandGreen} />
     ),
@@ -44,7 +44,7 @@ export const CardLinkWithContent: Story = {
 
 export const CardLinkWithDifferentContent: Story = {
   args: {
-    children: <div className="w-20 h-20"></div>,
+    children: <div className="h-20 w-20"></div>,
     mainIcon: (
       <UserIcon color={tailwindConfig.theme.extend.colors.brandGreen} />
     ),

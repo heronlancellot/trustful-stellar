@@ -96,8 +96,8 @@ export const ConnectWalletModal: Story = {
     buttonLabel: "Connect",
     title: "Connect Wallet",
     children: (
-      <div className="p-2 w-full h-full items-center justify-center flex flex-col">
-        <div className="my-8 p-8 pt-6 w-[150px] h-[150px] rounded-full bg-whiteOpacity005 items-center justify-center">
+      <div className="flex h-full w-full flex-col items-center justify-center p-2">
+        <div className="my-8 h-[150px] w-[150px] items-center justify-center rounded-full bg-whiteOpacity005 p-8 pt-6">
           <WalletIcon
             color={tailwindConfig.theme.extend.colors.brandGreen}
           ></WalletIcon>

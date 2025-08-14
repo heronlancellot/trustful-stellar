@@ -1,7 +1,7 @@
-'use client';
+/* eslint-disable react-hooks/exhaustive-deps */
+"use client";
 
 import {
-  CheckIcon,
   ContentTabs,
   DappHeader,
   PlusIcon,
@@ -9,38 +9,35 @@ import {
   StarIcon,
   TagIcon,
   UserIcon,
-} from '@/components';
-import { SearchIcon } from '@/components/atoms/icons/SearchIcon';
-import { ArrowIcon } from '@/components/atoms/icons/ArrowIcon';
-import { TableEmptyScreen } from '@/components/atoms/TableEmptyScreen';
-import { CustomTable } from '@/components/organisms/CustomTable';
-import { IconPosition } from '@/types/iconPosition';
-import { useRouter, useSearchParams } from 'next/navigation';
-import tailwindConfig from 'tailwind.config';
-import { TrashIcon } from '@/components/atoms/icons/TrashIcon';
-import { useModal } from '@/hooks/useModal';
-import { CustomModal } from '@/components/molecules';
-import LeaderboardTable from '@/components/molecules/leaderboard-table';
-import { useContext, useState, useEffect } from 'react';
-import { CommunityTableCell } from '@/components/molecules/CommunityTableCell';
-import { useCommunityContext } from '@/components/community/Context';
-import { useAuthContext } from '@/components/auth/Context';
-import useCommunitiesController from '@/components/community/hooks/controller';
-import toast from 'react-hot-toast';
-import { addUser, mainTestnet } from '@/testCall';
-import { kit } from '@/components/auth/ConnectStellarWallet';
-import { ALBEDO_ID } from '@creit.tech/stellar-wallets-kit';
-import { checkIfWalletIsInitialized } from '@/lib/stellar/isFundedStellarWallet';
-import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon } from 'lucide-react';
-import cc from 'classcat';
+} from "@/components";
+import { SearchIcon } from "@/components/atoms/icons/SearchIcon";
+import { TableEmptyScreen } from "@/components/atoms/TableEmptyScreen";
+import { CustomTable } from "@/components/organisms/CustomTable";
+import { IconPosition } from "@/types/iconPosition";
+import { useRouter, useSearchParams } from "next/navigation";
+import tailwindConfig from "tailwind.config";
+import { TrashIcon } from "@/components/atoms/icons/TrashIcon";
+import { useModal } from "@/hooks/useModal";
+import { CustomModal } from "@/components/molecules";
+import { LeaderboardTable } from "@/components/molecules/leaderboard-table";
+import { useState, useEffect } from "react";
+import { CommunityTableCell } from "@/components/molecules/CommunityTableCell";
+import { useCommunityContext } from "@/components/community/Context";
+import { useAuthContext } from "@/components/auth/Context";
+import useCommunitiesController from "@/components/community/hooks/controller";
+import toast from "react-hot-toast";
+import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon, X } from "lucide-react";
+import cc from "classcat";
 import {
   useCommunityBadges,
   useCommunityDetails,
   useCommunityMembers,
-} from '@/lib/hooks/api/useCommunityDetails';
-import { useQueryClient } from '@tanstack/react-query';
-import { useUpdateCommunityVisibility } from '@/lib/hooks/api/useCommunities';
-import ActivityIndicatorModal from '@/components/molecules/ActivityIndicatorModal';
+} from "@/lib/hooks/api/useCommunityDetails";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateCommunityVisibility } from "@/lib/hooks/api/useCommunities";
+import { ActivityIndicatorModal } from "@/components/molecules/ActivityIndicatorModal";
+import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
+import { Badge } from "@/components/badge-info/hooks/Controller";
 
 interface DetailsProps {
   params: {
@@ -50,20 +47,23 @@ interface DetailsProps {
 
 export default function DetailsCommunity({ params }: DetailsProps) {
   const { openModal, closeModal, isOpen } = useModal();
-  const { userAddress, setUserAddress } = useAuthContext();
+  const { userAddress } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const status = searchParams.get('status');
+  const status = searchParams.get("status");
   const communityAddress = params.communityAddress;
+  const queryClient = useQueryClient();
 
   const { stellarContractJoinCommunities, stellarContractManagers } =
     useCommunitiesController({ communityAddress });
 
-  const [newManager, setNewManager] = useState('');
-  const [removeManager, setRemoveManager] = useState('');
-  const queryClient = useQueryClient();
-  const [isHiding, setIsHiding] = useState(false);
-  const [hasOfferedRedirect, setHasOfferedRedirect] = useState(false);
+  const [newManager, setNewManager] = useState<string>("");
+  const [removeManager, setRemoveManager] = useState<string>("");
+  const [isHiding, setIsHiding] = useState<boolean>(false);
+  const [hasOfferedRedirect, setHasOfferedRedirect] = useState<boolean>(false);
+
+  const [isHoveringJoinButton, setIsHoveringJoinButton] =
+    useState<boolean>(false);
 
   const { data: communitiesDetail, isLoading: isLoadingDetails } =
     useCommunityDetails(communityAddress as string, userAddress);
@@ -85,21 +85,14 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     userAddress.toLowerCase() ===
       communitiesDetail.creator_address.toLowerCase();
 
-  const statusList = {
-    all: 'all',
-    joined: 'joined',
-    created: 'created',
-    hidden: 'hidden',
-  };
-
-  const { all, joined, created, hidden } = statusList;
+  const { all, joined, created, hidden } = NAVIGATION_STATUS_LIST;
 
   useEffect(() => {
     if (
       isCreator &&
       status !== created &&
       !hasOfferedRedirect &&
-      typeof window !== 'undefined'
+      typeof window !== "undefined"
     ) {
       if (status === hidden) {
         return;
@@ -117,8 +110,16 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     hasOfferedRedirect,
   ]);
 
-  console.log('communityAddress', communityAddress);
-  console.log('status', status);
+  const checkIfTheUserIsTheCreateOwner = () => {
+    if (
+      userAddress?.toUpperCase() !==
+      communitiesDetail?.creator_address.toUpperCase()
+    ) {
+      toast.error("You are not the owner of this community.");
+      return;
+    }
+  };
+
   if (!communityAddress || !status) {
     return <h1>Loading...</h1>;
   }
@@ -131,7 +132,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     const result = await stellarContractJoinCommunities.addUser();
 
     if (result.success) {
-      toast.success('Successful Joining Community');
+      toast.success("Successful Joining Community");
 
       setCommunitiesDetail((prev: any) => ({
         ...prev,
@@ -139,23 +140,25 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       }));
 
       queryClient.invalidateQueries({
-        queryKey: ['community-details', communityAddress, userAddress],
+        queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log('Transaction successful:', result.txHash);
-      closeModal('managers');
+      console.log("Transaction successful:", result.txHash);
+      closeModal("managers");
     } else {
-      toast.error('Not Successful Joining Community');
-      closeModal('managers');
-      console.error('Transaction failed:', result.error);
+      toast.error("Not Successful Joining Community");
+      closeModal("managers");
+      console.error("Transaction failed:", result.error);
     }
   };
 
   const handleExitCommunities = async (communityAddress: string) => {
+    console.log("handleExitCommunities", communityAddress);
     const result = await stellarContractJoinCommunities.removeUser();
+    console.log("result", result);
 
     if (result.success) {
-      toast.success('Successful Exiting Community');
+      toast.success("Successful Exiting Community");
 
       setCommunitiesDetail((prev: any) => ({
         ...prev,
@@ -163,29 +166,39 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       }));
 
       queryClient.invalidateQueries({
-        queryKey: ['community-details', communityAddress, userAddress],
+        queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log('Transaction successful:', result.txHash);
-      closeModal('managers');
+      console.log("Transaction successful:", result.txHash);
+      closeModal("managers");
     } else {
-      toast.error('Not Successful Exiting Community');
-      closeModal('managers');
-      console.error('Transaction failed:', result.error);
+      toast.error("Not Successful Exiting Community");
+      closeModal("managers");
+      console.error("Transaction failed:", result.error);
     }
   };
 
   const handleInviteManager = async (newManager: string) => {
+    if (
+      !communitiesMembersList?.some(
+        (member: any) => member.user_address === newManager.toLowerCase(),
+      )
+    ) {
+      toast.error("User is not a member of the community");
+      return;
+    }
+    checkIfTheUserIsTheCreateOwner();
+
     const sender = userAddress as string;
     const newManagerFormatted = newManager.toUpperCase();
 
     const result = await stellarContractManagers.addManager(
       sender,
-      newManagerFormatted
+      newManagerFormatted,
     );
 
     if (result.success) {
-      toast.success('Successful Inserting Manager');
+      toast.success("Successful Inserting Manager");
 
       setCommunitiesDetail((prev: any) => {
         const prevData = prev || {};
@@ -202,29 +215,49 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['community-details', communityAddress, userAddress],
+        queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log('Transaction successful:', result.txHash);
+      console.log("Transaction successful:", result.txHash);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
     } else {
-      toast.error('Not Successful Inserting Manager');
-      console.error('Inserting Manager failed:', result.error);
+      toast.error("Not Successful Inserting Manager");
+      console.error("Inserting Manager failed:", result.error);
     }
   };
 
+  const checkIfHasMoreThanOneManager = (): boolean => {
+    let totalManagers = 0;
+    if (
+      communitiesMembersList.map((member: any) => {
+        if (member.is_manager) {
+          totalManagers++;
+        }
+      })
+    ) {
+      if (totalManagers <= 1) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleRemoveManager = async (removedManager: string) => {
+    checkIfTheUserIsTheCreateOwner();
     const sender = userAddress as string;
 
     const removedManagerFormatted =
-      typeof removedManager === 'string' ? removedManager.toUpperCase() : '';
+      typeof removedManager === "string" ? removedManager.toUpperCase() : "";
 
     const result = await stellarContractManagers.removeManager(
       sender,
-      removedManagerFormatted
+      removedManagerFormatted,
     );
 
     if (result.success) {
-      toast.success('Successful Removing Manager');
+      toast.success("Successful Removing Manager");
 
       setCommunitiesDetail((prev: any) => {
         const prevData = prev || {};
@@ -233,62 +266,69 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         return {
           ...prevData,
           managers: currentManagers.filter(
-            (manager: string) => manager !== removedManagerFormatted
+            (manager: string) => manager !== removedManagerFormatted,
           ),
         };
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['community-details', communityAddress, userAddress],
+        queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log('Transaction successful:', result.txHash);
-      closeModal('deleteBadge');
+      console.log("Transaction successful:", result.txHash);
+      closeModal("removeManager");
+
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
     } else {
-      toast.error('Not Successful Removing Manager');
-      closeModal('deleteBadge');
-      console.error('Removing Manager failed:', result.error);
+      toast.error("Not Successful Removing Manager");
+      closeModal("removeManager");
+      console.error("Removing Manager failed:", result.error);
     }
   };
 
   const newCommunitiesBadgesList = Array.isArray(
-    communitiesBadgesList?.community_badges
+    communitiesBadgesList?.community_badges,
   )
     ? communitiesBadgesList.community_badges
     : [];
 
   const handleHideCommunity = async (communityAddress: string) => {
+    checkIfTheUserIsTheCreateOwner();
     setIsHiding(true);
     try {
       await updateHideCommunities(communityAddress);
-      toast.success('Community hidden successfully');
+      toast.success("Community hidden successfully");
 
       setCommunitiesDetail((prev: any) => ({
         ...prev,
         is_hidden: true,
       }));
 
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'joined', userAddress],
+        queryKey: ["communities", userAddress],
       });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'created', userAddress],
+        queryKey: ["communities", "joined", userAddress],
       });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'hidden', userAddress],
+        queryKey: ["communities", "created", userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "hidden", userAddress],
       });
 
       setTimeout(() => {
-        router.push('/communities?status=hidden');
+        router.push("/communities?status=hidden");
       }, 1000);
     } catch (error) {
-      toast.error('Failed to hide community');
-      console.error('Error hiding community:', error);
+      toast.error("Failed to hide community");
+      console.error("Error hiding community:", error);
     } finally {
       setIsHiding(false);
-      closeModal('hideCommunity');
+      closeModal("hideCommunity");
     }
   };
 
@@ -296,39 +336,41 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     setIsHiding(true);
     try {
       await updateShowCommunities(communityAddress);
-      toast.success('Community shown successfully');
+      toast.success("Community shown successfully");
 
       setCommunitiesDetail((prev: any) => ({
         ...prev,
         is_hidden: false,
       }));
 
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      queryClient.invalidateQueries({ queryKey: ['communities', userAddress] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'joined', userAddress],
+        queryKey: ["communities", userAddress],
       });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'created', userAddress],
+        queryKey: ["communities", "joined", userAddress],
       });
       queryClient.invalidateQueries({
-        queryKey: ['communities', 'hidden', userAddress],
+        queryKey: ["communities", "created", userAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "hidden", userAddress],
       });
 
       setTimeout(() => {
-        router.push('/communities?status=all');
+        router.push("/communities?status=all");
       }, 1000);
     } catch (error) {
-      toast.error('Failed to show community');
-      console.error('Error showing community:', error);
+      toast.error("Failed to show community");
+      console.error("Error showing community:", error);
     } finally {
       setIsHiding(false);
     }
   };
 
-  const searchedUserBadges = newCommunitiesBadgesList.map((badge: any) => ({
+  const searchedUserBadges = newCommunitiesBadgesList.map((badge: Badge) => ({
     badgeName: (
-      <div className="flex flex-row items-center h-7">
+      <div className="flex h-7 flex-row items-center">
         <div className="flex flex-col">
           <span>{badge?.name}</span>
           <span>{badge?.score}</span>
@@ -342,14 +384,14 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     Name: <CommunityTableCell issuerAddress={badge?.name} />,
     Status: (
       <CommunityTableCell
-        issuerAddress={badge?.user_has ? 'Completed' : 'Pending'}
+        issuerAddress={badge?.user_has ? "Completed" : "Pending"}
       />
     ),
   }));
 
   return (
-    <div className="flex flex-col w-full h-full bg-brandBlack">
-      <div className="w-full h-fit z-10">
+    <div className="flex h-full w-full flex-col bg-brandBlack">
+      <div className="z-10 h-fit w-full">
         <DappHeader />
       </div>
       <div className="flex flex-col gap-6 px-8 pt-8">
@@ -357,11 +399,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/communities')}
-                className="flex items-center justify-center w-8 h-8 rounded-full transition-colors"
+                onClick={() => router.push("/communities")}
+                className="flex size-8 items-center justify-center rounded-full transition-colors"
               >
-                <div className="w-4 h-4">
-                  <ArrowLeft />
+                <div className="group size-4">
+                  <ArrowLeft className="group-hover:text-brandGreen" />
                 </div>
               </button>
               <h1 className="text-2xl">{`${communitiesDetail?.name}`}</h1>
@@ -373,7 +415,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   {isCreator ? (
                     <div className="flex justify-items-center gap-2">
                       <PrimaryButton
-                        className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                        className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
                         label="Hide"
                         icon={
                           <EyeOff
@@ -385,22 +427,24 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                           />
                         }
                         iconPosition={IconPosition.LEFT}
-                        onClick={() => openModal('hideCommunity')}
+                        onClick={() => openModal("hideCommunity")}
                       />
                       <PrimaryButton
-                        className="rounded-lg w-max"
+                        className="w-max rounded-lg"
                         label="Managers"
                         icon={<LockIcon color="black" width={16} height={16} />}
                         iconPosition={IconPosition.LEFT}
-                        onClick={() => openModal('managers')}
+                        onClick={() => openModal("managers")}
                       />
                     </div>
                   ) : (
                     <div>
-                      {typeof isJoined !== 'undefined' && isJoined ? (
+                      {typeof isJoined !== "undefined" && isJoined ? (
                         <PrimaryButton
-                          className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                          label="Joined"
+                          className="group w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen after:content-['']"
+                          label={isHoveringJoinButton ? "Exit" : "Joined"}
+                          onMouseEnter={() => setIsHoveringJoinButton(true)}
+                          onMouseLeave={() => setIsHoveringJoinButton(false)}
                           icon={
                             <Check
                               color={
@@ -418,9 +462,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       ) : (
                         <PrimaryButton
                           className={cc([
-                            'rounded-lg w-max',
+                            "w-max rounded-lg",
                             {
-                              'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                              "cursor-not-allowed bg-darkGreenOpacity01 opacity-30":
                                 !userAddress,
                             },
                           ])}
@@ -442,7 +486,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               {status === created && (
                 <div className="flex justify-items-center gap-2">
                   <PrimaryButton
-                    className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                    className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
                     label="Hide"
                     icon={
                       <EyeOff
@@ -452,14 +496,14 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                       />
                     }
                     iconPosition={IconPosition.LEFT}
-                    onClick={() => openModal('hideCommunity')}
+                    onClick={() => openModal("hideCommunity")}
                   />
                   <PrimaryButton
-                    className="rounded-lg w-max"
+                    className="w-max rounded-lg"
                     label="Managers"
                     icon={<LockIcon color="black" width={16} height={16} />}
                     iconPosition={IconPosition.LEFT}
-                    onClick={() => openModal('managers')}
+                    onClick={() => openModal("managers")}
                   />
                 </div>
               )}
@@ -468,7 +512,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                   {isCreator ? (
                     <div className="flex justify-items-center gap-2">
                       <PrimaryButton
-                        className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                        className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
                         label="Hide"
                         icon={
                           <EyeOff
@@ -480,24 +524,24 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                           />
                         }
                         iconPosition={IconPosition.LEFT}
-                        onClick={() => openModal('hideCommunity')}
+                        onClick={() => openModal("hideCommunity")}
                       />
                       <PrimaryButton
-                        className="rounded-lg w-max"
+                        className="w-max rounded-lg"
                         label="Managers"
                         icon={<LockIcon color="black" width={16} height={16} />}
                         iconPosition={IconPosition.LEFT}
-                        onClick={() => openModal('managers')}
+                        onClick={() => openModal("managers")}
                       />
                     </div>
                   ) : (
                     <div>
-                      {typeof isJoined === 'undefined' || !isJoined ? (
+                      {typeof isJoined === "undefined" || !isJoined ? (
                         <PrimaryButton
                           className={cc([
-                            'rounded-lg w-max',
+                            "w-max rounded-lg",
                             {
-                              'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                              "cursor-not-allowed bg-darkGreenOpacity01 opacity-30":
                                 !userAddress,
                             },
                           ])}
@@ -513,8 +557,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         />
                       ) : (
                         <PrimaryButton
-                          className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
-                          label="Joined"
+                          className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
+                          label={isHoveringJoinButton ? "Exit" : "Joined"}
+                          onMouseEnter={() => setIsHoveringJoinButton(true)}
+                          onMouseLeave={() => setIsHoveringJoinButton(false)}
                           icon={
                             <Check
                               color={
@@ -537,7 +583,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               {status === hidden && (
                 <div className="flex justify-items-center">
                   <PrimaryButton
-                    className="rounded-lg w-max text-brandGreen bg-darkGreenOpacity01"
+                    className="w-max rounded-lg bg-darkGreenOpacity01 text-brandGreen"
                     label="Show"
                     icon={
                       <EyeIcon
@@ -555,7 +601,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               )}
             </div>
           </div>
-          <h3 className="text-gray-500 text-base pl-12">{`${communitiesDetail?.description}`}</h3>
+          <h3 className="pl-12 text-base text-gray-500">{`${communitiesDetail?.description}`}</h3>
         </div>
 
         <div className="flex items-center gap-2 pl-12">
@@ -609,9 +655,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         />
                       }
                       className="mt-6"
-                      headers={['Name', 'Score']}
+                      headers={["Name", "Score"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -628,7 +674,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
             }}
           ></ContentTabs>
         )}
-        {status === created && (
+        {status === created && ( // When the community is created, the user can see the badges that he has created and manage it
           <ContentTabs
             tabs={{
               Badges: {
@@ -651,11 +697,11 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         />
                       }
                       className="mt-6"
-                      headers={['Name', 'Score', 'Status']}
-                      data={searchedUserBadges}
+                      headers={["Name", "Score", "Status"]}
+                      data={newCommunitiesBadgesList}
                       isLogged
                       isCreated
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -670,7 +716,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 tabNumber: 2,
               },
             }}
-          ></ContentTabs>
+          />
         )}
         {status === joined && (
           <ContentTabs
@@ -695,9 +741,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         />
                       }
                       className="mt-6"
-                      headers={['Name', 'Score', 'Status']}
+                      headers={["Name", "Score", "Status"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -737,9 +783,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                         />
                       }
                       className="mt-6"
-                      headers={['Name', 'Score', 'Status']}
+                      headers={["Name", "Score", "Status"]}
                       data={searchedUserBadges}
-                    ></CustomTable>
+                    />
                   </div>
                 ),
                 tabNumber: 1,
@@ -754,31 +800,31 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                 tabNumber: 2,
               },
             }}
-          ></ContentTabs>
+          />
         )}
       </div>
 
       <CustomModal
         title="Hide community?"
-        isOpen={isOpen('hideCommunity')}
-        onClose={() => closeModal('hideCommunity')}
+        isOpen={isOpen("hideCommunity")}
+        onClose={() => closeModal("hideCommunity")}
         isAsync={false}
         headerBackgroundColor="bg-whiteOpacity008"
       >
         <>
           <div className="w-full bg-whiteOpacity008">
-            <div className="p-6 border-whiteOpacity005 border-b">
+            <div className="border-b border-whiteOpacity005 p-6">
               <span className="text-base font-normal">
                 {`If you hide this community it won't be visible anymore.`}
               </span>
             </div>
           </div>
-          <div className="bg-whiteOpacity008 pt-4 pr-6 pb-4 pl-6 w-[480px] h-[68px] flex justify-end gap-2">
-            <button className="text-sm text-center w-[153px] h-[36px] rounded-md bg-darkGreenOpacity01 text-brandGreen pr-2 pl-2">
+          <div className="flex h-[68px] w-[480px] justify-end gap-2 bg-whiteOpacity008 pb-4 pl-6 pr-6 pt-4">
+            <button className="h-[36px] w-[153px] rounded-md bg-darkGreenOpacity01 pl-2 pr-2 text-center text-sm text-brandGreen">
               No, keep visible
             </button>
             <button
-              className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack pr-2 pl-2"
+              className="h-[36px] w-[102px] rounded-md bg-othersRed pl-2 pr-2 text-center text-sm text-brandBlack"
               onClick={() => handleHideCommunity(communityAddress as string)}
             >
               Yes, hide
@@ -789,38 +835,38 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
       <CustomModal
         title="People that can manage"
-        isOpen={isOpen('managers')}
-        onClose={() => closeModal('managers')}
+        isOpen={isOpen("managers")}
+        onClose={() => closeModal("managers")}
         isAsync={false}
         headerBackgroundColor="bg-whiteOpacity008"
       >
         <>
-          <div className="bg-whiteOpacity008 flex items-center flex-col w-[580px] h-[428px]">
-            <div className="flex flex-col items-center w-[552px] h-[172px]">
+          <div className="flex h-[428px] w-[580px] flex-col items-center bg-whiteOpacity008">
+            <div className="flex h-[172px] w-[552px] flex-col items-center">
               <div className="w-[552px]">
                 <div className="flex gap-3 py-3">
                   <input
                     placeholder="Add managers by inserting the Stellar address"
-                    className="w-[440px] h-[36px] p-2 rounded-lg bg-whiteOpacity005"
+                    className="h-[36px] w-[440px] rounded-lg bg-whiteOpacity005 p-2"
                     type="text"
-                    onChange={e => setNewManager(e.target.value)}
+                    onChange={(e) => setNewManager(e.target.value)}
                   />
                   <button
-                    className="flex items-center justify-center w-[100px] h-[36px] rounded-lg bg-brandGreen text-base text-brandBlack text-center"
+                    className="flex h-[36px] w-[100px] items-center justify-center rounded-lg bg-brandGreen text-center text-base text-brandBlack"
                     onClick={() => handleInviteManager(newManager)}
                   >
                     Invite
                   </button>
                 </div>
-                <div className="w-full flex flex-col">
+                <div className="flex w-full flex-col">
                   {communitiesDetail?.managers?.map((item: string) => (
                     <div
                       key={item}
-                      className="w-full flex items-center border-b border-whiteOpacity005 border-opacity-10 py-3"
+                      className="flex w-full items-center border-b border-whiteOpacity005 border-opacity-10 py-3"
                     >
-                      <div className="w-full flex justify-between items-center gap-2">
-                        <div className="flex gap-4 items-center">
-                          <div className="w-[35px] h-[35px] rounded-full p-2 bg-blue-500">
+                      <div className="flex w-full items-center justify-between gap-2">
+                        <div className="flex items-center gap-4">
+                          <div className="size-[35px] rounded-full bg-blue-500 p-2">
                             <StarIcon />
                           </div>
                           <div className="flex flex-col">
@@ -832,15 +878,22 @@ export default function DetailsCommunity({ params }: DetailsProps) {
                             </span>
                           </div>
                         </div>
-                        <div
+                        <button
                           onClick={() => {
-                            openModal('deleteBadge');
-                            setRemoveManager(item);
+                            if (checkIfHasMoreThanOneManager()) {
+                              setRemoveManager(item);
+                              openModal("removeManager");
+                              return;
+                            } else {
+                              toast.error(
+                                "You need at least two managers to remove one",
+                              );
+                            }
                           }}
-                          className="w-[15px] h-[15px] cursor-pointer"
+                          className="size-[15px] cursor-pointer hover:bg-whiteOpacity005"
                         >
-                          <TrashIcon />
-                        </div>
+                          <TrashIcon className="size-4" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -852,30 +905,29 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       </CustomModal>
 
       <CustomModal
-        title="Delete badge?"
-        isOpen={isOpen('deleteBadge')}
-        onClose={() => closeModal('deleteBadge')}
+        title="Remove Manager?"
+        isOpen={isOpen("removeManager")}
+        onClose={() => closeModal("removeManager")}
         isAsync={false}
         headerBackgroundColor="bg-whiteOpacity008"
       >
         <>
-          <div className="bg-whiteOpacity008 w-[500px] h-[100px] p-6">
+          <div className="h-[100px] w-[500px] bg-whiteOpacity008 p-6">
             <span className="text-base font-normal">
-              If you delete this badge, it will no longer be valid as a score
-              for your community and may impact the reputation scores of your
-              community members.
+              If you remove this manager, it will no longer be able to manage
+              this community.
             </span>
           </div>
-          <div className="bg-whiteOpacity008 pt-4 pr-6 pb-4 pl-6 flex justify-end gap-2">
+          <div className="flex justify-end gap-2 bg-whiteOpacity008 pb-4 pl-6 pr-6 pt-4">
             <button
-              onClick={() => closeModal('deleteBadge')}
-              className="text-sm text-center w-[153px] h-[36px] rounded-md bg-darkGreenOpacity01 text-brandGreen  "
+              onClick={() => closeModal("removeManager")}
+              className="h-[36px] w-[153px] rounded-md bg-darkGreenOpacity01 text-center text-sm text-brandGreen"
             >
               No, keep it
             </button>
             <button
               onClick={() => handleRemoveManager(removeManager)}
-              className="text-sm text-center w-[102px] h-[36px] rounded-md bg-othersRed text-brandBlack "
+              className="h-[36px] w-[102px] rounded-md bg-othersRed text-center text-sm text-brandBlack"
             >
               Yes, delete
             </button>

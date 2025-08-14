@@ -1,7 +1,7 @@
-import { kit } from '@/components/auth/ConnectStellarWallet';
-import { WalletNetwork } from '@creit.tech/stellar-wallets-kit';
-import * as StellarSdk from '@stellar/stellar-sdk';
-import { STELLAR } from '@/lib/environmentVars';
+import { kit } from "@/components/auth/ConnectStellarWallet";
+import { WalletNetwork } from "@creit.tech/stellar-wallets-kit";
+import * as StellarSdk from "@stellar/stellar-sdk";
+import { STELLAR } from "@/lib/environmentVars";
 
 const signTransaction = async (transactionXdr: string) => {
   const { address } = await kit.getAddress();
@@ -11,7 +11,7 @@ const signTransaction = async (transactionXdr: string) => {
   });
   const transaction = new StellarSdk.Transaction(
     signedTxXdr,
-    STELLAR.WALLET_NETWORK
+    STELLAR.WALLET_NETWORK,
   );
   return transaction;
 };
@@ -24,14 +24,14 @@ const signFeeBumpTransaction = async (transactionXdr: string) => {
   });
   const feeBumpTransaction = new StellarSdk.FeeBumpTransaction(
     signedTxXdr,
-    STELLAR.WALLET_NETWORK
+    STELLAR.WALLET_NETWORK,
   );
   return feeBumpTransaction;
 };
 
 export const sendSignedTransaction = async (
   transactionXdr: string,
-  userAddress: string
+  userAddress: string,
 ) => {
   try {
     const network = StellarSdk.Networks.PUBLIC;
@@ -40,10 +40,10 @@ export const sendSignedTransaction = async (
     // 2. Re build the original transaction
     const originalTransaction = new StellarSdk.Transaction(
       transactionXdr,
-      network
+      network,
     );
     const signedTransaction = await signTransaction(
-      originalTransaction.toXDR()
+      originalTransaction.toXDR(),
     );
 
     const multipliedBaseFee = String(parseInt(StellarSdk.BASE_FEE) * 2);
@@ -53,11 +53,11 @@ export const sendSignedTransaction = async (
         userAddress,
         multipliedBaseFee,
         signedTransaction,
-        network
+        network,
       );
 
     const signedFeeBumpTransaction = await signFeeBumpTransaction(
-      feeBumpTransaction.toXDR()
+      feeBumpTransaction.toXDR(),
     );
 
     // 4. Submit the fee-bumped transaction
@@ -68,37 +68,38 @@ export const sendSignedTransaction = async (
   } catch (error) {
     console.error(error);
     if (error === undefined) {
-      throw new Error('Undefined Error');
+      throw new Error("Undefined Error");
     } else if (
       (error as StellarSdk.NetworkError)?.response?.data?.status === 400
     ) {
       if (
         (error as StellarSdk.NetworkError)?.response?.data?.title.includes(
-          'Transaction Failed'
+          "Transaction Failed",
         )
       ) {
         const errorData = (error as StellarSdk.BadRequestError).response
           ?.data as StellarSdk.Horizon.HorizonApi.ErrorResponseData.TransactionFailed;
         const isLowReserveError =
-          errorData.extras.result_codes.operations.includes('op_low_reserve');
+          errorData.extras.result_codes.operations.includes("op_low_reserve");
         if (isLowReserveError) {
           throw new Error(
-            'Transaction Failed: Your XLM reserve is too low to submit this transaction'
+            "Transaction Failed: Your XLM reserve is too low to submit this transaction",
           );
         } else {
           throw new Error(
-            'Transaction Failed: ' + (error as StellarSdk.NetworkError)?.message
+            "Transaction Failed: " +
+              (error as StellarSdk.NetworkError)?.message,
           );
         }
       }
     } else if (
       (error as StellarSdk.NetworkError)?.response?.data?.status === 429
     ) {
-      throw new Error('Too many requests, try again later');
+      throw new Error("Too many requests, try again later");
     } else if (
       (error as StellarSdk.NetworkError)?.response?.data?.status === 500
     ) {
-      throw new Error('Internal Server Error, try again later');
+      throw new Error("Internal Server Error, try again later");
     }
     throw error;
   }

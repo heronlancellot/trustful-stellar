@@ -3,7 +3,7 @@ export interface IGenericHttpClient {
   post: <T, P extends Object, B extends Object>(
     path: string,
     query: P,
-    body: B
+    body: B,
   ) => Promise<T>;
 }
 

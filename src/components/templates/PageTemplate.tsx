@@ -1,16 +1,15 @@
-import cc from 'classcat';
-import { ReactNode, useState } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import React from 'react';
-import { Tooltip } from 'react-tooltip';
-import { PrimaryButton } from '../atoms/PrimaryButton';
-import { IconPosition } from '@/types/iconPosition';
-import { PlusIcon } from '../atoms';
-import { StepModal } from '../molecules/StepModal';
-import { useAuthContext } from '../auth/Context';
-import { DappHeader } from '../organisms';
+import cc from "classcat";
+import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import { Tooltip } from "react-tooltip";
+import { PrimaryButton } from "@/components/atoms/PrimaryButton";
+import { IconPosition } from "@/types/iconPosition";
+import { PlusIcon } from "@/components/atoms";
+import { StepModal } from "@/components/molecules/StepModal";
+import { useAuthContext } from "@/components/auth/Context";
+import { DappHeader } from "@/components/organisms";
 
-interface PageTemplateProps extends React.ComponentPropsWithoutRef<'div'> {
+interface PageTemplateProps extends ComponentPropsWithoutRef<"div"> {
   className: string;
   title: string;
   children: ReactNode;
@@ -25,53 +24,54 @@ export const PageTemplate = ({
   tooltip,
   isCommunity,
 }: PageTemplateProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] =
+    useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const { userAddress } = useAuthContext();
 
-  const handleCreateClick = () => {
-    setIsModalOpen(true);
+  const handleCreateCommunity = () => {
+    setIsCommunityModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseCommunityModal = () => {
+    setIsCommunityModalOpen(false);
     setCurrentStep(1);
   };
 
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 3));
+    setCurrentStep((prev) => Math.min(prev + 1, 3));
   };
 
   const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleConfirm = () => {
-    handleCloseModal();
+    handleCloseCommunityModal();
   };
 
   return (
     <div
-      className={cc([className, 'flex flex-col w-full h-full  bg-brandBlack'])}
+      className={cc([className, "flex h-full w-full flex-col bg-brandBlack"])}
     >
       <DappHeader />
-      <PerfectScrollbar className="h-full flex flex-col w-full">
-        <div className="text-left text-[26px] pl-12 pt-8 pb-3 flex justify-between items-center">
-          <h1 className="font-spaceGrotesk">{title}</h1>{' '}
+      <PerfectScrollbar className="flex h-full w-full flex-col">
+        <div className="flex items-center justify-between px-6 py-4 text-left text-[26px] sm:px-12 sm:pb-3 sm:pt-8">
+          <h1 className="font-spaceGrotesk">{title}</h1>{" "}
           {isCommunity && (
-            <div className="py-6 px-12">
+            <div>
               <PrimaryButton
                 className={cc([
-                  'rounded-lg w-max',
+                  "w-max rounded-lg",
                   {
-                    'opacity-30 cursor-not-allowed bg-darkGreenOpacity01':
+                    "cursor-not-allowed bg-darkGreenOpacity01 opacity-30":
                       !userAddress,
                   },
                 ])}
                 label="Create"
                 icon={<PlusIcon color="black" width={16} height={16} />}
                 iconPosition={IconPosition.LEFT}
-                onClick={handleCreateClick}
+                onClick={handleCreateCommunity}
                 disabled={!userAddress}
               />
             </div>
@@ -79,12 +79,12 @@ export const PageTemplate = ({
         </div>
         <div className="flex">{children}</div>
       </PerfectScrollbar>
-      {!!tooltip ? <Tooltip id={tooltip?.tooltipId} /> : <></>}
+      {!!tooltip && <Tooltip id={tooltip?.tooltipId} />}
 
-      {isModalOpen && (
+      {isCommunityModalOpen && (
         <StepModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
+          isOpen={isCommunityModalOpen}
+          onClose={handleCloseCommunityModal}
           currentStep={currentStep}
           onNext={handleNext}
           onBack={handleBack}
