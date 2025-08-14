@@ -208,6 +208,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       });
 
       console.log("Transaction successful:", result.txHash);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
     } else {
       toast.error("Not Successful Inserting Manager");
       console.error("Inserting Manager failed:", result.error);
@@ -262,6 +265,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
 
       console.log("Transaction successful:", result.txHash);
       closeModal("removeManager");
+
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
     } else {
       toast.error("Not Successful Removing Manager");
       closeModal("removeManager");
@@ -276,6 +283,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     : [];
 
   const handleHideCommunity = async (communityAddress: string) => {
+    if (communityAddress !== communitiesDetail?.creator_address) {
+      toast.error("You are not the owner of this community.");
+      return;
+    }
     setIsHiding(true);
     try {
       await updateHideCommunities(communityAddress);
