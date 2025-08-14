@@ -36,7 +36,6 @@ export const CustomTable = <T extends Record<string, any>>({
   isCreated,
   communityAddress,
 }: CustomTableProps<T>): ReactElement => {
-  console.log("data21", data);
   const hasRowsToDisplay = !!data && data.length > 0;
 
   const mapRowData = (row: T, header: string) => {
@@ -64,10 +63,7 @@ export const CustomTable = <T extends Record<string, any>>({
   const { userAddress } = useAuthContext();
 
   const handleRemoveBadge = async (badge: Badge) => {
-    console.log("badge2121", badge); //TODO: Find the issuer here to remove the hardcoded issuer address
     try {
-      console.log("Badge to remove:", badge);
-
       // let badgeName = "";
       // if (badge.Name) {
       //   if (typeof badge.Name === "object" && badge.Name.props) {

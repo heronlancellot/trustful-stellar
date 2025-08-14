@@ -110,6 +110,13 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     hasOfferedRedirect,
   ]);
 
+  const checkIfTheUserIsTheCreateOwner = () => {
+    if (userAddress !== communitiesDetail?.creator_address) {
+      toast.error("You are not the owner of this community.");
+      return;
+    }
+  };
+
   if (!communityAddress || !status) {
     return <h1>Loading...</h1>;
   }
@@ -177,6 +184,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       toast.error("User is not a member of the community");
       return;
     }
+    checkIfTheUserIsTheCreateOwner();
 
     const sender = userAddress as string;
     const newManagerFormatted = newManager.toUpperCase();
@@ -234,6 +242,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const handleRemoveManager = async (removedManager: string) => {
+    checkIfTheUserIsTheCreateOwner();
     const sender = userAddress as string;
 
     const removedManagerFormatted =
@@ -283,10 +292,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
     : [];
 
   const handleHideCommunity = async (communityAddress: string) => {
-    if (communityAddress !== communitiesDetail?.creator_address) {
-      toast.error("You are not the owner of this community.");
-      return;
-    }
+    checkIfTheUserIsTheCreateOwner();
     setIsHiding(true);
     try {
       await updateHideCommunities(communityAddress);
@@ -298,7 +304,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       }));
 
       queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["communities", userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", userAddress],
+      });
       queryClient.invalidateQueries({
         queryKey: ["communities", "joined", userAddress],
       });
@@ -333,7 +341,9 @@ export default function DetailsCommunity({ params }: DetailsProps) {
       }));
 
       queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["communities", userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", userAddress],
+      });
       queryClient.invalidateQueries({
         queryKey: ["communities", "joined", userAddress],
       });
