@@ -7,12 +7,14 @@ import tailwindConfig from "tailwind.config";
 import cc from "classcat";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { setUserAddress, userAddress } = useAuthContext();
+  const queryClient = useQueryClient();
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -34,6 +36,8 @@ export const UserDropdown = () => {
   const disconnect = () => {
     setUserAddress("");
     setIsOpen(false);
+    queryClient.clear();
+    router.push("/");
   };
 
   useEffect(() => {
