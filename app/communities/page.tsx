@@ -22,6 +22,7 @@ import useCommunitiesController from "@/components/community/hooks/controller";
 import {
   useCommunities,
   useCommunitiesByStatus,
+  useCommunitiesByManager,
 } from "@/lib/hooks/api/useCommunities";
 import { NAVIGATION_STATUS_LIST } from "@/shared/constants";
 
@@ -68,12 +69,18 @@ function CommunitiesContent() {
     useCommunities(userAddress);
   const { data: statusCommunities, isLoading: isLoadingStatusCommunities } =
     useCommunitiesByStatus(
-      currentStatus !== NAVIGATION_STATUS_LIST.all ? currentStatus : "",
+      currentStatus !== NAVIGATION_STATUS_LIST.all && currentStatus !== NAVIGATION_STATUS_LIST.created ? currentStatus : "",
       userAddress,
+    );
+  const { data: managedCommunities, isLoading: isLoadingManagedCommunities } =
+    useCommunitiesByManager(
+      currentStatus === NAVIGATION_STATUS_LIST.created ? userAddress : undefined,
     );
 
   const communities =
-    currentStatus !== NAVIGATION_STATUS_LIST.all && userAddress
+    currentStatus === NAVIGATION_STATUS_LIST.created && userAddress
+      ? managedCommunities
+      : currentStatus !== NAVIGATION_STATUS_LIST.all && userAddress
       ? statusCommunities
       : allCommunities;
 
@@ -104,7 +111,7 @@ function CommunitiesContent() {
   }, [communities, setCommunities]);
 
   useEffect(() => {
-    if (isLoadingAllCommunities || isLoadingStatusCommunities) {
+    if (isLoadingAllCommunities || isLoadingStatusCommunities || isLoadingManagedCommunities) {
       setIsLoading(true);
       setDataFetched(false);
     } else {
@@ -114,7 +121,7 @@ function CommunitiesContent() {
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isLoadingAllCommunities, isLoadingStatusCommunities]);
+  }, [isLoadingAllCommunities, isLoadingStatusCommunities, isLoadingManagedCommunities]);
 
   const isImportButtonDisabled = (questName: string) => {
     if (!userAddress) {

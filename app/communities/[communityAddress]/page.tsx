@@ -111,7 +111,10 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   ]);
 
   const checkIfTheUserIsTheCreateOwner = () => {
-    if (userAddress !== communitiesDetail?.creator_address) {
+    if (
+      userAddress?.toUpperCase() !==
+      communitiesDetail?.creator_address.toUpperCase()
+    ) {
       toast.error("You are not the owner of this community.");
       return;
     }

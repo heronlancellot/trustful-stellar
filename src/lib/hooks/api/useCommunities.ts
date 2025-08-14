@@ -53,6 +53,21 @@ async function fetchVerifyReputationList(
   return response.json();
 }
 
+async function fetchCommunitiesByManager(
+  userAddress: string,
+): Promise<Communities[]> {
+  const userAddressFormatted = userAddress?.toLowerCase();
+  const response = await fetch(
+    getApiUrl(`/communities/managed/${userAddressFormatted}`),
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch managed communities");
+  }
+
+  return response.json();
+}
+
 async function updateCommunityVisibility(
   communityAddress: string,
 ): Promise<any> {
@@ -96,6 +111,14 @@ export function useVerifyReputationList(userAddress: string) {
   return useQuery({
     queryKey: [COMMUNITIES_QUERY_KEY, "verify-reputation", userAddress],
     queryFn: () => fetchVerifyReputationList(userAddress),
+    enabled: !!userAddress,
+  });
+}
+
+export function useCommunitiesByManager(userAddress?: string) {
+  return useQuery({
+    queryKey: [COMMUNITIES_QUERY_KEY, "managed", userAddress],
+    queryFn: () => fetchCommunitiesByManager(userAddress!),
     enabled: !!userAddress,
   });
 }
