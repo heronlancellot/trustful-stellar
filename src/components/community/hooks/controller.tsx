@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { STELLAR } from '@/lib/environmentVars';
-import { useStellarContract } from '@/lib/stellar/transactions/hooks/useStellarContract';
-import { useStellarContractBadge } from '@/lib/stellar/transactions/hooks/useStellarContractBadge';
-import { useStellarContractManager } from '@/lib/stellar/transactions/hooks/useStellarContractManager';
-import { useStellarContractRemoveBadge } from '@/lib/stellar/transactions/hooks/useStellarContractRemoveBadge';
-import { useState } from 'react';
+import { useState } from "react";
+import { STELLAR } from "@/lib/environmentVars";
+import { useStellarContract } from "@/lib/stellar/transactions/hooks/useStellarContract";
+import { useStellarContractAddBadge } from "@/lib/stellar/transactions/hooks/useStellarContractAddBadge";
+import { useStellarContractManager } from "@/lib/stellar/transactions/hooks/useStellarContractManager";
+import { useStellarContractRemoveBadge } from "@/lib/stellar/transactions/hooks/useStellarContractRemoveBadge";
+import { useAuthContext } from "@/components/auth/Context";
 
 interface UseCommunitiesControllerParams {
   communityAddress?: string;
@@ -14,14 +15,16 @@ interface UseCommunitiesControllerParams {
 export default function useCommunitiesController({
   communityAddress,
 }: UseCommunitiesControllerParams = {}) {
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState<string>("");
+  const { userAddress } = useAuthContext();
 
   const communityAddressFormatted =
-    typeof communityAddress === 'string' ? communityAddress.toUpperCase() : '';
+    typeof communityAddress === "string" ? communityAddress.toUpperCase() : "";
 
   const stellarContractJoinCommunities = useStellarContract({
     contractId: communityAddressFormatted,
     rpcUrl: STELLAR.RPC_URL,
+    userAddress: userAddress,
   });
 
   const stellarContractManagers = useStellarContractManager({
@@ -30,7 +33,7 @@ export default function useCommunitiesController({
     networkType: STELLAR.NETWORK_TYPE,
   });
 
-  const stellarContractBadges = useStellarContractBadge({
+  const stellarContractAddBadges = useStellarContractAddBadge({
     contractId: communityAddressFormatted,
     rpcUrl: STELLAR.RPC_URL,
     networkType: STELLAR.NETWORK_TYPE,
@@ -47,7 +50,7 @@ export default function useCommunitiesController({
     setInputText,
     stellarContractJoinCommunities,
     stellarContractManagers,
-    stellarContractBadges,
+    stellarContractAddBadges,
     stellarContractRemoveBadges,
   };
 }

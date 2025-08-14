@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useAuthContext } from '@/components/auth/Context';
-import { getApiUrl } from '@/lib/environmentVars';
-import { useState } from 'react';
+import { useAuthContext } from "@/components/auth/Context";
+import { getApiUrl } from "@/lib/environmentVars";
+import { useState } from "react";
 
 export type Badge = {
   message?: any;
@@ -31,8 +31,8 @@ export default function useVerifyReputationController() {
       setBadgeDetails(null);
       const response = await fetch(
         getApiUrl(
-          `/communities/${communityAddress}/badges?user_address=${userAddress}`
-        )
+          `/communities/${communityAddress}/badges?user_address=${userAddress}`,
+        ),
       );
       const data: BadgeDTO = await response.json();
 

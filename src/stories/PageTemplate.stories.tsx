@@ -19,32 +19,41 @@ export const PageTemplateWithNoContentTabs: Story = {
   args: {
     title: "Page Template With No ContentTabs",
     className: "",
-    children: <div className="text-left p-2 pl-12 bg-whiteOpacity05 h-full w-screen text-brandBlack">Hey! This is a Children of Page Template</div>
+    children: (
+      <div className="h-full w-screen bg-whiteOpacity05 p-2 pl-12 text-left text-brandBlack">
+        Hey! This is a Children of Page Template
+      </div>
+    ),
   },
 };
 
 export const PageTemplateWithContentTabs: Story = {
-    args: {
-      title: "Page Template ContentTabs",
-      className: "",
-      children: <ContentTabs tabs={{
-        "Import": {
-          content: (
-            <div className="flex w-full h-full min-h-[300px] justify-center items-center bg-green-500 text-brandBlack">
-              Hey
-            </div>
-          ),
-          tabNumber: 1,
-        },
-        "Create new": {
-          content: (
-            <div className="flex w-full h-full min-h-[300px] justify-center items-center bg-gray-800">
-              Hey 2
-            </div>
-          ),
-          tabNumber: 2,
-        },
-      }}> </ContentTabs>
-    },
-  };
-  
+  args: {
+    title: "Page Template ContentTabs",
+    className: "",
+    children: (
+      <ContentTabs
+        tabs={{
+          Import: {
+            content: (
+              <div className="flex h-full min-h-[300px] w-full items-center justify-center bg-green-500 text-brandBlack">
+                Hey
+              </div>
+            ),
+            tabNumber: 1,
+          },
+          "Create new": {
+            content: (
+              <div className="flex h-full min-h-[300px] w-full items-center justify-center bg-gray-800">
+                Hey 2
+              </div>
+            ),
+            tabNumber: 2,
+          },
+        }}
+      >
+        {" "}
+      </ContentTabs>
+    ),
+  },
+};

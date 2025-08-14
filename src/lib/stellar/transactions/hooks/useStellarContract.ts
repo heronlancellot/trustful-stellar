@@ -2,29 +2,33 @@ import {
   rpc,
   TransactionBuilder,
   BASE_FEE,
-  Networks,
   Operation,
   Address,
-} from '@stellar/stellar-sdk';
-import albedo from '@albedo-link/intent';
-import { STELLAR, ALBEDO } from '@/lib/environmentVars';
+} from "@stellar/stellar-sdk";
+import albedo from "@albedo-link/intent";
+import { STELLAR, ALBEDO } from "@/lib/environmentVars";
 
 interface UseStellarContractProps {
   contractId: string;
   rpcUrl: string;
+  userAddress?: string;
 }
 
 export const useStellarContract = ({
   contractId,
   rpcUrl,
+  userAddress,
 }: UseStellarContractProps) => {
   const executeContractFunction = async (functionName: string) => {
     try {
-      const { pubkey } = await albedo.publicKey({ require_existing: true });
+      // Validate userAddress before proceeding
+      if (!userAddress || userAddress.trim() === "") {
+        return { success: false, error: "User address is required" };
+      }
 
       // Load user account via RPC
       const server = new rpc.Server(rpcUrl, { allowHttp: true });
-      const account = await server.getAccount(pubkey);
+      const account = await server.getAccount(userAddress);
 
       // Create and prepare transaction
       const transaction = new TransactionBuilder(account, {
@@ -35,8 +39,8 @@ export const useStellarContract = ({
           Operation.invokeContractFunction({
             function: functionName,
             contract: contractId,
-            args: [new Address(pubkey).toScVal()],
-          })
+            args: [new Address(userAddress).toScVal()],
+          }),
         )
         .setTimeout(30)
         .build();
@@ -52,17 +56,17 @@ export const useStellarContract = ({
 
       return { success: true, txHash: signResult.tx_hash };
     } catch (error: any) {
-      console.error('Contract execution error:', error);
+      console.error("Contract execution error:", error);
       return {
         success: false,
-        error: error.message || 'Failed to process transaction',
+        error: error.message || "Failed to process transaction",
       };
     }
   };
 
   return {
     executeContractFunction,
-    addUser: () => executeContractFunction('add_user'),
-    removeUser: () => executeContractFunction('remove_user'),
+    addUser: () => executeContractFunction("add_user"),
+    removeUser: () => executeContractFunction("remove_user"),
   };
 };

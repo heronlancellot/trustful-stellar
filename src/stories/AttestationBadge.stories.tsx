@@ -37,7 +37,7 @@ export const AttestationBadgeStellarQuest: Story = {
 
 export const AttestationBadgeSorobanQuest: Story = {
   args: {
-    children: <div className="w-20 h-20"></div>,
+    children: <div className="h-20 w-20"></div>,
     icon: CalculatorIcon,
     title: "Soroban Quest",
     imported: false,

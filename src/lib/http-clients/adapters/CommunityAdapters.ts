@@ -6,7 +6,7 @@ export const communityBadgeAdapter = (() => {
     communityBadgeFromApi: CommunityBadgeFromApi,
     assetCode: string,
     questName: string,
-    communityName: string
+    communityName: string,
   ): CommunityBadge => {
     const { score, issuer, description, title } = communityBadgeFromApi;
     return {
@@ -16,7 +16,7 @@ export const communityBadgeAdapter = (() => {
       score,
       issuer,
       description,
-      title
+      title,
     };
   };
   return { fromApi };

@@ -1,12 +1,13 @@
-import React, { ReactNode, useState } from "react";
-import { IconicButton, UserIcon } from "../atoms";
-import tailwindConfig from "tailwind.config";
-import { RotateLeftIcon } from "../atoms/icons/RotateLeftIcon";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
+import {
+  IconicButton,
+  UserIcon,
+  RotateLeftIcon,
+  CopyAndPasteButton,
+} from "@/components/atoms";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
-import { CopyIcon } from "../atoms/icons/CopyIcon";
-import toast from "react-hot-toast";
 
-interface ProfileBoxProps extends React.ComponentPropsWithoutRef<"div"> {
+interface ProfileBoxProps extends ComponentPropsWithoutRef<"div"> {
   userAddress?: string;
   userBadgesQuantity?: number;
   userScore?: number;
@@ -24,80 +25,62 @@ export const ProfileBox = ({
   searchBar,
 }: ProfileBoxProps) => {
   return (
-    <div className="flex flex-row w-full min-w-[500px] h-[100px] bg-whiteOpacity008 rounded-md border border-whiteOpacity008 justify-between">
-      <div className="flex flex-row flex-1 min-w-[300px] p-[26px] items-center">
-        <div className="h-[52px] w-[52px] flex rounded-md bg-whiteOpacity008 items-center justify-center">
-          <div className="h-6 w-6">
+    <div className="flex h-auto min-h-[100px] w-full min-w-[320px] flex-col justify-between rounded-md border border-whiteOpacity008 bg-whiteOpacity008 md:h-[100px] md:min-w-[500px] md:flex-row">
+      <div className="flex min-w-0 flex-1 flex-row items-center p-4 md:min-w-[300px] md:p-[26px]">
+        <div className="flex size-[52px] flex-shrink-0 items-center justify-center rounded-md bg-whiteOpacity008">
+          <div className="size-6">
             <UserIcon
               color={
                 !userAddress
-                  ? tailwindConfig.theme.extend.colors.whiteOpacity05
-                  : tailwindConfig.theme.extend.colors.brandGreen
+                  ? "rgba(245, 255, 255, 0.5)"
+                  : "rgba(177, 239, 66, 1)"
               }
-            ></UserIcon>
+            />
           </div>
         </div>
-        <div className="flex flex-col text-left pl-4">
-          <div className="flex flex-row gap-2 items-center">
-            <span className="text-brandWhite text-lg font-medium">
+        <div className="flex min-w-0 flex-1 flex-col pl-4 text-left">
+          <div className="flex flex-row items-center gap-2">
+            <span className="truncate text-lg font-medium text-brandWhite">
               {userAddress
                 ? getEllipsedAddress(userAddress)
                 : "No user selected"}
             </span>
             {userAddress && (
-              <div
-                className="w-3 h-3 hover:cursor-pointer items-center justify-center"
-                onClick={() => {
-                  if (!navigator.clipboard) {
-                    toast.error(
-                      "Copy to clipboard not allowed by the navigator"
-                    );
-                  } else {
-                    navigator.clipboard.writeText(userAddress || "");
-                    toast.success("User Address copied to the clipboard");
-                  }
-                }}
-              >
-                <CopyIcon />
-              </div>
+              <CopyAndPasteButton
+                textToCopy={userAddress}
+                size="sm"
+                className="flex-shrink-0"
+              />
             )}
           </div>
           <div className="flex flex-row gap-4">
             {userBadgesQuantity !== undefined ? (
-              <span className="text-whiteOpacity05 text-sm font-normal">
+              <span className="text-sm font-normal text-whiteOpacity05">
                 {userBadgesQuantity > 1
                   ? `${userBadgesQuantity} badges`
                   : `${userBadgesQuantity || "0"} badge`}
               </span>
-            ) : (
-              <></>
-            )}
+            ) : null}
             {userScore !== undefined ? (
-              <span className="text-whiteOpacity05 text-sm font-normal">
+              <span className="text-sm font-normal text-whiteOpacity05">
                 {userScore} points
               </span>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
-      <div className="w-max min-w-[200px] flex flex-row h-full items-center pr-[26px]">
-        <div className="w-max h-10 pr-2">
+      <div className="flex h-auto w-full flex-row items-center justify-between gap-2 p-4 md:h-full md:w-max md:min-w-[200px] md:justify-end md:pr-[26px]">
+        <div className="h-10 w-max">
           {isClearButtonVisible && (
             <IconicButton
               className="bg-darkGreenOpacity01 text-brandGreen"
               onClick={onClear}
-              label={"Clear"}
-              icon={
-                <RotateLeftIcon
-                  color={tailwindConfig.theme.extend.colors.brandGreen}
-                />
-              }
+              label="Clear"
+              icon={<RotateLeftIcon color="rgba(177, 239, 66, 1)" />}
             />
           )}
         </div>
-        <div className="min-w-[200px] w-full h-max">{searchBar}</div>
+        <div className="h-max w-full min-w-0 md:min-w-[200px]">{searchBar}</div>
       </div>
     </div>
   );

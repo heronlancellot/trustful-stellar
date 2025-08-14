@@ -1,32 +1,30 @@
-import { SVGProps } from "react";
+import { ComponentPropsWithoutRef, SVGProps } from "react";
 import cc from "classcat";
-import { CheckIcon } from "./icons/CheckIcon";
-import { ArrowIcon } from "./icons/ArrowIcon";
-import React from "react";
+import { ArrowIcon, CheckIcon } from "@/components/atoms/icons";
 import tailwindConfig from "tailwind.config";
 
-interface AttestationBadgeProps extends React.ComponentPropsWithoutRef<"div"> {
+interface AttestationBadgeProps extends ComponentPropsWithoutRef<"div"> {
   title: string;
   imported: boolean | undefined;
   icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
 }
 
-export const AttestationBadge: React.FC<AttestationBadgeProps> = ({
+export const AttestationBadge = ({
   title,
   className,
   imported,
   icon,
   ...props
-}) => {
+}: AttestationBadgeProps) => {
   const Icon = icon;
   return (
     <div
-      className="rounded-lg flex border border-whiteOpacity008 w-[21vw] h-[25vh] bg-whiteOpacity005 hover:cursor-pointer"
+      className="flex h-[25vh] w-[21vw] rounded-lg border border-whiteOpacity008 bg-whiteOpacity005 hover:cursor-pointer"
       {...props}
     >
-      <div className="flex flex-1 max-w-[50%] flex-col p-3 justify-between">
-        <div className="flex-1 p-2 w-max">
-          <div className="w-[38px] h-[38px] p-2 rounded-full bg-whiteOpacity008">
+      <div className="flex max-w-[50%] flex-1 flex-col justify-between p-3">
+        <div className="w-max flex-1 p-2">
+          <div className="h-[38px] w-[38px] rounded-full bg-whiteOpacity008 p-2">
             <Icon
               color={
                 imported
@@ -36,30 +34,30 @@ export const AttestationBadge: React.FC<AttestationBadgeProps> = ({
             />
           </div>
         </div>
-        <div className={"title p-2 mt-3 h-max justify-center w-max"}>
+        <div className={"title mt-3 h-max w-max justify-center p-2"}>
           <span>{title}</span>
         </div>
       </div>
-      <div className="flex flex-1 max-w-[50%] flex-col align-center">
-        <div className="flex-1 m-4 ml-6 h-[25px]">
+      <div className="align-center flex max-w-[50%] flex-1 flex-col">
+        <div className="m-4 ml-6 h-[25px] flex-1">
           <div
             className={cc([
               { hidden: !imported },
-              "flex text-xs font-medium justify-end",
+              "flex justify-end text-xs font-medium",
             ])}
           >
-            <div className="w-3 mr-2">
+            <div className="mr-2 w-3">
               <CheckIcon />
             </div>
             <span className="text-brandGreen">IMPORTED</span>
           </div>
           <div
             className={cc([
-              { hidden: imported === true || imported === undefined},
-              "flex text-xs font-medium justify-end",
+              { hidden: imported === true || imported === undefined },
+              "flex justify-end text-xs font-medium",
             ])}
           >
-            <div className="w-3 mr-2">
+            <div className="mr-2 w-3">
               <ArrowIcon
                 color={tailwindConfig.theme.extend.colors.whiteOpacity05}
               />

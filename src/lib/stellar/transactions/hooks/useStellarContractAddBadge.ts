@@ -5,29 +5,40 @@ import {
   Networks,
   Operation,
   Address,
+  xdr,
 } from "@stellar/stellar-sdk";
 import albedo from "@albedo-link/intent";
+import { useAuthContext } from "@/components/auth/Context";
 
-interface UseStellarContractProps {
+interface UseStellarContractBadgeProps {
   contractId: string;
   rpcUrl: string;
   networkType: "TESTNET" | "PUBLIC";
 }
 
-export const useStellarContractManager = ({
+export const useStellarContractAddBadge = ({
   contractId,
   rpcUrl,
   networkType = "TESTNET",
-}: UseStellarContractProps) => {
+}: UseStellarContractBadgeProps) => {
+  const { userAddress } = useAuthContext();
+
   const executeContractFunction = async (
     functionName: string,
-    sender: string,
-    newManagerAddress: string,
+    badgeName: string,
+    issuer: string,
+    score: number,
   ) => {
+    const nameScVal = xdr.ScVal.scvString(badgeName);
+    const scoreScval = xdr.ScVal.scvU32(score);
+
     try {
+      // 1. Obter chave pública via Albedo
+      const { pubkey } = await albedo.publicKey({ require_existing: true });
+
       // Load user account via RPC
       const server = new rpc.Server(rpcUrl, { allowHttp: true });
-      const account = await server.getAccount(sender);
+      const account = await server.getAccount(pubkey);
 
       // Create and prepare transaction
       const transaction = new TransactionBuilder(account, {
@@ -40,8 +51,10 @@ export const useStellarContractManager = ({
             function: functionName,
             contract: contractId,
             args: [
-              new Address(sender).toScVal(),
-              new Address(newManagerAddress).toScVal(),
+              new Address(pubkey).toScVal(),
+              nameScVal,
+              new Address(issuer).toScVal(),
+              scoreScval,
             ],
           }),
         )
@@ -50,7 +63,6 @@ export const useStellarContractManager = ({
 
       const preparedTransaction = await server.prepareTransaction(transaction);
       const transactionXDR = preparedTransaction.toXDR();
-
       // Sign with Albedo and submit
       const signResult = await albedo.tx({
         xdr: transactionXDR,
@@ -70,9 +82,7 @@ export const useStellarContractManager = ({
 
   return {
     executeContractFunction,
-    addManager: (sender: string, newManagerAddress: string) =>
-      executeContractFunction("add_manager", sender, newManagerAddress),
-    removeManager: (sender: string, newManagerAddress: string) =>
-      executeContractFunction("remove_manager", sender, newManagerAddress),
+    addBadge: (badgeName: string, issuer: string, score: number) =>
+      executeContractFunction("add_badge", badgeName, issuer, score),
   };
 };

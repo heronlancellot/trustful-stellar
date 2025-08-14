@@ -9,7 +9,7 @@ export class UserClient {
   static badgesBySetPath = "users/badges/bySet";
   static availableClaimableBalancesPath = "users/available-claimable-balances";
   static scorePath = "users/score";
-  static defaultCommunity = 'stellar'
+  static defaultCommunity = "stellar";
 
   async getBadges(publicKey: string): Promise<UserBadge[]> {
     if (!publicKey) {
@@ -27,7 +27,7 @@ export class UserClient {
   async getBadgesTrustful(publicKey: string): Promise<UserBadge[]> {
     if (!publicKey) {
       throw new Error(
-        "UserClient getBadgesTrustful: publicKey empty or invalid"
+        "UserClient getBadgesTrustful: publicKey empty or invalid",
       );
     }
     const badgesFromApi: UserBadgeFromApi[] = await httpClient.get<
@@ -48,21 +48,21 @@ export class UserClient {
       {
         publicKey,
         badgeSetName,
-      }
+      },
     );
   }
 
   getAvailableClaimableBalancesPath(publicKey: string) {
     if (!publicKey) {
       throw new Error(
-        "UserClient getAvailableClaimableBalancesPath: publicKey empty or invalid"
+        "UserClient getAvailableClaimableBalancesPath: publicKey empty or invalid",
       );
     }
     return httpClient.get<any, { userPublicKey: string }>(
       UserClient.availableClaimableBalancesPath,
       {
         userPublicKey: publicKey,
-      }
+      },
     );
   }
 
@@ -70,13 +70,13 @@ export class UserClient {
     if (!publicKey) {
       throw new Error("UserClient getScore: publicKey empty or invalid");
     }
-    const { totalScore } = await httpClient.get<any, { publicKey: string, community: string }>(
-      UserClient.scorePath,
-      {
-        publicKey,
-        community: community ? community : UserClient.defaultCommunity
-      }
-    );
+    const { totalScore } = await httpClient.get<
+      any,
+      { publicKey: string; community: string }
+    >(UserClient.scorePath, {
+      publicKey,
+      community: community ? community : UserClient.defaultCommunity,
+    });
     return totalScore;
   }
 }

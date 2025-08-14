@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { getApiUrl } from '@/lib/environmentVars';
+import { useState } from "react";
+import { getApiUrl } from "@/lib/environmentVars";
 
 export type Badge = {
   issuer: string;
@@ -30,26 +30,28 @@ type CustomResponse = Response & {
 
 export default function useBadgeInfoController() {
   const [badgeTypeDetails, setBadgeTypeDetails] = useState<BadgeTypeDetails[]>(
-    []
+    [],
   );
 
   const getBadgesByTypes = async (selectedTypes: string[]) => {
     try {
-      const promises = selectedTypes.map(type =>
+      const promises = selectedTypes.map((type) =>
         fetch(getApiUrl(`/badges/${type}`)).then(
           async (response: CustomResponse) => {
             return response.json();
-          }
-        )
+          },
+        ),
       );
 
       const results = await Promise.all(promises);
-      const flattenedResults = results.filter(result => result !== null).flat();
+      const flattenedResults = results
+        .filter((result) => result !== null)
+        .flat();
 
       setBadgeTypeDetails(flattenedResults);
       return flattenedResults;
     } catch (error) {
-      console.error('Error fetching badge types:', error);
+      console.error("Error fetching badge types:", error);
       return [];
     }
   };

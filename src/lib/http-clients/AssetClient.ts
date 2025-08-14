@@ -1,13 +1,13 @@
-import httpClient from './HttpClient';
+import httpClient from "./HttpClient";
 
 export class AssetClient {
-  static assetPath = 'asset';
-  static defaultCommunity = 'stellar';
+  static assetPath = "asset";
+  static defaultCommunity = "stellar";
 
   async postAsset(
     receivingPublicKey: string,
     assetName: string[],
-    community?: string
+    community?: string,
   ) {
     const { transaction } = await httpClient.post<
       any,
@@ -20,7 +20,7 @@ export class AssetClient {
         receivingPublicKey,
         assetName,
         community: community ?? AssetClient.defaultCommunity,
-      }
+      },
     );
 
     return transaction;

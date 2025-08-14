@@ -10,7 +10,7 @@ export type UserContext = {
   setUserBadgesToImport: (
     userBadges: UserBadge[],
     userBadgesImported: UserBadge[],
-    communityBadges: CommunityBadge[]
+    communityBadges: CommunityBadge[],
   ) => void;
 };
 

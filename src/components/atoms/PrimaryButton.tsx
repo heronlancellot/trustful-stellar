@@ -1,10 +1,10 @@
-import { IconPosition } from "@/types/iconPosition";
 import cc from "classcat";
-import { ClipLoader, PacmanLoader, PulseLoader } from "react-spinners";
+import { ButtonHTMLAttributes, ReactNode } from "react";
+import { PulseLoader } from "react-spinners";
+import { IconPosition } from "@/types/iconPosition";
 
-interface PrimaryButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: React.ReactNode;
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: ReactNode;
   label: string;
   onClick?: () => void;
   iconPosition?: IconPosition;
@@ -26,16 +26,16 @@ export const PrimaryButton = ({
       {...props}
       onClick={onClick}
       className={cc([
-        "flex w-full space-x-3 items-center justify-center gap-2 px-4 py-2 text-base font-medium text-brandBlack hover:bg-primary transition",
+        "hover:bg-primary flex w-full items-center justify-center gap-2 space-x-3 px-4 py-2 text-base font-medium text-brandBlack transition",
         { "flex-row-reverse": iconPosition === IconPosition.RIGHT },
-        { "bg-whiteOpacity05": disabled },
-        { "bg-brandGreen": !disabled },
+        { "bg-whiteOpacity05 hover:bg-whiteOpacity05/80": disabled },
+        { "bg-brandGreen hover:bg-brandGreen/80": !disabled },
         className,
       ])}
       disabled={disabled}
     >
       {!isLoading ? (
-        icon && <div className="w-5 h-5">{icon}</div>
+        icon && <div className="flex">{icon}</div>
       ) : (
         <PulseLoader size={8}></PulseLoader>
       )}

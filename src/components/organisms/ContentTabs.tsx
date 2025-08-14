@@ -1,22 +1,18 @@
-'use client';
+"use client";
 
-import { Tabs } from '@/components/organisms/types';
-import cc from 'classcat';
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import { SearchIconPrimary } from '../atoms';
-import { SearchBar } from '../search/SearchBar';
-import useCommunitiesController from '../community/hooks/controller';
-import { useCommunityContext } from '../community/Context';
+import cc from "classcat";
+import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
+import { SearchBar } from "../search/SearchBar";
+import { useCommunityContext } from "../community/Context";
 
 export interface TabProps {
-  content: React.ReactNode;
+  content: ReactNode;
   tabNumber: number;
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
   disabled?: boolean;
 }
 
-export interface ContentTabsProps
-  extends React.ComponentPropsWithoutRef<'div'> {
+export interface ContentTabsProps extends ComponentPropsWithoutRef<"div"> {
   tabs: Record<string, TabProps>;
   onButtonClick?: (tabName: string) => void;
   inputText?: string;
@@ -24,15 +20,15 @@ export interface ContentTabsProps
   inputSearch?: boolean;
 }
 
-export const ContentTabs: React.FC<ContentTabsProps> = ({
+export const ContentTabs = ({
   className,
   tabs,
   inputSearch,
-  inputText = '',
+  inputText = "",
   setInputText,
   onButtonClick,
   ...props
-}) => {
+}: ContentTabsProps) => {
   const [selectedTab, setSelectedTab] = useState(Object.keys(tabs)[0] ?? null);
 
   const { getCommunitiesDetails } = useCommunityContext();
@@ -42,8 +38,8 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
   };
 
   return (
-    <div className={cc([className, 'w-full h-max bg-brandBlack'])} {...props}>
-      <nav className="flex nav-bar px-12 justify-between cursor-pointer items-center">
+    <div className={cc([className, "h-max w-full bg-brandBlack"])} {...props}>
+      <nav className="nav-bar flex flex-col items-center justify-between sm:flex-row sm:px-12">
         <div className="flex">
           {Object.entries(tabs)
             .sort(([_, a], [__, b]) => a.tabNumber - b.tabNumber)
@@ -52,9 +48,9 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
                 <div
                   key={tabName}
                   className={cc([
-                    { 'tab-active': tabName == selectedTab },
-                    { 'opacity-50 cursor-not-allowed': tabProps.disabled },
-                    'tab p-2 px-4',
+                    { "tab-active": tabName == selectedTab },
+                    { "cursor-not-allowed opacity-50": tabProps.disabled },
+                    "tab cursor-pointer p-2 px-4",
                   ])}
                   onClick={() => {
                     if (!tabProps.disabled) {
@@ -68,10 +64,10 @@ export const ContentTabs: React.FC<ContentTabsProps> = ({
               );
             })}
         </div>
-        <div className="py-4">
+        <div className="flex py-4">
           {inputSearch && setInputText && (
             <SearchBar
-              placeholder={'Paste the address...'}
+              placeholder={"Paste the address..."}
               onButtonClick={onSearch}
               inputText={inputText}
               onChangeInputText={setInputText}

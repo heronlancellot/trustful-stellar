@@ -23,9 +23,9 @@ export class CommunityClient {
               badge,
               assetCode,
               badgeSetName,
-              community ?? CommunityClient.defaultCommunity
-            )
-          )
+              community ?? CommunityClient.defaultCommunity,
+            ),
+          ),
         );
       });
 
