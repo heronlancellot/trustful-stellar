@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+"use client";
+
 import { useAuthContext } from "@/components/auth/Context";
 import { getEllipsedAddress } from "@/lib/utils/getEllipsedAddress";
 import { useBadgeStore } from "@/store/badgeStore";

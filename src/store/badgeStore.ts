@@ -6,7 +6,11 @@ interface BadgeStore {
   setBadges: (badges: Badge[]) => void;
   addBadge: (badge: Badge) => void;
   removeBadge: (index: number) => void;
-  updateBadge: (index: number, field: keyof Badge, value: string | number) => void;
+  updateBadge: (
+    index: number,
+    field: keyof Badge,
+    value: string | number,
+  ) => void;
   clearBadges: () => void;
 }
 
@@ -24,7 +28,7 @@ export const useBadgeStore = create<BadgeStore>((set) => ({
   updateBadge: (index, field, value) =>
     set((state) => ({
       badges: state.badges.map((badge, i) =>
-        i === index ? { ...badge, [field]: value } : badge
+        i === index ? { ...badge, [field]: value } : badge,
       ),
     })),
   clearBadges: () => set({ badges: [] }),
