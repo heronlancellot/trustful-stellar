@@ -106,9 +106,7 @@ export const CommunitiesCard = ({
       return;
     }
     try {
-      console.log("handleExit - userAddress:", userAddress);
       const result = await stellarContractJoinCommunities.removeUser();
-      console.log("handleExit - result:", result);
 
       if (result.success) {
         toast.success("Successfully left community");
@@ -143,7 +141,6 @@ export const CommunitiesCard = ({
           );
           queryClient.setQueryData(["communities", userAddress], updatedData);
         }
-        console.log("handleExit - currentData:", currentData);
       } else {
         toast.error("Failed to leave community");
         console.error("Transaction failed:", result.error);

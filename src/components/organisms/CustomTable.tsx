@@ -56,7 +56,7 @@ export const CustomTable = <T extends Record<string, any>>({
             Completed
           </div>
         ) : (
-          <div className="w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs text-white">
+          <div className="w-24 rounded-3xl bg-[rgba(245,255,255,0.08)] p-1 text-center text-xs text-whiteOpacity05">
             Pending
           </div>
         );
@@ -128,10 +128,6 @@ export const CustomTable = <T extends Record<string, any>>({
       );
 
       if (result.success) {
-        console.log(
-          `Badge ${badge.name} successfully removed - TX Hash:`,
-          result.txHash,
-        );
         toast.success(`Badge ${badge.name} successfully removed`);
 
         if (communityAddress) {
