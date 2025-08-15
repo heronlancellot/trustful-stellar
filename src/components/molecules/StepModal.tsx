@@ -497,7 +497,7 @@ export const StepModal = ({
       if (!isValidStellarAddress(badge.issuer.toUpperCase())) {
         return {
           isValid: false,
-          error: `Badge ${i + 1}: Invalid Stellar address`,
+          error: `${badge.name} Issuer is not a valid Stellar address`,
         };
       }
       if (!badge.score || badge.score <= 0) {
