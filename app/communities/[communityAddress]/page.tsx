@@ -150,7 +150,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log("Transaction successful:", result.txHash);
       closeModal("managers");
     } else {
       toast.error("Not Successful Joining Community");
@@ -160,9 +159,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
   };
 
   const handleExitCommunities = async (communityAddress: string) => {
-    console.log("handleExitCommunities", communityAddress);
     const result = await stellarContractJoinCommunities.removeUser();
-    console.log("result", result);
 
     if (result.success) {
       toast.success("Successful Exiting Community");
@@ -176,7 +173,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log("Transaction successful:", result.txHash);
       closeModal("managers");
     } else {
       toast.error("Not Successful Exiting Community");
@@ -225,7 +221,6 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log("Transaction successful:", result.txHash);
       // setTimeout(() => {
       //   window.location.reload();
       // }, 1000);
@@ -282,12 +277,7 @@ export default function DetailsCommunity({ params }: DetailsProps) {
         queryKey: ["community-details", communityAddress, userAddress],
       });
 
-      console.log("Transaction successful:", result.txHash);
       closeModal("removeManager");
-
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 1000);
     } else {
       toast.error("Not Successful Removing Manager");
       closeModal("removeManager");

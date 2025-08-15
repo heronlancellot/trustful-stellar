@@ -20,9 +20,7 @@ class HttpClient implements IGenericHttpClient {
     const fullPath = [this._baseUrl, path, "?", parseQueryParams(query)].join(
       "",
     );
-    console.log("fullPath", fullPath);
     const response = await axios.post<T>(fullPath, body);
-    console.log("response", response);
     return response.data;
   }
 
@@ -30,9 +28,7 @@ class HttpClient implements IGenericHttpClient {
     const fullPath = [this._baseUrl, path, "?", parseQueryParams(query)].join(
       "",
     );
-    console.log("fullPath get", fullPath);
     const response = await axios.get<T>(fullPath);
-    console.log("response get", response);
     return response.data;
   }
 }

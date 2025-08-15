@@ -64,7 +64,6 @@ export const NewBadgeTable = ({
       );
 
       if (result.success) {
-        console.log("Transaction successful - TX Hash:", result.txHash);
         toast.success(`Badge ${newBadgeData.name} added successfully`);
         setIsNewBadge(false);
 

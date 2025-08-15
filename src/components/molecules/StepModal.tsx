@@ -440,7 +440,6 @@ export const StepModal = ({
         network: ALBEDO.NETWORK_TYPE,
         submit: true,
       });
-      console.log("Result Creating Community", result);
       if (!result.tx_hash) {
         console.error("No tx_hash returned from Albedo.");
         setIsSubmitting(false);
@@ -458,10 +457,6 @@ export const StepModal = ({
       } while (txResponse.status === "NOT_FOUND" && attempts < maxAttempts);
 
       if (txResponse.status === "SUCCESS") {
-        console.log("Scorer contract created!");
-        console.log("Contract Address:", txResponse.returnValue?.toString());
-        console.log("Transaction Hash:", result.tx_hash);
-
         setIsSubmitting(false);
         onClose();
         clearAllBadges();

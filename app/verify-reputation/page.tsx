@@ -72,7 +72,6 @@ function VerifyReputationContent() {
   const { badgeDetails, getBagdeDetails, setBadgeDetails } =
     useVerifyReputationController();
   const router = useRouter();
-  console.log("badgeDetails", badgeDetails);
 
   const {
     searchedUserAddress,

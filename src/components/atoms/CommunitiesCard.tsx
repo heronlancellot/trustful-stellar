@@ -106,9 +106,7 @@ export const CommunitiesCard = ({
       return;
     }
     try {
-      console.log("handleExit - userAddress:", userAddress);
       const result = await stellarContractJoinCommunities.removeUser();
-      console.log("handleExit - result:", result);
 
       if (result.success) {
         toast.success("Successfully left community");
@@ -143,7 +141,6 @@ export const CommunitiesCard = ({
           );
           queryClient.setQueryData(["communities", userAddress], updatedData);
         }
-        console.log("handleExit - currentData:", currentData);
       } else {
         toast.error("Failed to leave community");
         console.error("Transaction failed:", result.error);
@@ -258,17 +255,19 @@ export const CommunitiesCard = ({
         </div>
 
         <div className="flex-start mt-10 flex gap-3">
-          <div className="flex items-center justify-center gap-1 text-xs">
-            <div className="h-3 w-3">
-              <UserIcon />
+          {community?.total_members && (
+            <div className="flex items-center justify-center gap-1 text-xs">
+              <div className="size-3">
+                <UserIcon />
+              </div>
+              <div className="flex justify-center">
+                <span>{community?.total_members}</span>
+              </div>
             </div>
-            <div className="flex justify-center">
-              <span>{community?.total_members}</span>
-            </div>
-          </div>
+          )}
 
           <div className="flex items-center justify-center gap-2 text-xs">
-            <div className="h-3 w-3">
+            <div className="size-3">
               <TagIcon />
             </div>
             <div className="flex justify-center">
