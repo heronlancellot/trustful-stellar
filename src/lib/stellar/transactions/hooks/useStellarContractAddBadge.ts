@@ -58,7 +58,7 @@ export const useStellarContractAddBadge = ({
             ],
           }),
         )
-        .setTimeout(30)
+        .setTimeout(300)
         .build();
 
       const preparedTransaction = await server.prepareTransaction(transaction);

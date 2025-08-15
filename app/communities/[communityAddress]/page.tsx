@@ -26,7 +26,14 @@ import { useCommunityContext } from "@/components/community/Context";
 import { useAuthContext } from "@/components/auth/Context";
 import useCommunitiesController from "@/components/community/hooks/controller";
 import toast from "react-hot-toast";
-import { ArrowLeft, Check, EyeOff, LockIcon, EyeIcon, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  EyeOff,
+  LockIcon,
+  EyeIcon,
+  InfoIcon,
+} from "lucide-react";
 import cc from "classcat";
 import {
   useCommunityBadges,
@@ -627,6 +634,13 @@ export default function DetailsCommunity({ params }: DetailsProps) {
               {communitiesDetail?.total_badges}
             </span>
             <span className="text-gray-500">Badges</span>
+            <div className="group relative">
+              <InfoIcon className="h-4 w-4 cursor-help text-gray-400" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 transform whitespace-nowrap rounded-lg bg-brandGreen/80 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                Badges are updated daily.
+                <div className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 transform border-l-4 border-r-4 border-t-4 border-transparent border-t-brandGreen"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
