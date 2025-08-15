@@ -100,7 +100,6 @@ const createCommunitySchema = z.object({
     .max(120, "Description must be less than 120 characters"),
   avatar: z.string().min(1, "Avatar is required"),
   badgeType: z.string().min(1, "Badge is required"),
-  // Removemos validação de badges do schema - será validada manualmente
 });
 
 type CreateCommunityForm = z.infer<typeof createCommunitySchema>;
@@ -214,10 +213,6 @@ export const StepModal = ({
     setValue("badgeType", selectedBadge.join(","));
   }, [selectedAvatar, selectedBadge, setValue]);
 
-  // Não precisamos mais do useEffect complexo para badges!
-
-  // Não precisamos mais sincronizar badgeTypeDetails
-
   useEffect(() => {
     if (currentStep === 2) {
       const fetchAndSetBadges = async () => {
@@ -279,7 +274,6 @@ export const StepModal = ({
   };
 
   const addNewBadge = () => {
-    // Simplesmente adiciona nova badge vazia
     addEmptyBadge();
   };
 
@@ -336,7 +330,6 @@ export const StepModal = ({
     setIsSubmitting(true);
 
     try {
-      // Valida badges do store
       const badgeValidation = validateBadges();
       if (!badgeValidation.isValid) {
         toast.error(badgeValidation.error || "Badge validation failed");
@@ -485,7 +478,6 @@ export const StepModal = ({
   };
 
   const handleRemoveBadge = (index: number) => {
-    // Simplesmente remove do store
     removeBadge(index);
   };
 
@@ -681,7 +673,11 @@ export const StepModal = ({
                               type="text"
                               value={badges[index]?.issuer || ""}
                               onChange={(e) =>
-                                updateBadge(index, "issuer", e.target.value.toUpperCase())
+                                updateBadge(
+                                  index,
+                                  "issuer",
+                                  e.target.value.toUpperCase(),
+                                )
                               }
                               placeholder={`Issuer #${index + 1}`}
                               className="max-h-10 w-full flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
