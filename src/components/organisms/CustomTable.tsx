@@ -104,13 +104,13 @@ export const CustomTable = <T extends Record<string, any>>({
 
       if (!badge.name) {
         console.error("Badge name missing");
-        alert("Cannot remove badge: Missing badge name");
+        toast.error("Cannot remove badge: Missing badge name");
         return;
       }
 
       if (!stellarContractRemoveBadges.removeBadge) {
         console.error("Badge removal service not available");
-        alert("Badge removal service not available");
+        toast.error("Badge removal service not available");
         return;
       }
 
@@ -155,11 +155,11 @@ export const CustomTable = <T extends Record<string, any>>({
         }
       } else {
         console.error("Transaction failed:", result.error);
-        alert(`Failed to remove badge: ${result.error}`);
+        toast.error(`Failed to remove badge: ${result.error}`);
       }
     } catch (error) {
       console.error("Error in removal operation:", error);
-      alert("An error occurred while processing the badge removal.");
+      toast.error("An error occurred while processing the badge removal.");
     }
   };
 

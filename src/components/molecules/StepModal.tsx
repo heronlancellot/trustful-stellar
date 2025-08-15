@@ -236,7 +236,6 @@ export const StepModal = ({
             selectedBadge.length === 1 &&
             (!details || details.length === 0)
           ) {
-            alert("yo");
             addEmptyBadge();
           }
         } catch (error) {
