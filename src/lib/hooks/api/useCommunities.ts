@@ -93,17 +93,17 @@ async function updateCommunityVisibility(
 
 export function useCommunities(userAddress?: string) {
   return useQuery({
-    queryKey: [COMMUNITIES_QUERY_KEY, userAddress],
+    queryKey: [COMMUNITIES_QUERY_KEY, userAddress || ""],
     queryFn: () => fetchCommunities({ userAddress }),
-    enabled: !!userAddress || userAddress === "",
+    enabled: true,
   });
 }
 
 export function useCommunitiesByStatus(status: string, userAddress?: string) {
   return useQuery({
-    queryKey: [COMMUNITIES_QUERY_KEY, status, userAddress],
+    queryKey: [COMMUNITIES_QUERY_KEY, status, userAddress || ""],
     queryFn: () => fetchCommunitiesByStatus(status, userAddress),
-    enabled: !!status && (!!userAddress || userAddress === ""),
+    enabled: !!status,
   });
 }
 
