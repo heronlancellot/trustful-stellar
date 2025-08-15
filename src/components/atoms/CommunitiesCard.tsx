@@ -255,17 +255,19 @@ export const CommunitiesCard = ({
         </div>
 
         <div className="flex-start mt-10 flex gap-3">
-          <div className="flex items-center justify-center gap-1 text-xs">
-            <div className="h-3 w-3">
-              <UserIcon />
+          {community?.total_members && (
+            <div className="flex items-center justify-center gap-1 text-xs">
+              <div className="size-3">
+                <UserIcon />
+              </div>
+              <div className="flex justify-center">
+                <span>{community?.total_members}</span>
+              </div>
             </div>
-            <div className="flex justify-center">
-              <span>{community?.total_members}</span>
-            </div>
-          </div>
+          )}
 
           <div className="flex items-center justify-center gap-2 text-xs">
-            <div className="h-3 w-3">
+            <div className="size-3">
               <TagIcon />
             </div>
             <div className="flex justify-center">
