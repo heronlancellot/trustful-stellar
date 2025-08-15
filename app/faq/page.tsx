@@ -22,7 +22,7 @@ export default function IssueBadgePage() {
             empowering users to prove their contributions over time.
           </span>
         </CardTemplate>
-        <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(33vw-27px-1.5rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(33vw-27px-1.5rem)]">
+        {/* <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(33vw-27px-1.5rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(33vw-27px-1.5rem)]">
           <div className="flex w-full justify-center">
             <h2 className="pb-3 pt-1 text-xl font-bold text-whiteOpacity05 sm:text-2xl">
               Why import badges?
@@ -34,8 +34,8 @@ export default function IssueBadgePage() {
             reputation scores, which can unlock opportunities like roles,
             grants, or ambassador programs within Stellar and other dApps.
           </span>
-        </CardTemplate>
-        <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(34vw-27px-1.5rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(34vw-27px-1.5rem)]">
+        </CardTemplate> */}
+        {/* <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(34vw-27px-1.5rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(34vw-27px-1.5rem)]">
           <div className="flex w-full justify-center">
             <h2 className="pb-5 pt-1 text-xl font-bold text-whiteOpacity05 sm:text-2xl">
               How can communities verify my reputation?
@@ -46,8 +46,8 @@ export default function IssueBadgePage() {
             public address. This will display all linked badges and their
             associated reputation scores.
           </span>
-        </CardTemplate>
-        <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(49.5vw-40px-0.75rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(49.5vw-40px-0.75rem)]">
+        </CardTemplate> */}
+        {/* <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(49.5vw-40px-0.75rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(49.5vw-40px-0.75rem)]">
           <div className="flex w-full justify-center">
             <h2 className="pb-8 pt-1 text-xl font-bold text-whiteOpacity05 sm:text-2xl">
               How can I create a reputation framework for my community?
@@ -59,7 +59,7 @@ export default function IssueBadgePage() {
             are deployed, you&apos;ll be able to create custom reputation
             badges, scorers, and attestations for your community.
           </span>
-        </CardTemplate>
+        </CardTemplate> */}
         <CardTemplate className="w-full border border-whiteOpacity05 bg-whiteOpacity005 p-6 hover:bg-whiteOpacity008 sm:w-[calc(49.5vw-40px-0.75rem)] sm:p-8 md:w-[calc(50vw-40px-1rem)] lg:w-[calc(49.5vw-40px-0.75rem)]">
           <div className="flex w-full justify-center">
             <h2 className="pb-8 pt-1 text-xl font-bold text-whiteOpacity05 sm:text-2xl">

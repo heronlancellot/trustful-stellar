@@ -51,7 +51,15 @@ export const CustomTable = <T extends Record<string, any>>({
       case "score":
         return row.score || row.Score;
       case "status":
-        return row.user_has ? "Completed" : "Pending";
+        return row.user_has ? (
+          <div className="w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs text-white">
+            Completed
+          </div>
+        ) : (
+          <div className="w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs text-white">
+            Pending
+          </div>
+        );
       default:
         return row[header] || row[headerLower] || row[header.toLowerCase()];
     }
