@@ -34,6 +34,7 @@ import {
   CloseIcon,
 } from "@/components/atoms/icons";
 import { ALBEDO, STELLAR } from "@/lib/environmentVars";
+import { isValidStellarAddress } from "@/lib/stellar/isValidStellarAddress";
 
 interface ModalProps {
   isOpen: boolean;
@@ -99,13 +100,7 @@ const createCommunitySchema = z.object({
     .max(120, "Description must be less than 120 characters"),
   avatar: z.string().min(1, "Avatar is required"),
   badgeType: z.string().min(1, "Badge is required"),
-  badges: z.array(
-    z.object({
-      name: z.string().min(1, "Required"),
-      issuer: z.string().min(1, "Required"),
-      score: z.number().min(1, "Required"),
-    }),
-  ),
+  // Removemos validação de badges do schema - será validada manualmente
 });
 
 type CreateCommunityForm = z.infer<typeof createCommunitySchema>;
@@ -133,12 +128,11 @@ export const StepModal = ({
   const { userAddress } = useAuthContext();
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedBadge, setSelectedBadge] = useState<string[]>([]);
-  const [badgeCount, setBadgeCount] = useState<number>(3);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { getBadgesByTypes } = useBadgeInfoController();
-  const [badgeTypeDetails, setBadgeTypeDetails] = useState<Badge[]>([]);
   const [loadingBadgeListType, setLoadingBadgeListType] = useState(false);
-  const { badges, setBadges, removeBadge } = useBadgeStore();
+  const { badges, setBadges, addBadge, updateBadge, removeBadge } =
+    useBadgeStore();
 
   const ICONS_MAPPER = [
     {
@@ -220,33 +214,9 @@ export const StepModal = ({
     setValue("badgeType", selectedBadge.join(","));
   }, [selectedAvatar, selectedBadge, setValue]);
 
-  useEffect(() => {
-    const currentFields = watch("badges") || [];
-    currentFields.forEach((_, index) => {
-      unregister(`badges.${index}`);
-    });
+  // Não precisamos mais do useEffect complexo para badges!
 
-    badges.forEach((badge, index) => {
-      setValue(`badges.${index}`, {
-        name: badge.name,
-        issuer: badge.issuer,
-        score: badge.score,
-      });
-    });
-
-    for (let i = badges?.length; i < badgeCount; i++) {
-      if (!watch(`badges.${i}`)) {
-        setValue(`badges.${i}`, { name: "", issuer: "", score: 0 });
-      }
-    }
-  }, [badges, badgeCount, setValue, watch, unregister]);
-
-  useEffect(() => {
-    if (badges?.length > 0) {
-      setBadgeTypeDetails(badges);
-      setBadgeCount(badges?.length);
-    }
-  }, [badges]);
+  // Não precisamos mais sincronizar badgeTypeDetails
 
   useEffect(() => {
     if (currentStep === 2) {
@@ -265,6 +235,7 @@ export const StepModal = ({
             selectedBadge.length === 1 &&
             (!details || details.length === 0)
           ) {
+            alert("yo");
             addEmptyBadge();
           }
         } catch (error) {
@@ -303,12 +274,12 @@ export const StepModal = ({
       score: 0,
     } as Badge;
 
-    useBadgeStore.getState().addBadge(newBadge);
-    setBadgeCount((prev) => Math.max(prev, 1));
+    addBadge(newBadge);
     return newBadge;
   };
 
   const addNewBadge = () => {
+    // Simplesmente adiciona nova badge vazia
     addEmptyBadge();
   };
 
@@ -353,14 +324,7 @@ export const StepModal = ({
 
   const clearAllBadges = () => {
     setBadges([]);
-    setBadgeCount(0);
     setSelectedBadge([]);
-
-    const currentFields = watch("badges") || [];
-    currentFields.forEach((_, index) => {
-      unregister(`badges.${index}`);
-    });
-
     useBadgeStore.getState().clearBadges();
   };
 
@@ -372,15 +336,17 @@ export const StepModal = ({
     setIsSubmitting(true);
 
     try {
-      const filteredBadges = data.badges.filter(
-        (badge) => badge && badge.name && badge.name.trim() !== "",
-      );
-
-      if (filteredBadges.length === 0) {
-        toast.error("At least one badge is required.");
+      // Valida badges do store
+      const badgeValidation = validateBadges();
+      if (!badgeValidation.isValid) {
+        toast.error(badgeValidation.error || "Badge validation failed");
         setIsSubmitting(false);
         return;
       }
+
+      const filteredBadges = badges.filter(
+        (badge) => badge && badge.name && badge.name.trim() !== "",
+      );
 
       const { pubkey } = await albedo.publicKey({
         require_existing: true,
@@ -519,15 +485,38 @@ export const StepModal = ({
   };
 
   const handleRemoveBadge = (index: number) => {
+    // Simplesmente remove do store
     removeBadge(index);
-    setBadgeCount((prev) => prev - 1);
-    unregister(`badges.${index}`);
+  };
 
-    const remainingFields =
-      watch("badges")?.filter((_, i) => i !== index) || [];
-    remainingFields.forEach((field, i) => {
-      setValue(`badges.${i}`, field);
-    });
+  const validateBadges = () => {
+    if (badges.length === 0) {
+      return { isValid: false, error: "At least one badge is required" };
+    }
+
+    for (let i = 0; i < badges.length; i++) {
+      const badge = badges[i];
+      if (!badge.name || badge.name.trim() === "") {
+        return { isValid: false, error: `Badge ${i + 1}: Name is required` };
+      }
+      if (!badge.issuer || badge.issuer.trim() === "") {
+        return { isValid: false, error: `Badge ${i + 1}: Issuer is required` };
+      }
+      if (!isValidStellarAddress(badge.issuer.toUpperCase())) {
+        return {
+          isValid: false,
+          error: `Badge ${i + 1}: Invalid Stellar address`,
+        };
+      }
+      if (!badge.score || badge.score <= 0) {
+        return {
+          isValid: false,
+          error: `Score must be greater than 0`,
+        };
+      }
+    }
+
+    return { isValid: true, error: null };
   };
 
   const renderStep = () => {
@@ -661,81 +650,61 @@ export const StepModal = ({
                   </div>
                   <CustomHR />
 
-                  {Array.from({ length: badgeCount }, (_, index) => (
+                  {Array.from({ length: badges.length }, (_, index) => (
                     <React.Fragment key={`badge-${index}`}>
                       <div className="grid grid-cols-[140px_100px_80px] gap-3">
-                        <div className="flex- flex-col">
+                        <div className="flex flex-col">
                           <input
-                            {...register(`badges.${index}.name`, {
-                              required: "Required",
-                            })}
                             type="text"
                             placeholder={`Badge Name #${index + 1}`}
-                            defaultValue={badgeTypeDetails[index]?.name || ""}
+                            value={badges[index]?.name || ""}
+                            onChange={(e) =>
+                              updateBadge(index, "name", e.target.value)
+                            }
                             className="h-10 max-h-10 max-w-full rounded-lg bg-whiteOpacity005 px-2"
                           />
-                          {errors?.badges && errors.badges[index]?.name && (
+                          {!badges[index]?.name && (
                             <span className="mt-1 text-[10px] text-red-500">
-                              {errors.badges[index]?.name?.message}
+                              Required
                             </span>
                           )}
                         </div>
                         <div className="flex h-full flex-col">
-                          {badgeTypeDetails[index]?.issuer !== "" ? (
+                          {badges[index]?.issuer &&
+                          badges[index].issuer !== "" &&
+                          !selectedBadge.includes("custom") ? (
                             <div className="overflow-hidden py-2">
-                              {getEllipsedAddress(
-                                badgeTypeDetails[index]?.issuer || "",
-                              )}
+                              {getEllipsedAddress(badges[index]?.issuer || "")}
                             </div>
                           ) : (
                             <input
-                              {...register(`badges.${index}.issuer`, {
-                                required: "Required",
-                                onChange: (e) => {
-                                  const value = e.target.value;
-                                  if (value !== "") {
-                                    e.target.value = "";
-                                    setValue(`badges.${index}.issuer`, value);
-                                  }
-                                },
-                              })}
                               type="text"
-                              defaultValue={
-                                badgeTypeDetails[index]?.issuer || ""
+                              value={badges[index]?.issuer || ""}
+                              onChange={(e) =>
+                                updateBadge(index, "issuer", e.target.value.toUpperCase())
                               }
                               placeholder={`Issuer #${index + 1}`}
                               className="max-h-10 w-full flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                             />
                           )}
-                          {errors?.badges && errors.badges[index]?.issuer && (
+                          {!badges[index]?.issuer && (
                             <span className="mt-1 text-[10px] text-red-500">
-                              {errors.badges[index]?.issuer?.message}
+                              Required
                             </span>
                           )}
                         </div>
                         <div className="flex flex-col">
                           <div className="flex items-center justify-between">
                             <input
-                              {...register(`badges.${index}.score`, {
-                                valueAsNumber: true,
-                                required: "Required",
-                                onChange: (e) => {
-                                  const value = e.target.value;
-                                  if (value === "") {
-                                    e.target.value = "";
-                                    setValue(`badges.${index}.score`, 0);
-                                  } else {
-                                    setValue(
-                                      `badges.${index}.score`,
-                                      parseInt(value) || 0,
-                                    );
-                                  }
-                                },
-                              })}
                               type="number"
-                              defaultValue={
-                                badgeTypeDetails[index]?.score || ""
-                              }
+                              value={badges[index]?.score || ""}
+                              onChange={(e) => {
+                                const value =
+                                  e.target.value === ""
+                                    ? 0
+                                    : parseInt(e.target.value) || 0;
+                                updateBadge(index, "score", value);
+                              }}
                               placeholder="Score"
                               className="max-h-10 max-w-20 flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                             />
@@ -749,9 +718,10 @@ export const StepModal = ({
                               </div>
                             </button>
                           </div>
-                          {errors?.badges && errors.badges[index]?.score && (
+                          {(!badges[index]?.score ||
+                            badges[index].score === 0) && (
                             <span className="mt-1 text-[10px] text-red-500">
-                              {errors.badges[index]?.score?.message}
+                              Required
                             </span>
                           )}
                         </div>
@@ -776,7 +746,7 @@ export const StepModal = ({
       }
       case 3: {
         const avatar = watch("avatar");
-        const badges = watch("badges");
+        // const badges = watch("badges");
         const description = watch("description");
         const name = watch("name");
         const icon =
@@ -878,13 +848,19 @@ export const StepModal = ({
       return;
     }
 
+    // Valida formulário básico
     const isValid = await trigger();
     if (!isValid) {
-      badges.map((item) => {
-        if (item.message) return toast.error(item.message);
-      });
-
       return;
+    }
+
+    // Se estamos no step 2, valida badges também
+    if (currentStep === 2) {
+      const badgeValidation = validateBadges();
+      if (!badgeValidation.isValid) {
+        toast.error(badgeValidation.error || "Please fill all badge fields");
+        return;
+      }
     }
 
     onNext();
