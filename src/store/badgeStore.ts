@@ -15,7 +15,7 @@ export const useBadgeStore = create<BadgeStore>((set) => ({
   setBadges: (badges) => set({ badges }),
   addBadge: (badge) =>
     set((state) => ({
-      badges: [...state.badges, badge],
+      badges: [badge, ...state.badges],
     })),
   removeBadge: (index) =>
     set((state) => ({
