@@ -45,7 +45,7 @@ export const useStellarContractManager = ({
             ],
           }),
         )
-        .setTimeout(30)
+        .setTimeout(500)
         .build();
 
       const preparedTransaction = await server.prepareTransaction(transaction);

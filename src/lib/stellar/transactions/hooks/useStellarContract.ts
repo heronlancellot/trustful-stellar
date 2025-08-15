@@ -42,7 +42,7 @@ export const useStellarContract = ({
             args: [new Address(userAddress).toScVal()],
           }),
         )
-        .setTimeout(30)
+        .setTimeout(500)
         .build();
 
       const preparedTransaction = await server.prepareTransaction(transaction);
