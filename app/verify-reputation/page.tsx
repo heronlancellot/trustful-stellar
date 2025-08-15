@@ -110,15 +110,6 @@ function VerifyReputationContent() {
     }
   }, [searchParams]);
 
-  const reputation = [
-    {
-      name: "one",
-      score: 5,
-      status: "completed",
-      statusColor: "bg-darkGreenOpacity01",
-    },
-  ];
-
   const handleDetailCommunity = (communityAddress: string) => {
     const filteredCommunity = verifyReputationcommunities.find(
       (item) => item.community_address === communityAddress,
@@ -233,7 +224,7 @@ function VerifyReputationContent() {
             </div>
           </div>
           <div className="mb-4 ml-4 mr-4 w-[552px] rounded-xl bg-whiteOpacity005">
-            <div className="flex max-h-[440px] flex-col rounded-xl border border-whiteOpacity005">
+            <div className="flex max-h-[440px] flex-col overflow-y-auto rounded-xl border border-whiteOpacity005">
               <div className="flex items-center justify-between border-b border-whiteOpacity005 px-6 py-4">
                 <span className="text-left text-sm">Name</span>
                 <span className="w-24 text-left text-sm">Score</span>
@@ -243,7 +234,6 @@ function VerifyReputationContent() {
               {badgeDetails &&
                 Array.isArray(badgeDetails.community_badges) &&
                 badgeDetails.community_badges.map((item: Badge) => {
-                  console.log("item", item);
                   return (
                     <>
                       <div
@@ -257,7 +247,11 @@ function VerifyReputationContent() {
                           {item?.score}
                         </span>
                         <span
-                          className={`w-24 rounded-3xl bg-darkGreenOpacity01 p-1 text-center text-xs ${reputation[0]?.statusColor}`}
+                          className={`w-24 rounded-3xl p-1 text-center text-xs ${
+                            item.user_has
+                              ? "bg-darkGreenOpacity01 text-brandGreen"
+                              : "bg-[rgba(245,255,255,0.08)] text-whiteOpacity05"
+                          }`}
                         >
                           {`${item.user_has ? "Completed" : "Pending"}`}
                         </span>
