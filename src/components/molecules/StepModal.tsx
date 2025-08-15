@@ -128,6 +128,8 @@ export const StepModal = ({
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedBadge, setSelectedBadge] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showValidationErrors, setShowValidationErrors] =
+    useState<boolean>(false);
   const { getBadgesByTypes } = useBadgeInfoController();
   const [loadingBadgeListType, setLoadingBadgeListType] = useState(false);
   const { badges, setBadges, addBadge, updateBadge, removeBadge } =
@@ -497,7 +499,7 @@ export const StepModal = ({
       if (!isValidStellarAddress(badge.issuer.toUpperCase())) {
         return {
           isValid: false,
-          error: `${badge.name} Issuer is not a valid Stellar address`,
+          error: `${badge.issuer} is not a valid Stellar address`,
         };
       }
       if (!badge.score || badge.score <= 0) {
@@ -655,7 +657,7 @@ export const StepModal = ({
                             }
                             className="h-10 max-h-10 max-w-full rounded-lg bg-whiteOpacity005 px-2"
                           />
-                          {!badges[index]?.name && (
+                          {!badges[index]?.name && showValidationErrors && (
                             <span className="mt-1 text-[10px] text-red-500">
                               Required
                             </span>
@@ -683,7 +685,7 @@ export const StepModal = ({
                               className="max-h-10 w-full flex-1 rounded-lg border-whiteOpacity008 bg-whiteOpacity005 p-2"
                             />
                           )}
-                          {!badges[index]?.issuer && (
+                          {!badges[index]?.issuer && showValidationErrors && (
                             <span className="mt-1 text-[10px] text-red-500">
                               Required
                             </span>
@@ -715,11 +717,12 @@ export const StepModal = ({
                             </button>
                           </div>
                           {(!badges[index]?.score ||
-                            badges[index].score === 0) && (
-                            <span className="mt-1 text-[10px] text-red-500">
-                              Required
-                            </span>
-                          )}
+                            badges[index].score === 0) &&
+                            showValidationErrors && (
+                              <span className="mt-1 text-[10px] text-red-500">
+                                Required
+                              </span>
+                            )}
                         </div>
                       </div>
                       {index < badges?.length - 1 && <CustomHR />}
@@ -854,11 +857,13 @@ export const StepModal = ({
     if (currentStep === 2) {
       const badgeValidation = validateBadges();
       if (!badgeValidation.isValid) {
+        setShowValidationErrors(true);
         toast.error(badgeValidation.error || "Please fill all badge fields");
         return;
       }
     }
 
+    setShowValidationErrors(false);
     onNext();
   };
 
