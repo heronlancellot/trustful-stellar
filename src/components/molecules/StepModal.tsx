@@ -100,6 +100,7 @@ const createCommunitySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z
     .string()
+    .min(1, "Description is required")
     .max(120, "Description must be less than 120 characters"),
   avatar: z.string().min(1, "Avatar is required"),
   badgeType: z.string().min(1, "Badge is required"),
@@ -836,6 +837,12 @@ export const StepModal = ({
   const handleNextClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    // Valida formulário básico primeiro
+    const isValid = await trigger();
+    if (!isValid) {
+      return;
+    }
+
     // Ensure at least one empty badge exists when only 'custom' is selected
     if (
       currentStep === 1 &&
@@ -847,12 +854,6 @@ export const StepModal = ({
         setBadges([newBadge]);
       }
       onNext();
-      return;
-    }
-
-    // Valida formulário básico
-    const isValid = await trigger();
-    if (!isValid) {
       return;
     }
 
